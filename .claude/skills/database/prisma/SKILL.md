@@ -92,7 +92,95 @@ export const db = globalForPrisma.prisma ?? new PrismaClient();
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = db;
 ```
 
-## Examples
+## Framework Integration
+
+### TanStack Start - API Routes (REQUIRED)
+
+**CRITICAL:** In TanStack Start, ALL Prisma queries MUST go in API routes (`app/routes/api/*`), NOT in loaders or components. This prevents Prisma from leaking into the client bundle.
+
+**Correct - API Route:**
+```ts
+// app/routes/api/users.ts
+import { createFileRoute } from '@tanstack/react-router';
+import { db } from '@/lib/db';
+
+export const Route = createFileRoute('/api/users')({
+  server: {
+    handlers: {
+      GET: async () => {
+        const users = await db.user.findMany({
+          include: { posts: true },
+        });
+        return Response.json({ users });
+      },
+      POST: async ({ request }) => {
+        const body = await request.json();
+        const user = await db.user.create({ data: body });
+        return Response.json({ user });
+      },
+    },
+  },
+});
+```
+
+**Frontend - Fetch from API route:**
+```tsx
+// app/routes/users.tsx
+import { createFileRoute } from '@tanstack/react-router';
+
+export const Route = createFileRoute('/users')({
+  loader: async () => {
+    const response = await fetch('/api/users');
+    const { users } = await response.json();
+    return { users };
+  },
+  component: Users,
+});
+
+function Users() {
+  const { users } = Route.useLoaderData();
+  return <ul>{users.map(u => <li key={u.id}>{u.name}</li>)}</ul>;
+}
+```
+
+**Wrong - DON'T import db in loaders:**
+```ts
+// ❌ WRONG - This leaks Prisma to client bundle
+import { db } from '@/lib/db';
+
+export const Route = createFileRoute('/users')({
+  loader: async () => {
+    const users = await db.user.findMany();  // DON'T DO THIS
+    return { users };
+  },
+});
+```
+
+### Next.js - Server Actions/API Routes
+
+**Server Action:**
+```ts
+'use server';
+import { db } from '@/lib/db';
+
+export async function getUsers() {
+  return await db.user.findMany();
+}
+```
+
+**API Route:**
+```ts
+// app/api/users/route.ts
+import { db } from '@/lib/db';
+import { NextResponse } from 'next/server';
+
+export async function GET() {
+  const users = await db.user.findMany();
+  return NextResponse.json({ users });
+}
+```
+
+## Query Examples
 
 **Create:**
 ```ts
