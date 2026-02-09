@@ -5,7 +5,7 @@
 **Version:** 1.1.0
 **Author:** Manuel Merz
 **License:** MIT
-**Date:** 04/02/2026
+**Date:** 09/02/2026
 
 ---
 

@@ -37,7 +37,18 @@ Stop here and wait for user to create a branch.
 **If on a feature branch:**
 Continue with the push workflow.
 
-### Step 2: Run Linter
+### Step 2: Update README Date
+
+If a `README.md` exists in the project root, update the date to today:
+
+```bash
+# Check if README exists and has a date field
+grep -q "Date:" README.md 2>/dev/null
+```
+
+If it exists, update it using the Edit tool to match today's date in DD/MM/YYYY format.
+
+### Step 3: Run Linter
 
 ```bash
 npx ultracite fix
@@ -45,7 +56,7 @@ npx ultracite fix
 
 If linter finds issues that can't be auto-fixed, show them and ask user to fix before continuing.
 
-### Step 3: Check for Changes
+### Step 4: Check for Changes
 
 ```bash
 git status
@@ -65,7 +76,7 @@ Stop here.
 **If changes exist:**
 Continue to commit.
 
-### Step 4: Generate Commit Message
+### Step 5: Generate Commit Message
 
 Review the changes and generate a commit message:
 
@@ -93,7 +104,7 @@ Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
 
 Suggest a commit message based on changes, or ask user if unclear.
 
-### Step 5: Stage and Commit
+### Step 6: Stage and Commit
 
 ```bash
 git add .
@@ -103,7 +114,7 @@ EOF
 )"
 ```
 
-### Step 6: Push to GitHub
+### Step 7: Push to GitHub
 
 Check if branch exists on remote:
 
@@ -121,7 +132,7 @@ git push -u origin feature/branch-name
 git push origin feature/branch-name
 ```
 
-### Step 7: Create Pull Request
+### Step 8: Create Pull Request
 
 Use GitHub CLI to create the PR:
 
