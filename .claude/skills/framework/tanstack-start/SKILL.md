@@ -15,6 +15,17 @@ Full-stack React framework with type-safe file-based routing, server functions, 
 - Working with file-based routing in React
 - User wants to use TanStack Query with SSR
 
+## Security Requirements
+
+**IMPORTANT:** When setting up a new TanStack Start project or working with an existing one, you MUST also apply the [tanstack-nitro-security](../../security/tanstack-nitro-security/SKILL.md) skill to implement security headers middleware.
+
+This is required for:
+- New TanStack Start project setup
+- Preparing for production deployment
+- Security audits
+
+The security skill adds Nitro middleware for HTTP security headers (X-Frame-Options, HSTS, etc.).
+
 ## Instructions
 
 ### Vite Configuration (Critical)
@@ -243,6 +254,47 @@ function ProductsPage() {
   }, []);
 
   return <ul>{products.map(p => <li key={p.id}>{p.name}</li>)}</ul>;
+}
+```
+
+## Data Fetching Strategy
+
+**Start with loaders. They're like a mini-Query.** If you need more control, move to TanStack Query.
+
+| Approach | When to Use |
+|----------|-------------|
+| **Loaders** (default) | Route-level data, initial page load, simple fetch-and-display |
+| **TanStack Query** | Mutations, optimistic updates, infinite scroll, manual refetching, shared cache across components, polling |
+| **API Routes** | Database operations (Prisma), authentication, webhooks |
+
+**Progression path:**
+1. Start with loaders for all route data
+2. Add TanStack Query when you need mutations or cross-component cache
+3. Use API routes for server-only code (DB, auth)
+
+```tsx
+// Step 1: Simple loader (start here)
+export const Route = createFileRoute('/posts')({
+  loader: async () => {
+    const posts = await fetch('/api/posts').then(r => r.json());
+    return { posts };
+  },
+  component: Posts,
+});
+
+// Step 2: Graduate to Query when you need mutations
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+
+function Posts() {
+  const { posts } = Route.useLoaderData();
+  const queryClient = useQueryClient();
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => fetch(`/api/posts/${id}`, { method: 'DELETE' }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['posts'] }),
+  });
+
+  return /* ... */;
 }
 ```
 

@@ -119,6 +119,7 @@ Reusable across projects: `skills/`, `templates/`, `commands/`
 | API security, input validation | `security/api-security-audit` |
 | Frontend security, XSS, dependencies | `security/frontend-security-audit` |
 | Deployment security, headers, secrets | `security/deployment-security-audit` |
+| TanStack Start security headers (Nitro) | `security/tanstack-nitro-security` |
 | Debugging errors | `workflow/debugger` |
 | Linting before commits | `workflow/ultracite` |
 | Development best practices | `workflow/best-practices` |

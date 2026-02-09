@@ -118,7 +118,100 @@ npx drizzle-kit generate
 npx drizzle-kit push
 ```
 
-## Examples
+## Framework Integration
+
+### TanStack Start - API Routes (REQUIRED)
+
+**CRITICAL:** In TanStack Start, ALL Drizzle queries MUST go in API routes (`app/routes/api/*`), NOT in loaders or components. This prevents database code from leaking into the client bundle.
+
+**Correct - API Route:**
+```ts
+// app/routes/api/users.ts
+import { createFileRoute } from '@tanstack/react-router';
+import { db } from '@/lib/db';
+import { users } from '@/lib/schema';
+import { eq } from 'drizzle-orm';
+
+export const Route = createFileRoute('/api/users')({
+  server: {
+    handlers: {
+      GET: async () => {
+        const allUsers = await db.select().from(users);
+        return Response.json({ users: allUsers });
+      },
+      POST: async ({ request }) => {
+        const body = await request.json();
+        const newUser = await db.insert(users)
+          .values(body)
+          .returning();
+        return Response.json({ user: newUser[0] });
+      },
+    },
+  },
+});
+```
+
+**Frontend - Fetch from API route:**
+```tsx
+// app/routes/users.tsx
+import { createFileRoute } from '@tanstack/react-router';
+
+export const Route = createFileRoute('/users')({
+  loader: async () => {
+    const response = await fetch('/api/users');
+    const { users } = await response.json();
+    return { users };
+  },
+  component: Users,
+});
+
+function Users() {
+  const { users } = Route.useLoaderData();
+  return <ul>{users.map(u => <li key={u.id}>{u.name}</li>)}</ul>;
+}
+```
+
+**Wrong - DON'T import db in loaders:**
+```ts
+// ❌ WRONG - This leaks Drizzle to client bundle
+import { db } from '@/lib/db';
+import { users } from '@/lib/schema';
+
+export const Route = createFileRoute('/users')({
+  loader: async () => {
+    const allUsers = await db.select().from(users);  // DON'T DO THIS
+    return { users: allUsers };
+  },
+});
+```
+
+### Next.js - Server Actions/API Routes
+
+**Server Action:**
+```ts
+'use server';
+import { db } from '@/lib/db';
+import { users } from '@/lib/schema';
+
+export async function getUsers() {
+  return await db.select().from(users);
+}
+```
+
+**API Route:**
+```ts
+// app/api/users/route.ts
+import { db } from '@/lib/db';
+import { users } from '@/lib/schema';
+import { NextResponse } from 'next/server';
+
+export async function GET() {
+  const allUsers = await db.select().from(users);
+  return NextResponse.json({ users: allUsers });
+}
+```
+
+## Query Examples
 
 **Select:**
 ```ts
