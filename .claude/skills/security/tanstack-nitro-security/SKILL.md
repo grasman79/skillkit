@@ -25,21 +25,21 @@ This skill requires:
 
 ## Instructions
 
-### Step 1: Verify and Update Nitro Dependency
+### Step 1: Verify Nitro Dependency
 
-Check `package.json` for the Nitro dependency. If it uses nightly channel, update to stable version.
+Check `package.json` for the Nitro dependency. TanStack Start requires the nightly version of Nitro.
 
 **Check current version:**
 ```bash
 grep '"nitro"' package.json
 ```
 
-**If it shows `"nitro": "npm:nitro-nightly@latest"`, replace with:**
+**Expected:**
 ```json
-"nitro": "^3.0.0"
+"nitro": "npm:nitro-nightly@latest"
 ```
 
-**If already stable version (e.g., `"nitro": "^3.0.0"`), skip this step.**
+**If missing or set to a stable version like `"nitro": "^3.0.0"`, update to the nightly version above.** The nightly channel is the official recommendation from TanStack Start docs. Without it, the dev server may fail to start.
 
 After updating, run:
 ```bash
@@ -207,11 +207,28 @@ bun run dev
 **Cause:** Conflicting Nitro versions or config issues
 
 **Fix:**
-- Ensure stable Nitro version: `"nitro": "^3.0.0"`
+- Ensure Nitro nightly version: `"nitro": "npm:nitro-nightly@latest"`
 - Run `bun install` again
 - Delete `.nitro/` and `node_modules/`, reinstall
 
 ## Security Best Practices
+
+### Performance: FastResponse (Node.js)
+
+If deploying to Node.js with Nitro, add srvx's FastResponse for a ~5% throughput improvement:
+
+**Install srvx:**
+```bash
+bun add srvx
+```
+
+**Add to `src/server.ts` (or `app/server.ts`):**
+```typescript
+import { FastResponse } from "srvx";
+globalThis.Response = FastResponse;
+```
+
+This replaces the global Response constructor with an optimized version that avoids overhead in the Web Response to Node.js conversion. Only applies to Node.js deployments.
 
 ### Production Checklist
 
