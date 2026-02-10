@@ -109,6 +109,7 @@ Reusable across projects: `skills/`, `templates/`, `commands/`
 | Sending emails, notifications | `email/resend` |
 | File uploads, image storage, S3/R2 | `storage/cloudflare-r2` |
 | Framework-specific patterns | `framework/nextjs` or `framework/tanstack-start` |
+| Deploying to Railway (TanStack Start SSR) | `deployment/railway` |
 | Project setup, new projects | `workflow/project-setup` |
 | Feature planning, "plan feature" | `workflow/feature-planner` |
 | Server issues, port conflicts | `workflow/dev-server` |
