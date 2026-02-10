@@ -28,6 +28,17 @@ The security skill adds Nitro middleware for HTTP security headers (X-Frame-Opti
 
 ## Instructions
 
+### Nitro Installation (Critical)
+
+TanStack Start uses Nitro as its server layer. You **must** install the nightly version - this is the official recommendation from the TanStack Start docs.
+
+**In `package.json`, add:**
+```json
+"nitro": "npm:nitro-nightly@latest"
+```
+
+Then install dependencies. Without this, Nitro will be imported but not actually installed, causing the dev server to fail.
+
 ### Vite Configuration (Critical)
 
 The order of plugins in `vite.config.ts` is **critical**. Use this exact order:
@@ -323,6 +334,23 @@ export const Route = createFileRoute('/api/users')({
   },
 });
 ```
+
+## Performance: FastResponse (Node.js)
+
+If deploying to Node.js with Nitro, you can get a ~5% throughput improvement by replacing the global Response constructor with srvx's optimized FastResponse.
+
+**Install srvx:**
+```bash
+bun add srvx
+```
+
+**Add to `src/server.ts` (or `app/server.ts`):**
+```typescript
+import { FastResponse } from "srvx";
+globalThis.Response = FastResponse;
+```
+
+This works because srvx's FastResponse includes an optimized `_toNodeResponse()` path that avoids the overhead of standard Web Response to Node.js conversion. Only applies to Node.js deployments using Nitro/h3/srvx.
 
 ## Tips
 
