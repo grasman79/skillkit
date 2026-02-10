@@ -246,6 +246,7 @@ Next session, Claude picks up exactly where you left off.
 |-------|--------------|
 | `vercel` | Vercel deployment |
 | `netlify-edge` | Netlify Edge Functions |
+| `railway` | Railway deployment for TanStack Start with Nitro SSR |
 | `appwrite` | Appwrite BaaS |
 
 ### Email
@@ -372,6 +373,7 @@ The `project-setup` skill automatically recommends this stack and detects your p
 - **Package manager detection** - Auto-detects bun/pnpm/yarn/npm from lock files
 - **Recommended stack** - Default recommendation is now TanStack Start + Supabase + Drizzle + Better Auth
 - **Update stack skill** - New skill to safely update all dependencies with breaking change detection
+- **Railway deployment** - Complete deployment guide for TanStack Start with Nitro SSR, including troubleshooting for common issues
 
 ### v1.0.1 (2026-01-17)
 - **Folder reorganization** - Project-specific files moved to `project/` subfolder
