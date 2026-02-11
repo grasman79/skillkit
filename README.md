@@ -233,6 +233,7 @@ Next session, Claude picks up exactly where you left off.
 | `server-actions` | Next.js Server Actions |
 | `orpc` | oRPC type-safe APIs |
 | `unkey` | Unkey API key management |
+| `zefix` | Zefix Swiss company lookup (search, UID, SOGC publications) |
 
 ### Backend
 | Skill | What It Does |
@@ -375,6 +376,7 @@ The `project-setup` skill automatically recommends this stack and detects your p
 - **TanStack Start security** - Nitro middleware for HTTP security headers (X-Content-Type-Options, X-Frame-Options, HSTS, etc.)
 - **Database bundle leak prevention** - Prisma and Drizzle skills now enforce API route patterns to prevent client bundle leaks
 - **AutoSend email skill** - Cheaper email alternative with transactional, marketing, bulk send, Better Auth integration, and Resend drop-in compatibility
+- **Zefix API skill** - Swiss company data lookup via Zefix Public REST API (search, UID lookup, SOGC publications, legal forms)
 
 ### v1.1.0 (2026-02-04)
 - **Server-side auth patterns** - Better Auth skill now enforces secure server-side authentication

@@ -126,6 +126,7 @@ Reusable across projects: `skills/`, `templates/`, `commands/`
 | Migrating from old claude-memory | `workflow/migrate-from-memory` |
 | Updating dependencies | `workflow/update-stack` |
 | Background jobs, workflows, event-driven | `backend/motia` |
+| Swiss company lookup, Zefix, UID search | `api/zefix` |
 
 ## Common Mistakes to Avoid
 
