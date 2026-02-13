@@ -1,0 +1,1722 @@
+---
+name: payload
+description: Payload CMS - Open-source TypeScript backend framework with built-in admin panel. Trigger words - Payload, CMS, headless CMS, admin panel, content management, backend framework, collections, media management, blocks, layout builder
+---
+
+# Payload CMS
+
+Open-source backend framework that drops into Next.js and provides a full admin UI, REST API, authentication, and database management out of the box. Works excellently as a headless CMS with any frontend (Astro, Next.js, SvelteKit, etc.).
+
+## What Payload Is
+
+Payload is a config-based backend framework written in TypeScript that gives you:
+
+- Full admin UI (auto-generated)
+- Complete backend architecture
+- Authentication built-in
+- Auto-mounted REST API endpoints
+- Database management (MongoDB, PostgreSQL, SQLite)
+- File/media handling with image processing
+
+**Key advantage:** Truly open source - no tiers, no quotas. Host anywhere (Vercel, Netlify, Railway, etc.).
+
+**Use cases:** CMS, e-commerce, digital asset management, app backends - anything needing a backend with admin panel.
+
+## When to Use This Skill
+
+- Building a headless CMS
+- Need an admin panel for content management
+- Want a type-safe backend framework with Next.js
+- Building e-commerce or digital asset management
+- Need versioning, drafts, and content workflows
+- Want REST APIs auto-generated from your schema
+- Need file uploads with image processing
+- Backend for Astro/React/Vue frontends (see `framework/astro` skill)
+
+## When NOT to Use
+
+- Simple static sites (use Astro or vanilla Next.js)
+- No admin panel needed (use direct database access)
+- Real-time collaborative editing (use dedicated realtime platforms)
+- Extremely high-traffic APIs (consider specialized API frameworks)
+
+## Installation
+
+```bash
+pnpx create-payload-app@latest
+# Also works with: npx, bunx, yarn
+```
+
+The CLI guides you through:
+1. Project name
+2. Template selection (blank, website, etc.)
+3. Database choice (MongoDB, SQLite, PostgreSQL)
+
+After installation:
+```bash
+cd <project-name>
+[runner] dev
+```
+
+Server runs on `localhost:3000`. Admin panel lives at `/admin`.
+
+### Templates
+
+- **Blank** - Minimal (users + media collections only)
+- **Website** - Production-grade with live preview, revalidation, static rendering, forms, redirects, sitemap
+
+## Core Concept: Config-Based Architecture
+
+Everything starts with the **Payload config file** (`payload.config.ts`). This is the single source of truth for your entire backend.
+
+Changes are picked up instantly via Next.js HMR - no restart needed.
+
+## Collections
+
+Collections are the primary building blocks. They map to database tables and auto-generate:
+- Admin UI
+- REST API endpoints
+- TypeScript types
+
+### Defining a Collection
+
+```typescript
+// In payload.config.ts
+{
+  slug: 'cars',
+  fields: [
+    {
+      name: 'title',
+      type: 'text',
+      required: true,
+    }
+  ],
+  admin: {
+    useAsTitle: 'title', // Which field shows as document title in admin
+  }
+}
+```
+
+### Key Collection Options
+
+```typescript
+{
+  slug: 'pages',
+  fields: [...],
+
+  // Admin UI config
+  admin: {
+    useAsTitle: 'title',
+    defaultColumns: ['title', 'status', 'updatedAt'],
+  },
+
+  // Versioning and drafts
+  versions: {
+    drafts: true,
+    maxPerDoc: 50,
+  },
+
+  // Auto-save drafts
+  autosave: true,
+
+  // Access control (see Access Control section)
+  access: {
+    read: () => true,
+    create: ({ req: { user } }) => !!user,
+  },
+
+  // Lifecycle hooks (see Hooks section)
+  hooks: {
+    beforeChange: [],
+    afterRead: [],
+  },
+}
+```
+
+## Field Types
+
+All fields require at minimum `name` and `type`.
+
+### Common Field Types
+
+```typescript
+// Text input
+{
+  name: 'title',
+  type: 'text',
+  required: true,
+}
+
+// Number
+{
+  name: 'price',
+  type: 'number',
+  min: 0,
+}
+
+// Select dropdown
+{
+  name: 'status',
+  type: 'select',
+  options: ['draft', 'published', 'archived'],
+  defaultValue: 'draft',
+}
+
+// Checkbox
+{
+  name: 'featured',
+  type: 'checkbox',
+  defaultValue: false,
+}
+
+// Date
+{
+  name: 'publishDate',
+  type: 'date',
+}
+
+// Email
+{
+  name: 'email',
+  type: 'email',
+  required: true,
+}
+
+// Textarea
+{
+  name: 'description',
+  type: 'textarea',
+}
+```
+
+### Upload (File/Image)
+
+```typescript
+{
+  name: 'featuredImage',
+  type: 'upload',
+  relationTo: 'media', // Points to the media collection
+  required: true,
+}
+```
+
+### Relationship
+
+```typescript
+{
+  name: 'manufacturer',
+  type: 'relationship',
+  relationTo: 'manufacturers',
+  required: true,
+}
+
+// Multiple relationships
+{
+  name: 'categories',
+  type: 'relationship',
+  relationTo: 'categories',
+  hasMany: true, // Allows multiple selections
+}
+
+// Polymorphic relationships
+{
+  name: 'relatedItems',
+  type: 'relationship',
+  relationTo: ['cars', 'manufacturers'], // Can relate to multiple collections
+  hasMany: true,
+}
+```
+
+### Join (Bidirectional Relationships)
+
+Create automatic links from the "other side" of a relationship.
+
+```typescript
+// On the manufacturers collection
+{
+  name: 'cars',
+  type: 'join',
+  collection: 'cars', // Which collection to join from
+  on: 'manufacturer',  // Which field on that collection points here
+}
+```
+
+This shows all cars related to a manufacturer in the admin UI with direct navigation.
+
+### Rich Text (Lexical Editor)
+
+```typescript
+{
+  name: 'content',
+  type: 'richText',
+}
+```
+
+The Lexical editor is highly extensible (see Rich Text Customization section).
+
+### Blocks (Layout Building)
+
+**Blocks are the key to building flexible, modular pages.** Think of blocks as Legos - editors can add, remove, and rearrange them to build pages.
+
+**Core concept:** A `blocks` field contains an array of different block types. Each block type defines its own set of fields. Editors select which blocks to add and in what order.
+
+**Common use case:** Pages collection with a `layout` field containing hero blocks, content blocks, form blocks, etc.
+
+```typescript
+{
+  name: 'layout',
+  type: 'blocks',
+  blocks: [
+    // Each block defined here becomes available in the admin UI
+    HeroBlock,
+    ContentBlock,
+    FormBlock,
+  ],
+}
+```
+
+#### Defining Blocks
+
+Blocks are defined separately and imported into your collection. Best practice: create a `blocks/` directory to organize them.
+
+**Hero Block Example:**
+
+```typescript
+// src/blocks/HeroBlock.ts
+import { Block } from 'payload';
+
+export const HeroBlock: Block = {
+  slug: 'hero',
+  fields: [
+    {
+      name: 'heading',
+      type: 'text',
+      required: true,
+    },
+    {
+      name: 'subheading',
+      type: 'richText',
+    },
+    {
+      name: 'image',
+      type: 'upload',
+      relationTo: 'media',
+    },
+    {
+      name: 'ctaButton',
+      type: 'group',
+      fields: [
+        {
+          name: 'label',
+          type: 'text',
+          required: true,
+        },
+        {
+          name: 'url',
+          type: 'text',
+          required: true,
+        },
+      ],
+    },
+  ],
+};
+```
+
+**Content Block Example:**
+
+```typescript
+// src/blocks/ContentBlock.ts
+import { Block } from 'payload';
+
+export const ContentBlock: Block = {
+  slug: 'content',
+  fields: [
+    {
+      name: 'heading',
+      type: 'text',
+    },
+    {
+      name: 'content',
+      type: 'richText',
+      required: true,
+    },
+  ],
+};
+```
+
+**Form Block Example:**
+
+```typescript
+// src/blocks/FormBlock.ts
+import { Block } from 'payload';
+
+export const FormBlock: Block = {
+  slug: 'form',
+  fields: [
+    {
+      name: 'heading',
+      type: 'text',
+    },
+    {
+      name: 'form',
+      type: 'relationship',
+      relationTo: 'forms',
+      required: true,
+    },
+  ],
+};
+```
+
+#### Using Blocks in Collections
+
+```typescript
+// collections/Pages.ts
+import { HeroBlock } from '../blocks/HeroBlock';
+import { ContentBlock } from '../blocks/ContentBlock';
+import { FormBlock } from '../blocks/FormBlock';
+
+export const Pages: CollectionConfig = {
+  slug: 'pages',
+  fields: [
+    {
+      name: 'title',
+      type: 'text',
+      required: true,
+    },
+    {
+      name: 'slug',
+      type: 'text',
+      required: true,
+      unique: true,
+    },
+    {
+      name: 'layout',
+      type: 'blocks',
+      blocks: [HeroBlock, ContentBlock, FormBlock],
+    },
+  ],
+  admin: {
+    useAsTitle: 'title',
+  },
+};
+```
+
+#### Rendering Blocks on the Frontend
+
+When you fetch a page, the `layout` field contains an array of blocks with a `blockType` property.
+
+**Pattern: Switch statement to render different block types**
+
+```typescript
+// Render blocks helper
+function renderBlocks(blocks: any[]) {
+  return blocks.map((block, index) => {
+    switch (block.blockType) {
+      case 'hero':
+        return <HeroBlock key={block.id || index} block={block} />;
+      case 'content':
+        return <ContentBlock key={block.id || index} block={block} />;
+      case 'form':
+        return <FormBlock key={block.id || index} block={block} />;
+      default:
+        return null;
+    }
+  });
+}
+
+// In your page component
+export default async function Page({ params }: { params: { slug: string } }) {
+  const payload = await getPayload({ config });
+
+  const page = await payload.find({
+    collection: 'pages',
+    where: { slug: { equals: params.slug } },
+  });
+
+  if (!page.docs[0]) {
+    return <div>Page not found</div>;
+  }
+
+  const { layout } = page.docs[0];
+
+  return <main>{renderBlocks(layout)}</main>;
+}
+```
+
+**Hero Block Component Example:**
+
+```typescript
+// components/HeroBlock.tsx
+import { RichText } from '@payloadcms/richtext-lexical/react';
+import Image from 'next/image';
+
+interface HeroBlockProps {
+  block: {
+    heading: string;
+    subheading: any; // Rich text
+    image: {
+      url: string;
+      alt: string;
+      width: number;
+      height: number;
+    };
+    ctaButton: {
+      label: string;
+      url: string;
+    };
+  };
+}
+
+export function HeroBlock({ block }: HeroBlockProps) {
+  return (
+    <section className="hero">
+      <h1>{block.heading}</h1>
+      <RichText data={block.subheading} />
+      {block.image && (
+        <Image
+          src={block.image.url}
+          alt={block.image.alt}
+          width={block.image.width}
+          height={block.image.height}
+        />
+      )}
+      {block.ctaButton && (
+        <a href={block.ctaButton.url} className="cta-button">
+          {block.ctaButton.label}
+        </a>
+      )}
+    </section>
+  );
+}
+```
+
+**Content Block Component Example:**
+
+```typescript
+// components/ContentBlock.tsx
+import { RichText } from '@payloadcms/richtext-lexical/react';
+
+interface ContentBlockProps {
+  block: {
+    heading?: string;
+    content: any; // Rich text
+  };
+}
+
+export function ContentBlock({ block }: ContentBlockProps) {
+  return (
+    <section className="content">
+      {block.heading && <h2>{block.heading}</h2>}
+      <RichText data={block.content} />
+    </section>
+  );
+}
+```
+
+#### Block Organization Best Practices
+
+1. **One block per file** - Keep blocks in `src/blocks/` directory
+2. **Descriptive slugs** - Use clear, semantic slugs (`hero`, `content`, `testimonials`)
+3. **Reusable blocks** - Design blocks to work across multiple collections
+4. **Type safety** - Extract types from Payload's auto-generated types
+
+```typescript
+import type { Page } from '@/payload-types';
+
+type HeroBlock = Extract<Page['layout'][0], { blockType: 'hero' }>;
+```
+
+## Media Collection
+
+The media collection handles file uploads and includes powerful image processing.
+
+### Image Sizes and Processing
+
+```typescript
+{
+  slug: 'media',
+  upload: {
+    // Define additional image sizes - automatically generated on upload
+    imageSizes: [
+      {
+        name: 'thumbnail',
+        width: 300,
+        height: 300,
+        crop: 'center', // or 'top', 'bottom', 'left', 'right', 'focalpoint'
+      },
+      {
+        name: 'banner',
+        width: 1200,
+        height: 400,
+        crop: 'focalpoint', // Uses focal point from admin UI
+      },
+      {
+        name: 'hero',
+        width: 1920,
+        height: 1080,
+      }
+    ],
+
+    // Crop controls in admin UI
+    cropControls: true,
+
+    // Focal point controls
+    focalPoint: true,
+  },
+  fields: [
+    {
+      name: 'alt',
+      type: 'text',
+      required: true,
+    }
+  ]
+}
+```
+
+**Features:**
+- Automatic image resizing
+- Built-in crop UI
+- Hotspot/focal point selection
+- Multiple sizes generated per upload
+
+## Rich Text Customization
+
+Payload uses Lexical and supports custom blocks within rich text.
+
+### Custom Blocks (Full-Width)
+
+```typescript
+// Define the block
+const CarHighlight = {
+  slug: 'carHighlight',
+  fields: [
+    {
+      name: 'car',
+      type: 'relationship',
+      relationTo: 'cars',
+      required: true,
+    },
+    {
+      name: 'highlightType',
+      type: 'select',
+      options: ['image', 'gallery', 'specs'],
+      defaultValue: 'image',
+    }
+  ],
+};
+
+// Add to rich text field
+{
+  name: 'content',
+  type: 'richText',
+  editor: lexicalEditor({
+    features: ({ defaultFeatures }) => [
+      ...defaultFeatures,
+      BlocksFeature({
+        blocks: [CarHighlight],
+      }),
+    ],
+  }),
+}
+```
+
+### Inline Blocks
+
+```typescript
+// Inline block for dynamic references
+const CarReference = {
+  slug: 'carReference',
+  fields: [
+    {
+      name: 'car',
+      type: 'relationship',
+      relationTo: 'cars',
+      required: true,
+    },
+    {
+      name: 'displayField',
+      type: 'select',
+      options: ['title', 'price', 'year'],
+    }
+  ],
+};
+
+// Add to rich text as inline
+{
+  name: 'content',
+  type: 'richText',
+  editor: lexicalEditor({
+    features: ({ defaultFeatures }) => [
+      ...defaultFeatures,
+      InlineBlocksFeature({
+        inlineBlocks: [CarReference],
+      }),
+    ],
+  }),
+}
+```
+
+Editors can insert these blocks directly in the text flow, and values populate dynamically on the frontend.
+
+## Custom React Components
+
+Inject custom React components anywhere in the admin UI.
+
+```typescript
+// Custom label component
+const CustomLabel: React.FC = () => {
+  const { value: carId } = useField<string>({ path: 'car' });
+  const [carTitle, setCarTitle] = useState('');
+
+  useEffect(() => {
+    if (carId) {
+      fetch(`/api/cars/${carId}`)
+        .then(r => r.json())
+        .then(data => setCarTitle(data.title));
+    }
+  }, [carId]);
+
+  return <span>{carTitle || 'Select a car'}</span>;
+};
+
+// Use in field definition
+{
+  name: 'car',
+  type: 'relationship',
+  relationTo: 'cars',
+  admin: {
+    components: {
+      Label: CustomLabel,
+    }
+  }
+}
+```
+
+You can customize:
+- `Label` - Field label
+- `Field` - Entire field component
+- `Error` - Error message display
+- `Description` - Field description
+
+## Access Control
+
+Access control is functional and fully typed. Define per-operation access rules.
+
+### Basic Access Control
+
+```typescript
+{
+  slug: 'pages',
+  access: {
+    // Anyone can read
+    read: () => true,
+
+    // Only logged-in users can create
+    create: ({ req: { user } }) => !!user,
+
+    // Only admins can delete
+    delete: ({ req: { user } }) => {
+      return user?.role === 'admin';
+    },
+  }
+}
+```
+
+### Query Constraints
+
+Return query constraints to filter data based on user context.
+
+```typescript
+{
+  slug: 'pages',
+  access: {
+    read: ({ req: { user } }) => {
+      // Logged-in users see everything
+      if (user) return true;
+
+      // Anonymous users only see published docs
+      return {
+        _status: { equals: 'published' }
+      };
+    },
+
+    // Users can only edit their own pages
+    update: ({ req: { user } }) => {
+      if (user?.role === 'admin') return true;
+
+      return {
+        author: { equals: user?.id }
+      };
+    },
+  }
+}
+```
+
+Access control applies automatically to:
+- Admin UI
+- REST API
+- Local API
+
+## Hooks
+
+Inject custom logic at specific points in the CRUD lifecycle.
+
+### Available Hooks
+
+```typescript
+{
+  slug: 'cars',
+  hooks: {
+    // Before operations
+    beforeChange: [
+      ({ data, req }) => {
+        // Modify data before save
+        data.slug = slugify(data.title);
+        return data;
+      }
+    ],
+    beforeRead: [({ doc, req }) => { /* ... */ }],
+    beforeDelete: [({ req, id }) => { /* ... */ }],
+
+    // After operations
+    afterChange: [
+      async ({ doc, req, operation }) => {
+        // Send notification, revalidate cache, etc.
+        if (operation === 'create') {
+          await sendNotification(doc);
+        }
+      }
+    ],
+    afterRead: [
+      ({ doc }) => {
+        // Add computed properties
+        doc.isVintage = doc.year < 1980;
+        return doc;
+      }
+    ],
+    afterDelete: [({ doc, req }) => { /* ... */ }],
+  }
+}
+```
+
+### Hook Parameters
+
+All hooks receive:
+- `req` - Request object with `user`, `payload`, etc.
+- `doc` - The document (in afterRead, afterChange, etc.)
+- `data` - The incoming data (in beforeChange)
+- `operation` - The operation type ('create', 'update', etc.)
+
+## REST API
+
+Payload auto-generates REST endpoints for every collection.
+
+### Auto-Generated Endpoints
+
+```
+GET    /api/cars          - List all cars
+GET    /api/cars/:id      - Get specific car
+POST   /api/cars          - Create car
+PATCH  /api/cars/:id      - Update car
+DELETE /api/cars/:id      - Delete car
+```
+
+### Query Parameters
+
+```
+GET /api/cars?where[manufacturer][equals]=ferrari
+GET /api/cars?limit=10&page=2
+GET /api/cars?sort=-createdAt
+GET /api/cars?depth=2  // Populate relationships
+```
+
+Access control applies automatically to all API requests.
+
+## Local API (Next.js Integration)
+
+Use Payload directly in Next.js route handlers, server components, and server actions.
+
+### In Route Handlers
+
+```typescript
+// app/my-route/route.ts
+import { getPayload } from 'payload';
+import config from '@payload-config';
+
+export async function GET(req: Request) {
+  const payload = await getPayload({ config });
+
+  // Check authentication
+  const { user } = await payload.auth({ headers: req.headers });
+
+  if (!user) {
+    return Response.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  // Query with Select API
+  const cars = await payload.find({
+    collection: 'cars',
+    select: {
+      title: true,
+      price: true,
+      manufacturer: true,
+    },
+    where: {
+      featured: { equals: true }
+    },
+    limit: 10,
+  });
+
+  return Response.json({ cars: cars.docs });
+}
+```
+
+### In Server Components
+
+```typescript
+// app/cars/page.tsx
+import { getPayload } from 'payload';
+import config from '@payload-config';
+
+export default async function CarsPage() {
+  const payload = await getPayload({ config });
+
+  const cars = await payload.find({
+    collection: 'cars',
+    where: { status: { equals: 'published' } },
+  });
+
+  return (
+    <div>
+      {cars.docs.map(car => (
+        <CarCard key={car.id} car={car} />
+      ))}
+    </div>
+  );
+}
+```
+
+### Local API Methods
+
+```typescript
+// Find
+const result = await payload.find({
+  collection: 'cars',
+  where: { ... },
+  limit: 10,
+  page: 1,
+  sort: '-createdAt',
+});
+
+// Find by ID
+const car = await payload.findByID({
+  collection: 'cars',
+  id: '123',
+});
+
+// Create
+const newCar = await payload.create({
+  collection: 'cars',
+  data: {
+    title: 'New Car',
+    price: 50000,
+  },
+});
+
+// Update
+const updated = await payload.update({
+  collection: 'cars',
+  id: '123',
+  data: {
+    price: 45000,
+  },
+});
+
+// Delete
+await payload.delete({
+  collection: 'cars',
+  id: '123',
+});
+
+// Authentication
+const { user } = await payload.auth({ headers });
+```
+
+## Select API
+
+Choose specific fields to return - keeps responses lean and typed.
+
+```typescript
+const cars = await payload.find({
+  collection: 'cars',
+  select: {
+    title: true,
+    price: true,
+    manufacturer: {
+      name: true,
+      country: true,
+    },
+  },
+});
+
+// TypeScript knows exact shape:
+// { title: string; price: number; manufacturer: { name: string; country: string } }
+```
+
+Only requested fields are returned and typed accordingly.
+
+## Auto-Generated Types
+
+Payload generates TypeScript types for all collections.
+
+```typescript
+import type { Car, Manufacturer, Page } from '@/payload-types';
+
+// Fully typed based on your collection schemas
+const car: Car = await payload.findByID({
+  collection: 'cars',
+  id: '123',
+});
+
+// TypeScript knows all fields, relationships, etc.
+console.log(car.title); // ✓
+console.log(car.manufacturer.name); // ✓
+```
+
+Types regenerate automatically when you change your config.
+
+## Versions and Drafts
+
+Enable version control and draft/publish workflows.
+
+```typescript
+{
+  slug: 'pages',
+  versions: {
+    drafts: true,      // Enable draft/published status
+    maxPerDoc: 50,     // Keep last 50 versions
+  },
+  autosave: true,      // Auto-save drafts while editing
+}
+```
+
+**Features:**
+- Draft vs. published status
+- Version history with rollback
+- Save changes without publishing
+- Compare versions
+
+Access control can filter by `_status`:
+
+```typescript
+access: {
+  read: ({ req: { user } }) => {
+    if (user) return true;
+    return { _status: { equals: 'published' } };
+  }
+}
+```
+
+## Common Patterns
+
+### Blog with Categories and Authors
+
+```typescript
+const collections = [
+  {
+    slug: 'posts',
+    fields: [
+      { name: 'title', type: 'text', required: true },
+      { name: 'slug', type: 'text', required: true, unique: true },
+      { name: 'content', type: 'richText' },
+      {
+        name: 'author',
+        type: 'relationship',
+        relationTo: 'users',
+        required: true,
+      },
+      {
+        name: 'categories',
+        type: 'relationship',
+        relationTo: 'categories',
+        hasMany: true,
+      },
+      {
+        name: 'featuredImage',
+        type: 'upload',
+        relationTo: 'media',
+      },
+      { name: 'publishedAt', type: 'date' },
+    ],
+    admin: { useAsTitle: 'title' },
+    versions: { drafts: true },
+  },
+  {
+    slug: 'categories',
+    fields: [
+      { name: 'name', type: 'text', required: true },
+      { name: 'slug', type: 'text', required: true },
+    ],
+    admin: { useAsTitle: 'name' },
+  },
+];
+```
+
+### E-commerce Products
+
+```typescript
+{
+  slug: 'products',
+  fields: [
+    { name: 'name', type: 'text', required: true },
+    { name: 'description', type: 'richText' },
+    { name: 'price', type: 'number', required: true, min: 0 },
+    {
+      name: 'images',
+      type: 'upload',
+      relationTo: 'media',
+      hasMany: true,
+    },
+    {
+      name: 'category',
+      type: 'relationship',
+      relationTo: 'categories',
+      required: true,
+    },
+    {
+      name: 'variants',
+      type: 'array',
+      fields: [
+        { name: 'name', type: 'text' },
+        { name: 'price', type: 'number' },
+        { name: 'sku', type: 'text' },
+        { name: 'stock', type: 'number', min: 0 },
+      ],
+    },
+    { name: 'featured', type: 'checkbox', defaultValue: false },
+  ],
+  admin: { useAsTitle: 'name' },
+}
+```
+
+## Form Builder Plugin
+
+The Form Builder plugin adds a complete form management system to Payload - create forms in the admin, manage submissions, and render forms on your frontend.
+
+### Installation
+
+```bash
+npm install @payloadcms/plugin-form-builder
+```
+
+### Configuration
+
+```typescript
+// payload.config.ts
+import { formBuilderPlugin } from '@payloadcms/plugin-form-builder';
+
+export default buildConfig({
+  plugins: [
+    formBuilderPlugin({
+      fields: {
+        // Use default fields (text, email, textarea, select, checkbox, etc.)
+      },
+      // Optional: customize form submissions collection
+      formSubmissionOverrides: {
+        slug: 'contact-submissions',
+      },
+    }),
+  ],
+});
+```
+
+This creates two collections automatically:
+- **forms** - Where you create and manage forms
+- **form-submissions** - Where form submissions are stored
+
+### Creating Forms in Admin
+
+1. Go to **Forms** collection in admin
+2. Click **Create New**
+3. Add a title (e.g., "Newsletter Signup")
+4. Add fields (text, email, textarea, select, checkbox, etc.)
+5. Configure submit button label
+6. Add confirmation message (rich text)
+7. Save
+
+**Example form fields:**
+- First Name (text, required)
+- Last Name (text, required)
+- Email (email, required)
+- Submit button label: "Sign Up"
+- Confirmation: "Thanks for signing up!"
+
+### Using Forms in Blocks
+
+**Form Block Definition:**
+
+```typescript
+// blocks/FormBlock.ts
+import { Block } from 'payload';
+
+export const FormBlock: Block = {
+  slug: 'form',
+  fields: [
+    {
+      name: 'heading',
+      type: 'text',
+    },
+    {
+      name: 'form',
+      type: 'relationship',
+      relationTo: 'forms',
+      required: true,
+    },
+  ],
+};
+```
+
+Add to your Pages collection's layout blocks, and editors can select which form to display.
+
+### Rendering Forms on Frontend
+
+```typescript
+// components/FormBlock.tsx
+'use client';
+
+import { useState, FormEvent } from 'react';
+import { RichText } from '@payloadcms/richtext-lexical/react';
+
+interface FormBlockProps {
+  block: {
+    heading?: string;
+    form: {
+      id: string;
+      title: string;
+      fields: Array<{
+        name: string;
+        label: string;
+        fieldType: string;
+        required: boolean;
+      }>;
+      submitButtonLabel: string;
+      confirmationMessage: any; // Rich text
+    };
+  };
+}
+
+export function FormBlock({ block }: FormBlockProps) {
+  const { heading, form } = block;
+  const [formState, setFormState] = useState({
+    loading: false,
+    error: null,
+    success: false,
+  });
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setFormState({ loading: true, error: null, success: false });
+
+    const formData = new FormData(e.currentTarget);
+    const data = Object.fromEntries(formData.entries());
+
+    try {
+      // Submit to Payload's form submission endpoint
+      const response = await fetch('/api/form-submissions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          form: form.id,
+          submissionData: Object.entries(data).map(([field, value]) => ({
+            field,
+            value: value as string,
+          })),
+        }),
+      });
+
+      if (!response.ok) throw new Error('Failed to submit form');
+
+      setFormState({ loading: false, error: null, success: true });
+      e.currentTarget.reset();
+
+      // Clear success message after 5 seconds
+      setTimeout(() => {
+        setFormState({ loading: false, error: null, success: false });
+      }, 5000);
+    } catch (error) {
+      setFormState({
+        loading: false,
+        error: 'Failed to submit form',
+        success: false,
+      });
+    }
+  };
+
+  return (
+    <section className="form-block">
+      {heading && <h2>{heading}</h2>}
+
+      <form onSubmit={handleSubmit}>
+        {form.fields.map((field) => (
+          <div key={field.name} className="form-field">
+            <label htmlFor={field.name}>{field.label}</label>
+            <input
+              id={field.name}
+              name={field.name}
+              type={field.fieldType}
+              required={field.required}
+              placeholder={field.label}
+            />
+          </div>
+        ))}
+
+        {formState.error && <p className="error">{formState.error}</p>}
+
+        {formState.success ? (
+          <div className="success">
+            <RichText data={form.confirmationMessage} />
+          </div>
+        ) : (
+          <button type="submit" disabled={formState.loading}>
+            {formState.loading ? 'Submitting...' : form.submitButtonLabel}
+          </button>
+        )}
+      </form>
+    </section>
+  );
+}
+```
+
+### Viewing Form Submissions
+
+All submissions appear in the **Form Submissions** collection in the admin panel, organized by form. Each submission shows:
+- Which form it came from
+- Submitted data
+- Submission timestamp
+- IP address (optional)
+
+## Headless CMS Pattern (Payload + Astro)
+
+Payload works excellently as a headless CMS - use Payload for the backend/admin and any frontend framework (Astro, Next.js, SvelteKit, etc.) to render the content.
+
+**See also:** The `framework/astro` skill has complete patterns for using Astro as a frontend with Payload CMS backend.
+
+### Architecture
+
+**Payload Backend:**
+- Collections, fields, relationships
+- Admin panel at `/admin`
+- REST API at `/api/*`
+- Hosted separately or on the same server
+
+**Astro Frontend:**
+- Fetches content from Payload REST API
+- Renders blocks as Astro components
+- Fast, static-first builds
+
+### Setup Pattern
+
+**Directory structure:**
+
+```
+my-project/
+├── payload/           # Payload CMS backend
+│   ├── src/
+│   │   ├── collections/
+│   │   ├── blocks/
+│   │   └── payload.config.ts
+│   └── package.json
+│
+├── frontend/          # Astro frontend
+│   ├── src/
+│   │   ├── pages/
+│   │   ├── components/
+│   │   └── lib/
+│   └── package.json
+```
+
+Or combined (Payload inside Astro project):
+
+```
+my-astro-site/
+├── src/
+│   ├── pages/         # Astro pages
+│   ├── components/    # Astro components
+│   └── payload/       # Payload CMS
+│       ├── collections/
+│       ├── blocks/
+│       └── payload.config.ts
+└── package.json
+```
+
+### Monorepo Development Workflow
+
+**Local development with separate package.json files (simpler):**
+
+```bash
+# Terminal 1 - Run Payload
+cd payload
+npm run dev  # Runs on localhost:3000
+
+# Terminal 2 - Run Astro
+cd frontend
+npm run dev  # Runs on localhost:4321, fetches from Payload
+```
+
+**Optional: Using workspaces (more advanced):**
+
+Create `pnpm-workspace.yaml` at root:
+```yaml
+packages:
+  - 'payload'
+  - 'frontend'
+```
+
+Root `package.json`:
+```json
+{
+  "name": "my-website-monorepo",
+  "private": true,
+  "scripts": {
+    "dev:payload": "pnpm --filter payload dev",
+    "dev:frontend": "pnpm --filter frontend dev",
+    "dev": "concurrently \"pnpm dev:payload\" \"pnpm dev:frontend\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
+```
+
+Then run both with: `pnpm dev`
+
+### Fetching Content from Payload in Astro
+
+```typescript
+// src/lib/payload.ts
+const PAYLOAD_API_URL = import.meta.env.PAYLOAD_API_URL || 'http://localhost:3000/api';
+
+export async function getPage(slug: string) {
+  const response = await fetch(
+    `${PAYLOAD_API_URL}/pages?where[slug][equals]=${slug}&depth=2`
+  );
+  const data = await response.json();
+  return data.docs[0];
+}
+
+export async function getAllPages() {
+  const response = await fetch(`${PAYLOAD_API_URL}/pages?limit=1000`);
+  const data = await response.json();
+  return data.docs;
+}
+```
+
+### Rendering Blocks in Astro
+
+**Create Astro components for each block type:**
+
+```astro
+---
+// src/components/blocks/HeroBlock.astro
+import { RichTextRenderer } from '../RichTextRenderer.astro';
+
+interface Props {
+  block: {
+    heading: string;
+    subheading: any;
+    image: {
+      url: string;
+      alt: string;
+    };
+    ctaButton: {
+      label: string;
+      url: string;
+    };
+  };
+}
+
+const { block } = Astro.props;
+---
+
+<section class="hero">
+  <h1>{block.heading}</h1>
+  <RichTextRenderer content={block.subheading} />
+  {block.image && (
+    <img src={block.image.url} alt={block.image.alt} />
+  )}
+  {block.ctaButton && (
+    <a href={block.ctaButton.url} class="cta-button">
+      {block.ctaButton.label}
+    </a>
+  )}
+</section>
+```
+
+```astro
+---
+// src/components/blocks/ContentBlock.astro
+import { RichTextRenderer } from '../RichTextRenderer.astro';
+
+interface Props {
+  block: {
+    heading?: string;
+    content: any;
+  };
+}
+
+const { block } = Astro.props;
+---
+
+<section class="content">
+  {block.heading && <h2>{block.heading}</h2>}
+  <RichTextRenderer content={block.content} />
+</section>
+```
+
+**Render blocks dynamically in Astro page:**
+
+```astro
+---
+// src/pages/[slug].astro
+import { getPage, getAllPages } from '../lib/payload';
+import HeroBlock from '../components/blocks/HeroBlock.astro';
+import ContentBlock from '../components/blocks/ContentBlock.astro';
+import FormBlock from '../components/blocks/FormBlock.astro';
+
+export async function getStaticPaths() {
+  const pages = await getAllPages();
+  return pages.map((page) => ({
+    params: { slug: page.slug },
+    props: { page },
+  }));
+}
+
+const { page } = Astro.props;
+const { layout } = page;
+
+// Helper to render the right component for each block type
+function getBlockComponent(blockType: string) {
+  switch (blockType) {
+    case 'hero':
+      return HeroBlock;
+    case 'content':
+      return ContentBlock;
+    case 'form':
+      return FormBlock;
+    default:
+      return null;
+  }
+}
+---
+
+<html>
+  <head>
+    <title>{page.title}</title>
+  </head>
+  <body>
+    <main>
+      {layout.map((block) => {
+        const Component = getBlockComponent(block.blockType);
+        return Component ? <Component block={block} /> : null;
+      })}
+    </main>
+  </body>
+</html>
+```
+
+### Deployment
+
+**Option 1: Separate Repos**
+- Two repositories: `my-site-payload` and `my-site-frontend`
+- Payload on Railway/Render/VPS
+- Astro on Vercel/Netlify/Cloudflare Pages
+
+**Option 2: Monorepo (Recommended)**
+- One repository with both projects
+- Deploy each to different platforms from same repo
+
+**Monorepo Structure for Separate Hosting:**
+
+```
+my-website/
+├── payload/                 # Payload CMS backend
+│   ├── src/
+│   │   ├── collections/
+│   │   ├── blocks/
+│   │   └── payload.config.ts
+│   ├── package.json
+│   └── .env
+│
+├── frontend/                # Astro frontend
+│   ├── src/
+│   │   ├── pages/
+│   │   ├── components/
+│   │   └── lib/
+│   ├── package.json
+│   └── .env
+│
+└── README.md
+```
+
+**Railway (Payload Backend) Configuration:**
+
+```
+Root Directory: payload
+Build Command: npm run build
+Start Command: npm run serve
+Environment Variables:
+  DATABASE_URI=mongodb://...
+  PAYLOAD_SECRET=your-secret-key
+  CORS_ORIGIN=https://your-site.pages.dev
+  NODE_ENV=production
+```
+
+**Cloudflare Pages (Astro Frontend) Configuration:**
+
+```
+Build command: npm run build
+Build output directory: dist
+Root directory: frontend
+Environment Variables:
+  PAYLOAD_API_URL=https://your-payload.railway.app/api
+  NODE_VERSION=20
+```
+
+**Vercel/Netlify (Alternative for Astro):**
+
+Same settings, just adjust platform-specific config files if needed.
+
+**Environment variables:**
+
+```env
+# payload/.env (local)
+DATABASE_URI=mongodb://localhost:27017/my-website
+PAYLOAD_SECRET=your-local-secret
+PORT=3000
+
+# frontend/.env (local)
+PAYLOAD_API_URL=http://localhost:3000/api
+```
+
+**Production environment variables (set in hosting platforms):**
+
+Railway (Payload):
+- `DATABASE_URI` - Production MongoDB/PostgreSQL URI
+- `PAYLOAD_SECRET` - Secure random string
+- `CORS_ORIGIN` - Your Astro site URL (e.g., `https://yoursite.pages.dev`)
+
+Cloudflare Pages (Astro):
+- `PAYLOAD_API_URL` - Your Payload Railway URL (e.g., `https://your-payload.railway.app/api`)
+
+### ISR (Incremental Static Regeneration) with Astro
+
+Enable on-demand revalidation when content changes in Payload:
+
+```typescript
+// Payload hook to trigger Astro rebuild
+{
+  slug: 'pages',
+  hooks: {
+    afterChange: [
+      async ({ doc, req, operation }) => {
+        // Trigger Astro rebuild webhook
+        await fetch('https://your-astro-site.com/api/revalidate', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${process.env.REVALIDATE_SECRET}` },
+          body: JSON.stringify({ slug: doc.slug }),
+        });
+      }
+    ]
+  }
+}
+```
+
+## Runtime Compatibility (Bun / Node.js)
+
+**Payload does NOT officially support Bun as a runtime.** Their test suite only runs against Node.js.
+
+### What works with Bun
+
+- **Bun as package manager** (`bun install`, `bun add`) - works fine
+- **`bun run dev`** - works because Next.js uses Node.js under the hood
+- **Payload CLI with `--disable-transpile`** - workaround for Bun runtime
+
+### What breaks with Bun
+
+- **Payload CLI commands under Bun runtime** - fails because Bun can't resolve the `tsx` transpiler Payload uses internally
+- Error: `Cannot find module 'tsx://...'`
+
+### Workaround: --disable-transpile flag
+
+```bash
+# Force Bun runtime with --disable-transpile
+bunx --bun payload migrate --disable-transpile
+bunx --bun payload run src/seed.ts --disable-transpile
+```
+
+This disables `tsx` and lets Bun handle TypeScript transpilation itself.
+
+### Recommended approach
+
+**Use Bun as package manager, Node.js as runtime for Payload:**
+
+```bash
+# Install dependencies (Bun - fast)
+bun install
+
+# Dev server (works - Next.js uses Node internally)
+bun run dev
+
+# Payload CLI commands (safe - uses Node via bun run, not bun runtime)
+bun run payload migrate:create
+bun run payload generate:types
+
+# If you MUST use Bun runtime for CLI
+bunx --bun payload migrate --disable-transpile
+```
+
+**Important:** This applies to the Payload backend only. The Astro frontend has full Bun support.
+
+## Tips and Best Practices
+
+1. **Start with the blank template** - Build up from minimal config
+2. **Use relationships over duplication** - Keep data normalized
+3. **Use join fields** for bidirectional relationships - Better admin UX
+4. **Leverage Select API** - Only fetch fields you need
+5. **Use hooks for computed fields** - Keep logic in one place
+6. **Version control important content** - Pages, posts, products
+7. **Set up access control early** - Think about permissions upfront
+8. **Use auto-generated types** - Let Payload handle TypeScript
+9. **Custom React components** for better UX - Make admin friendly for editors
+10. **Image sizes in media collection** - Define all sizes upfront
+
+## How to Verify
+
+### Quick Checks
+- `[runner] dev` starts without errors
+- Admin panel loads at `/admin`
+- Collections appear in admin UI
+- Can create/read/update/delete documents
+- API endpoints respond at `/api/<collection-slug>`
+- Types are generated in `payload-types.ts`
+
+### Common Issues
+- **"Cannot find module '@payload-config'"**: Check import path matches your config file location
+- **Types not updating**: Restart dev server or run `payload generate:types`
+- **Images not uploading**: Check `upload` directory permissions and config
+- **Access denied in admin**: Check `access` rules on collections
+- **Hooks not firing**: Verify hook array syntax and placement
+
+## Next Steps
+
+After basic setup:
+1. Define your collections and fields
+2. Set up relationships between collections
+3. Configure media handling and image sizes
+4. Add access control rules
+5. Implement hooks for business logic
+6. Customize rich text with blocks
+7. Build your frontend using the Local API
+8. Deploy (Vercel, Netlify, Railway, etc.)
+
+Payload handles the backend - you focus on the data model and frontend.

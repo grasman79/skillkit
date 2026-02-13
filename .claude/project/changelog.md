@@ -8,6 +8,38 @@ This file tracks work completed across sessions to help maintain context.
 
 ## Session Log
 
+### 2026-02-13 - Payload CMS Skill, Astro Enhancements, and Loading Best Practices
+
+**Summary:** Created comprehensive Payload CMS skill, enhanced Astro skill with headless CMS integration and View Transitions, added server-first rendering best practices, and documented loader caching patterns.
+
+**Completed:**
+- Created new skill: `.claude/skills/cms/payload/SKILL.md` - Full Payload CMS reference covering collections, field types, blocks, media, rich text, access control, hooks, REST API, Local API, Form Builder plugin, monorepo deployment (Railway + Cloudflare Pages), and Bun runtime compatibility
+- Updated `.claude/skills/framework/astro/SKILL.md` - Added headless CMS integration section (Astro + Payload), View Transitions for SPA-like navigation, prefetching strategies
+- Updated `.claude/skills/framework/tanstack-start/SKILL.md` - Added "Preventing UI Flash / Double-Load" section with BAD/GOOD patterns, loader caching with staleTime, TanStack Query ensureQueryData, and Link preloading
+- Updated `.claude/skills/workflow/best-practices/SKILL.md` - Added "Server-First Rendering" section covering the double-load flash problem, correct skeleton patterns, caching guidance
+- Updated `.claude/CLAUDE.md` - Added Payload CMS and Astro to skills routing table
+- Cross-referenced Payload and Astro skills so they link to each other
+
+**Key Decisions:**
+- Skeletons during navigation are good (pendingComponent/Suspense) - the problem is skeletons that replace already-rendered content (useEffect pattern)
+- Loader caching (staleTime) ensures skeleton only shows on first visit, not on return navigation
+- Payload recommended as headless CMS with Astro static frontend for content sites
+- Monorepo structure with separate package.json files for Payload and Astro, deployed to different hosts
+- Bun works as package manager for Payload but not as runtime - use Node.js runtime with --disable-transpile workaround if needed
+
+**Files Changed:**
+- `.claude/skills/cms/payload/SKILL.md` (new)
+- `.claude/skills/framework/astro/SKILL.md` (updated)
+- `.claude/skills/framework/tanstack-start/SKILL.md` (updated)
+- `.claude/skills/workflow/best-practices/SKILL.md` (updated)
+- `.claude/CLAUDE.md` (updated)
+
+**Next Steps:**
+- Build first Astro + Payload client website using the new skills
+- Consider adding Payload Live Preview integration patterns
+
+---
+
 ### 2026-02-11 - Auto-Fetch Update System
 
 **Summary:** Upgraded the `skillkit update` command from a manual guided download process to a fully automated GitHub fetch. Also fixed the startup version check URL that was returning 404.

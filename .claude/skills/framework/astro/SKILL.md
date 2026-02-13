@@ -1,6 +1,6 @@
 ---
 name: astro
-description: Astro web framework for content-focused websites. Trigger words - astro, blog, documentation site, marketing page, static site, content collections, islands, partial hydration, mdx
+description: Astro web framework for content-focused websites. Trigger words - astro, blog, documentation site, marketing page, static site, content collections, islands, partial hydration, mdx, headless cms frontend
 ---
 
 # Astro
@@ -14,6 +14,7 @@ Fast, content-focused web framework with islands architecture and zero JavaScrip
 - Want to mix multiple UI frameworks (React, Vue, Svelte)
 - Static site generation with optional SSR
 - Building with Markdown/MDX content
+- Frontend for headless CMS (Payload, Contentful, etc.)
 
 ## When NOT to Use
 
@@ -330,6 +331,61 @@ npx astro add vercel
 npx astro add netlify
 ```
 
+## View Transitions (SPA-like Navigation)
+
+Astro's View Transitions make multi-page sites feel like a single-page app - instant navigation, no full page reloads, smooth animations.
+
+```astro
+---
+// src/layouts/BaseLayout.astro
+import { ViewTransitions } from 'astro:transitions';
+---
+
+<html>
+<head>
+  <ViewTransitions />  <!-- Enables SPA-like navigation -->
+</head>
+<body>
+  <slot />
+</body>
+</html>
+```
+
+**What this gives you:**
+- Pages are still pre-built static HTML (no loading states needed)
+- Navigation fetches the next page in the background and swaps content
+- Browser doesn't do a full reload - feels instant
+- CSS transitions animate between pages
+
+### Prefetching (Zero-Wait Navigation)
+
+Astro can prefetch pages before the user clicks, making navigation feel truly instant:
+
+```javascript
+// astro.config.mjs
+export default defineConfig({
+  prefetch: {
+    prefetchAll: true,          // Prefetch all links on the page
+    // Or more targeted:
+    // defaultStrategy: 'hover', // Prefetch when user hovers a link
+  },
+});
+```
+
+**Prefetch strategies:**
+- `hover` (default) - Prefetch when user hovers over a link
+- `tap` - Prefetch on mousedown (just before click)
+- `viewport` - Prefetch when link enters viewport
+- `load` - Prefetch all links on page load
+
+**Per-link control:**
+```astro
+<a href="/about" data-astro-prefetch="viewport">About</a>
+<a href="/heavy-page" data-astro-prefetch="hover">Heavy Page</a>
+```
+
+**Why this matters for Astro + Payload:** Since Astro builds static HTML at build time, there's no data fetching at runtime. Combined with View Transitions and prefetching, users navigate between pages with zero loading states - the content is already there.
+
 ## Tips
 
 - Use `client:visible` for below-fold interactive components
@@ -337,6 +393,125 @@ npx astro add netlify
 - Content Collections provide type safety for Markdown
 - Mix frameworks on the same page if needed
 - Use `getStaticPaths()` for dynamic routes in static mode
+- Enable View Transitions for SPA-like navigation feel
+- Use prefetching with `hover` strategy for instant page loads
+
+## Headless CMS Integration (Astro + Payload CMS)
+
+Astro pairs excellently with Payload CMS as a headless backend. Payload handles content management and admin UI, while Astro renders blazing-fast static pages.
+
+**Pattern:** Payload for backend → Astro fetches via REST API → Static build
+
+**See:** `cms/payload` skill for complete Payload CMS setup and integration patterns.
+
+### Fetching from Payload
+
+```typescript
+// src/lib/payload.ts
+const PAYLOAD_API_URL = import.meta.env.PAYLOAD_API_URL || 'http://localhost:3000/api';
+
+export async function getPage(slug: string) {
+  const response = await fetch(
+    `${PAYLOAD_API_URL}/pages?where[slug][equals]=${slug}&depth=2`
+  );
+  const data = await response.json();
+  return data.docs[0];
+}
+
+export async function getAllPages() {
+  const response = await fetch(`${PAYLOAD_API_URL}/pages`);
+  const data = await response.json();
+  return data.docs;
+}
+```
+
+### Rendering Payload Blocks in Astro
+
+Payload's blocks system maps perfectly to Astro components:
+
+```astro
+---
+// src/pages/[slug].astro
+import { getPage, getAllPages } from '../lib/payload';
+import HeroBlock from '../components/blocks/HeroBlock.astro';
+import ContentBlock from '../components/blocks/ContentBlock.astro';
+
+export async function getStaticPaths() {
+  const pages = await getAllPages();
+  return pages.map((page) => ({
+    params: { slug: page.slug },
+    props: { page },
+  }));
+}
+
+const { page } = Astro.props;
+const { layout } = page;
+---
+
+<html>
+  <head>
+    <title>{page.title}</title>
+  </head>
+  <body>
+    {layout.map((block) => {
+      switch (block.blockType) {
+        case 'hero':
+          return <HeroBlock block={block} />;
+        case 'content':
+          return <ContentBlock block={block} />;
+        default:
+          return null;
+      }
+    })}
+  </body>
+</html>
+```
+
+### Block Components
+
+```astro
+---
+// src/components/blocks/HeroBlock.astro
+interface Props {
+  block: {
+    heading: string;
+    subheading: any;
+    image: { url: string; alt: string };
+    ctaButton: { label: string; url: string };
+  };
+}
+
+const { block } = Astro.props;
+---
+
+<section class="hero">
+  <h1>{block.heading}</h1>
+  <div set:html={block.subheading} />
+  {block.image && <img src={block.image.url} alt={block.image.alt} />}
+  {block.ctaButton && (
+    <a href={block.ctaButton.url}>{block.ctaButton.label}</a>
+  )}
+</section>
+```
+
+### Deployment
+
+- **Payload:** Railway/Render/VPS (needs Node.js)
+- **Astro:** Vercel/Netlify (static)
+- **Workflow:** Content changes in Payload → Trigger Astro rebuild → Deploy updated static site
+
+### When to Use This Pattern
+
+✅ **Use Astro + Payload when:**
+- Content-heavy sites (marketing, blogs, documentation)
+- Need admin UI for non-technical editors
+- Want maximum performance (static generation)
+- Content doesn't change constantly
+
+❌ **Don't use when:**
+- Need real-time content updates
+- Heavily interactive app (use Next.js + Payload instead)
+- No admin panel needed (use Astro Content Collections)
 
 ## How to Verify
 

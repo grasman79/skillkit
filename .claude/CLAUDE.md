@@ -106,7 +106,8 @@ Reusable across projects: `skills/`, `templates/`, `commands/`
 | AI features, chat, text generation | `ai/vercel-ai-sdk` |
 | Sending emails, notifications | `email/resend` or `email/autosend` |
 | File uploads, image storage, S3/R2 | `storage/cloudflare-r2` |
-| Framework-specific patterns | `framework/nextjs` or `framework/tanstack-start` |
+| Framework-specific patterns | `framework/nextjs`, `framework/tanstack-start`, or `framework/astro` |
+| CMS, admin panel, content management, Payload | `cms/payload` |
 | Deploying to Railway (TanStack Start SSR) | `deployment/railway` |
 | Project setup, new projects | `workflow/project-setup` |
 | Feature planning, "plan feature" | `workflow/feature-planner` |
