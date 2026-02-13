@@ -2,10 +2,10 @@
 
 > A skills system for Claude Code that teaches it exactly how to build your app, so you never have to explain the same thing twice.
 
-**Version:** 1.2.0
+**Version:** 1.2.1
 **Author:** Manuel Merz
 **License:** MIT
-**Date:** 11/02/2026
+**Date:** 13/02/2026
 
 ---
 
@@ -227,6 +227,11 @@ Next session, Claude picks up exactly where you left off.
 | `vercel-ai-sdk` | Vercel AI SDK streaming and tools |
 | `openrouter` | OpenRouter multi-model API |
 
+### CMS
+| Skill | What It Does |
+|-------|--------------|
+| `payload` | Payload CMS - headless backend with admin panel, blocks, media, REST API, Form Builder |
+
 ### API
 | Skill | What It Does |
 |-------|--------------|
@@ -366,6 +371,12 @@ The `project-setup` skill automatically recommends this stack and detects your p
 ---
 
 ## Changelog
+
+### v1.2.1 (2026-02-13)
+- **Payload CMS skill** - Comprehensive headless CMS skill with collections, blocks, media, hooks, REST API, Form Builder plugin, monorepo deployment (Railway + Cloudflare Pages), and Bun runtime compatibility
+- **Astro headless CMS integration** - View Transitions, prefetching, and complete Payload + Astro patterns
+- **Server-first rendering guide** - Anti-flash/double-load patterns in best-practices and TanStack Start skills
+- **Loader caching** - staleTime patterns, TanStack Query ensureQueryData, and Link preloading for skeleton-only-on-first-visit
 
 ### v1.2.0 (2026-02-11)
 - **Simplified workflow** - Consolidated /push + /merge into single `/wrap-up` command (log, lint, build, commit, push, PR, merge, cleanup)
