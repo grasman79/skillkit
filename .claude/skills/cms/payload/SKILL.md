@@ -1526,13 +1526,19 @@ function getBlockComponent(blockType: string) {
 
 ### Deployment
 
-**Option 1: Separate Repos**
-- Two repositories: `my-site-payload` and `my-site-frontend`
-- Payload on Railway/Render/VPS
-- Astro on Vercel/Netlify/Cloudflare Pages
+**Option 1: Full Cloudflare Stack (Recommended)**
+- Payload on Cloudflare Workers (D1 database + R2 storage)
+- Astro on Cloudflare Pages
+- Single platform, ~$5/month total
+- See "Deploying Payload on Cloudflare Workers" section below
 
-**Option 2: Monorepo (Recommended)**
-- One repository with both projects
+**Option 2: Railway + Cloudflare Pages**
+- Payload on Railway (MongoDB/PostgreSQL)
+- Astro on Cloudflare Pages
+- ~$28/month
+
+**Architecture: Monorepo (Recommended)**
+- One repository with both projects (`cms/` + `web/`)
 - Deploy each to different platforms from same repo
 
 **Monorepo Structure for Separate Hosting:**
@@ -1734,8 +1740,201 @@ export async function GET({ url }) {
 
 Payload has a Local API example for Astro in their repo, but **the Local API does not work reliably with Astro's SSG mode**. The known error is `"__dirname is not defined in ES module scope"`.
 
-**Recommendation:** Use the REST API for Astro integration. The Local API is designed for Next.js where Payload runs in the same process. For Astro, fetch from Payload's REST endpoints instead
+**Recommendation:** Use the REST API for Astro integration. The Local API is designed for Next.js where Payload runs in the same process. For Astro, fetch from Payload's REST endpoints instead.
+
+## Deploying Payload on Cloudflare Workers
+
+Payload has official support for Cloudflare Workers. This is an excellent option when you're already deploying Astro to Cloudflare Pages - keep the entire stack on Cloudflare.
+
+**What you get:**
+- **Cloudflare Workers** - Serverless platform running Payload (paid plan, ~$5/month)
+- **D1** - SQLite database with global read replicas (reads from nearest node)
+- **R2** - Object storage for media/uploads
+- **Wrangler** - CLI for local dev and deployment
+
+### Quick Start (One-Click Template)
+
+Payload provides an official one-click deploy template. It creates a D1 database and R2 bucket automatically bound to your worker.
+
+For manual setup, start from the template and customize.
+
+### Required Packages
+
+```bash
+pnpm add @payloadcms/db-d1-sqlite @payloadcms/storage-r2 @opennextjs/cloudflare
 ```
+
+### Wrangler Configuration
+
+```jsonc
+// wrangler.jsonc
+{
+  "name": "my-payload-app",
+  "compatibility_date": "2024-03-20",
+  "compatibility_flags": ["nodejs_compat"],
+  "main": ".open-next/worker.js",
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "d1_databases": [{
+    "binding": "DB",
+    "database_name": "my-payload-db",
+    "database_id": "<your D1 database ID>"
+  }],
+  "r2_buckets": [{
+    "binding": "R2_BUCKET",
+    "bucket_name": "my-payload-uploads"
+  }],
+  "vars": {
+    "PAYLOAD_SECRET": "your-secret-key",
+    "R2_PUBLIC_DOMAIN": "https://media.yoursite.com",
+    "CLOUDFLARE_ACCOUNT_ID": "<your account ID>"
+  }
+}
+```
+
+### Payload Config for Cloudflare
+
+```typescript
+// payload.config.ts
+import { buildConfig } from 'payload';
+import { sqliteD1Adapter } from '@payloadcms/db-d1-sqlite';
+import { r2Storage } from '@payloadcms/storage-r2';
+import { lexicalEditor } from '@payloadcms/richtext-lexical';
+
+export default buildConfig({
+  editor: lexicalEditor(),
+  db: sqliteD1Adapter({
+    binding: 'DB', // Must match wrangler.jsonc d1_databases binding
+  }),
+  plugins: [
+    r2Storage({
+      bucket: 'R2_BUCKET', // Must match wrangler.jsonc r2_buckets binding
+      collections: {
+        media: true,
+      },
+    }),
+  ],
+  collections: [
+    // Your collections here
+  ],
+});
+```
+
+### Create D1 Database and R2 Bucket
+
+```bash
+# Create database
+wrangler d1 create my-payload-db
+# Copy the database_id into wrangler.jsonc
+
+# Create storage bucket
+wrangler r2 bucket create my-payload-uploads
+```
+
+### Local Development
+
+```bash
+# Standard local dev (uses local SQLite)
+pnpm dev
+
+# Test against Cloudflare environment
+pnpm run build:open-next && pnpm wrangler dev
+```
+
+### Deploy
+
+```bash
+# Build and deploy to Cloudflare Workers
+pnpm run deploy
+```
+
+This builds your Next.js app, converts it via OpenNext, runs migrations, and deploys globally.
+
+### Package.json Scripts
+
+```json
+{
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "build:open-next": "open-next build",
+    "deploy": "pnpm run build:open-next && wrangler deploy",
+    "migrate:create": "payload migrate:create",
+    "migrate": "payload migrate"
+  }
+}
+```
+
+### Database Migrations
+
+Run before each deployment:
+
+```bash
+pnpm payload migrate:create
+pnpm payload migrate
+```
+
+### Full Cloudflare Stack (Recommended for Astro + Payload)
+
+When using both Astro and Payload on Cloudflare:
+
+```
+my-website/
+├── cms/                    # Payload on Cloudflare Workers
+│   ├── src/
+│   │   ├── collections/
+│   │   ├── blocks/
+│   │   └── payload.config.ts
+│   ├── wrangler.jsonc
+│   └── package.json
+│
+├── web/                    # Astro on Cloudflare Pages
+│   ├── src/
+│   │   ├── pages/
+│   │   ├── components/
+│   │   └── lib/
+│   └── package.json
+```
+
+**Environment variables:**
+
+```env
+# cms/.env (local)
+PAYLOAD_SECRET=your-local-secret
+
+# web/.env (local)
+PAYLOAD_API_URL=http://localhost:3000/api
+```
+
+**Production (set in Cloudflare dashboard):**
+
+Workers (Payload):
+- `PAYLOAD_SECRET` - Secure random string
+- D1 and R2 bindings configured in wrangler.jsonc
+
+Pages (Astro):
+- `PAYLOAD_API_URL` - Your Payload Worker URL (e.g., `https://my-payload-app.workers.dev/api`)
+
+### Limitations
+
+- **Paid Workers plan required** (~$5/month)
+- **GraphQL not fully supported** on Workers - use REST API
+- **Bundle size limit** - 1MB free tier, 10MB paid
+- **D1 access via bindings only** - no traditional connection strings
+
+### Cost Estimate (Cloudflare Stack)
+
+| Service | Cost |
+|---------|------|
+| Workers (paid plan) | ~$5/month |
+| D1 database | Free tier covers most CMS usage |
+| R2 storage | Free for first 10GB |
+| Pages (Astro) | Free |
+| **Total** | **~$5/month** |
+
+Significantly cheaper than Railway + MongoDB Atlas (~$28/month), with the bonus of global edge performance from read replicas.
 
 ## Runtime Compatibility (Bun / Node.js)
 
@@ -1782,6 +1981,8 @@ bunx --bun payload migrate --disable-transpile
 ```
 
 **Important:** This applies to the Payload backend only. The Astro frontend has full Bun support.
+
+**User note:** Use Bun as the default package manager for everything (Astro, daily work, installing packages). Keep pnpm available in the Payload backend for CLI commands where Node.js runtime is required (migrations, type generation). The backend `package.json` keeps its pnpm engine config for this reason. From the root, `bun run dev:backend` works fine since it delegates to Next.js which uses Node internally.
 
 ## Tips and Best Practices
 

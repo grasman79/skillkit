@@ -373,6 +373,7 @@ The `project-setup` skill automatically recommends this stack and detects your p
 ## Changelog
 
 ### v1.2.2 (2026-02-14)
+- **Payload on Cloudflare Workers** - Full deployment guide with D1 database, R2 storage, Wrangler config, migrations, and cost comparison (~$5/month vs ~$28/month Railway)
 - **Astro + Payload CMS theming** - CMS-driven theme pattern using CSS variables generated from Payload fields via Astro's `<style define:vars>`
 - **Payload build trigger strategies** - Three approaches for triggering Astro rebuilds: admin button, debounced auto-rebuild, and per-change webhooks
 - **Payload live preview with Astro** - postMessage-based preview in Payload's side panel, plus block-level preview via server routes
