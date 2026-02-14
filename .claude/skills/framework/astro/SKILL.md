@@ -494,6 +494,55 @@ const { block } = Astro.props;
 </section>
 ```
 
+### CMS-Driven Theming via CSS Variables
+
+Store theme tokens (colors, fonts, spacing) as Payload fields and generate CSS variables in Astro at build time. This lets editors customize the site's look from the admin panel.
+
+```typescript
+// src/lib/payload.ts
+export async function getTheme() {
+  const response = await fetch(`${PAYLOAD_API_URL}/globals/theme?depth=0`);
+  const data = await response.json();
+  return data;
+}
+```
+
+```astro
+---
+// src/layouts/BaseLayout.astro
+import { getTheme } from '../lib/payload';
+
+const theme = await getTheme();
+const primaryColor = theme.primaryColor || '#3b82f6';
+const secondaryColor = theme.secondaryColor || '#10b981';
+const fontFamily = theme.fontFamily || 'Inter, sans-serif';
+const borderRadius = theme.borderRadius || '0.5rem';
+---
+
+<html>
+<head>
+  <style define:vars={{ primaryColor, secondaryColor, fontFamily, borderRadius }}>
+    /* These become CSS variables usable in any component */
+    :root {
+      --color-primary: var(--primaryColor);
+      --color-secondary: var(--secondaryColor);
+      --font-family: var(--fontFamily);
+      --border-radius: var(--borderRadius);
+    }
+  </style>
+</head>
+<body>
+  <slot />
+</body>
+</html>
+```
+
+All downstream components consume `var(--color-primary)` etc. - no prop drilling needed.
+
+### Local API Caveat
+
+Payload has a Local API example for Astro, but **the Local API does not work with Astro's SSG mode** due to `"__dirname is not defined in ES module scope"`. Stick with the REST API for static builds. The Local API may work in SSR mode but is not officially tested with Astro.
+
 ### Deployment
 
 - **Payload:** Railway/Render/VPS (needs Node.js)

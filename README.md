@@ -2,10 +2,10 @@
 
 > A skills system for Claude Code that teaches it exactly how to build your app, so you never have to explain the same thing twice.
 
-**Version:** 1.2.1
+**Version:** 1.2.2
 **Author:** Manuel Merz
 **License:** MIT
-**Date:** 13/02/2026
+**Date:** 14/02/2026
 
 ---
 
@@ -371,6 +371,12 @@ The `project-setup` skill automatically recommends this stack and detects your p
 ---
 
 ## Changelog
+
+### v1.2.2 (2026-02-14)
+- **Astro + Payload CMS theming** - CMS-driven theme pattern using CSS variables generated from Payload fields via Astro's `<style define:vars>`
+- **Payload build trigger strategies** - Three approaches for triggering Astro rebuilds: admin button, debounced auto-rebuild, and per-change webhooks
+- **Payload live preview with Astro** - postMessage-based preview in Payload's side panel, plus block-level preview via server routes
+- **Local API caveat** - Documented `__dirname` ES module scope error when using Payload's Local API with Astro SSG mode
 
 ### v1.2.1 (2026-02-13)
 - **Payload CMS skill** - Comprehensive headless CMS skill with collections, blocks, media, hooks, REST API, Form Builder plugin, monorepo deployment (Railway + Cloudflare Pages), and Bun runtime compatibility

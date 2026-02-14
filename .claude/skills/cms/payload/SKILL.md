@@ -1608,9 +1608,53 @@ Railway (Payload):
 Cloudflare Pages (Astro):
 - `PAYLOAD_API_URL` - Your Payload Railway URL (e.g., `https://your-payload.railway.app/api`)
 
-### ISR (Incremental Static Regeneration) with Astro
+### Build Trigger Strategies
 
-Enable on-demand revalidation when content changes in Payload:
+When using Astro in SSG mode, content changes in Payload need to trigger a site rebuild. Several approaches:
+
+**Option 1: "Update Live Site" button in Payload admin**
+
+Add a custom admin UI button that editors click when they're ready to publish:
+
+```typescript
+// Payload hook on a dedicated "site-settings" global
+{
+  slug: 'site-settings',
+  hooks: {
+    afterChange: [
+      async () => {
+        await fetch(process.env.ASTRO_BUILD_WEBHOOK, { method: 'POST' });
+      }
+    ]
+  }
+}
+```
+
+**Option 2: Debounced auto-rebuild**
+
+Trigger a rebuild after a period of inactivity (e.g., no edits for 15 minutes). Implement with a simple timer in an afterChange hook:
+
+```typescript
+// Payload hook with debounce
+let rebuildTimer: NodeJS.Timeout | null = null;
+
+const triggerDebouncedRebuild = async () => {
+  if (rebuildTimer) clearTimeout(rebuildTimer);
+  rebuildTimer = setTimeout(async () => {
+    await fetch(process.env.ASTRO_BUILD_WEBHOOK, { method: 'POST' });
+  }, 15 * 60 * 1000); // 15 minutes
+};
+
+// Add to any collection that should trigger rebuilds
+{
+  slug: 'pages',
+  hooks: {
+    afterChange: [({ operation }) => { triggerDebouncedRebuild(); }],
+  }
+}
+```
+
+**Option 3: Direct webhook per change (simple)**
 
 ```typescript
 // Payload hook to trigger Astro rebuild
@@ -1618,9 +1662,8 @@ Enable on-demand revalidation when content changes in Payload:
   slug: 'pages',
   hooks: {
     afterChange: [
-      async ({ doc, req, operation }) => {
-        // Trigger Astro rebuild webhook
-        await fetch('https://your-astro-site.com/api/revalidate', {
+      async ({ doc }) => {
+        await fetch(process.env.ASTRO_BUILD_WEBHOOK, {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${process.env.REVALIDATE_SECRET}` },
           body: JSON.stringify({ slug: doc.slug }),
@@ -1629,6 +1672,69 @@ Enable on-demand revalidation when content changes in Payload:
     ]
   }
 }
+```
+
+Most hosting platforms (Vercel, Netlify, Cloudflare Pages) provide deploy hook URLs you can use as `ASTRO_BUILD_WEBHOOK`.
+
+### Live Preview with Astro
+
+Payload's live preview can work with Astro, though it requires SSR mode (not SSG).
+
+**Basic approach: Full page refresh via postMessage**
+
+Configure Payload to show your Astro page in its side panel preview frame:
+
+```typescript
+// payload.config.ts
+{
+  slug: 'pages',
+  admin: {
+    livePreview: {
+      url: ({ data }) =>
+        `${process.env.ASTRO_SITE_URL}/${data.slug}`,
+    },
+  },
+}
+```
+
+On the Astro side, add a client-side script that listens for Payload's refresh signal:
+
+```astro
+---
+// src/layouts/PreviewLayout.astro
+---
+<slot />
+
+<script>
+  // Listen for Payload's postMessage to refresh preview
+  window.addEventListener('message', (event) => {
+    if (event.data.type === 'payload-live-preview') {
+      window.location.reload();
+    }
+  });
+</script>
+```
+
+**Block-level preview (advanced)**
+
+Create an Astro server route that renders a single block from query params, then embed it in Payload via iframe:
+
+```typescript
+// src/pages/api/preview-block.ts (Astro SSR route)
+export async function GET({ url }) {
+  const blockData = JSON.parse(url.searchParams.get('data') || '{}');
+  const blockType = url.searchParams.get('type');
+  // Render the block component and return HTML
+}
+```
+
+**Note:** Live preview requires Astro in SSR mode (`output: 'server'` or `output: 'hybrid'`). For purely static sites, editors typically preview by triggering a build and checking the staging URL.
+
+### Local API Caveat with Astro
+
+Payload has a Local API example for Astro in their repo, but **the Local API does not work reliably with Astro's SSG mode**. The known error is `"__dirname is not defined in ES module scope"`.
+
+**Recommendation:** Use the REST API for Astro integration. The Local API is designed for Next.js where Payload runs in the same process. For Astro, fetch from Payload's REST endpoints instead
 ```
 
 ## Runtime Compatibility (Bun / Node.js)
