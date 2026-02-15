@@ -2,10 +2,10 @@
 
 > A skills system for Claude Code that teaches it exactly how to build your app, so you never have to explain the same thing twice.
 
-**Version:** 1.2.2
+**Version:** 1.2.3
 **Author:** Manuel Merz
 **License:** MIT
-**Date:** 14/02/2026
+**Date:** 15/02/2026
 
 ---
 
@@ -371,6 +371,12 @@ The `project-setup` skill automatically recommends this stack and detects your p
 ---
 
 ## Changelog
+
+### v1.2.3 (2026-02-15)
+- **Content website setup wizard** - Project setup now asks "Web application or Content website?" as the first question, routing to the appropriate questionnaire
+- **Content website questionnaire** - Simplified 3-question flow for Astro + Payload CMS sites: deployment targets (backend + frontend) and project description
+- **Template-aware setup** - Content website wizard recognizes that the Astro + Payload monorepo template is already in place, only creates documentation and configures environment variables
+- **Astro + Payload detection** - Codebase auto-detection now recognizes Astro and Payload CMS projects
 
 ### v1.2.2 (2026-02-14)
 - **Payload on Cloudflare Workers** - Full deployment guide with D1 database, R2 storage, Wrangler config, migrations, and cost comparison (~$5/month vs ~$28/month Railway)

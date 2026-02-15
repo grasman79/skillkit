@@ -22,7 +22,7 @@ First, detect the package manager by checking for lock files:
 - `yarn.lock` → Yarn
 - `package-lock.json` → npm
 
-If no lock file exists, ask the user.
+If no lock file exists, ask the user (see Question 0b below).
 
 ```
 Welcome! I'll help you set up your project.
@@ -35,7 +35,26 @@ Let's get started with a few quick questions.
 
 ---
 
-#### Question 0: Package Manager (if not detected)
+#### Question 0a: Project Type
+
+**This is always the first question.**
+
+```
+What type of project are you building?
+
+A. Web application (interactive app with user accounts, database, etc.)
+B. Content website (blog, marketing site, portfolio - powered by CMS)
+
+Pick the one that fits best!
+```
+
+**Routing:**
+- **Web application** → Continue with Question 0b (package manager) and the full web app questionnaire below (Q1-Q8)
+- **Content website** → Switch to the content website questionnaire: [content-questionnaire.md](content-questionnaire.md)
+
+---
+
+#### Question 0b: Package Manager (if not detected)
 
 ```
 Which package manager do you use?
@@ -229,6 +248,7 @@ Based on specific needs, recommend:
 | User Needs | Recommend |
 |------------|-----------|
 | Web app (default) | TanStack Start + Supabase + Drizzle + Better Auth |
+| Content website | Astro + Payload CMS + Tailwind (fixed stack) |
 | Real-time features | Add Supabase Realtime (built-in) |
 | Offline-first app | Electric SQL instead of Supabase Realtime |
 | Mobile app | React Native + Expo |
@@ -298,6 +318,7 @@ When creating documentation files, map questionnaire answers to template section
 
 | Question | Template Section |
 |----------|-----------------|
+| Q0a: Project type | Routes to web app or content website questionnaire |
 | Q1: What are you building? | `## Project Overview` → "What we're building" |
 | Q2: Who will use this? | `## Project Overview` → "Primary users" |
 | Q3: Application type | `## Tech Stack` → Framework selection |
@@ -306,6 +327,8 @@ When creating documentation files, map questionnaire answers to template section
 | Q6: Tech preferences | `## Tech Stack` → All subsections |
 | Q7: Timeline | `## Project Overview` → "Target launch" |
 | Q8: Code review | `## Code Review` in dev-context.md (if Greptile) |
+
+**Note:** If the user selects "Content website" in Q0a, the web app questions above are skipped entirely. See [content-questionnaire.md](content-questionnaire.md) for the content website field mapping.
 
 ### Additional Fields to Populate
 
@@ -323,6 +346,7 @@ Based on tech recommendations:
 
 | Project Type | Skip These Sections |
 |--------------|---------------------|
+| Content website | Auth, Payments, AI Integration, Database Schema, API Endpoints, Real-time (all handled by Payload template) |
 | Landing page | Database Schema, API Endpoints, AI Integration |
 | Simple app | API Endpoints (Planned), Implementation Priorities |
 | Full SaaS | None - use full template |

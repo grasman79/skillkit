@@ -25,20 +25,40 @@ Check what exists in the project:
 2. **Check for existing code** - No code → fresh start; Has code → analyze codebase
 3. **Check for installed skills** - Recommend missing skills based on project needs
 
-### Step 2: Gather Information
+### Step 2: Detect Project Type
 
-**For new projects**, ask about (one question at a time):
+**Before asking any questions, check if the project is a content website:**
+
+Look for Astro + Payload in the project folder:
+- `astro` + `payload` in package.json dependencies
+- `astro.config.*` + `payload.config.ts` files
+- A monorepo with `backend/` and `frontend/` folders containing these
+
+**If Astro + Payload detected:** Skip the project type question entirely. Go straight to the content website questionnaire (deployment questions only). The template code is already in place - the wizard only creates documentation files and updates environment variables. See [content-questionnaire.md](content-questionnaire.md).
+
+**If other code detected:** Run the existing codebase detection flow. See [detection.md](detection.md).
+
+**If empty folder:** Ask the project type question:
+
+```
+What type of project are you building?
+
+A. Web application (interactive app with user accounts, database, etc.)
+B. Content website (blog, marketing site, portfolio - powered by CMS)
+```
+
+**Routing:**
+- **Web application** → Continue with the web app questionnaire (Q1-Q8)
+- **Content website** → Switch to the content website questionnaire (3 questions only)
+
+**For web apps:** Ask about (one question at a time):
 - What you're building (in your own words)
 - Who it's for
 - Key features needed
 - Any technology preferences (recommend if unsure)
 
-**For existing codebases:**
-- Scan package.json and file structure
-- Detect frameworks, databases, auth systems
-- Ask user to confirm or correct findings
-
-See [questionnaire.md](questionnaire.md) for full question flow.
+See [questionnaire.md](questionnaire.md) for the web app question flow.
+See [content-questionnaire.md](content-questionnaire.md) for the content website question flow.
 See [detection.md](detection.md) for codebase analysis patterns.
 
 ### The "No Assumptions" Principle
@@ -214,6 +234,7 @@ Based on project type, recommend relevant skills:
 
 | Project Type | Recommended Skills |
 |--------------|-------------------|
+| Content website | astro, payload (fixed stack - no choices needed) |
 | Web app (SaaS) | tanstack-start, supabase, drizzle, better-auth, shadcn, stripe |
 | Landing page | tanstack-start, shadcn |
 | API/Backend | supabase, drizzle |
@@ -285,6 +306,75 @@ bun create @tanstack/app task-manager
 Next steps:
 1. Review project/projectbrief.md
 2. Start building - just tell me what you want!"
+```
+
+---
+
+**Content Website Setup:**
+
+```
+User: "I want to set up a content website"
+
+Claude: "Welcome! I'll help you set up your project.
+
+Project name: **agency-site** (from your folder)
+
+What type of project are you building?
+
+A. Web application (interactive app with user accounts, database, etc.)
+B. Content website (blog, marketing site, portfolio - powered by CMS)"
+
+User: "B"
+
+Claude: "Where do you want to deploy the backend (your content management system)?
+
+A. Cloudflare Workers (Recommended - $5/month, includes D1 database + R2 storage)
+B. Railway ($5/month, built-in Postgres)
+C. Vercel (free tier available)
+D. Render
+E. VPS (own server)"
+
+User: "A"
+
+Claude: "What database do you want to use for your content?
+
+A. PostgreSQL (Recommended - most common, works everywhere)
+B. SQLite / D1 (lightweight, great for Cloudflare)
+C. MongoDB"
+
+User: "B"
+
+Claude: "Where do you want to deploy the website itself (the pages visitors see)?
+
+A. Cloudflare Pages (Recommended - free, fast, global CDN)
+B. Netlify
+C. Vercel"
+
+User: "A"
+
+Claude: "In 2-3 sentences, describe the website you're building."
+
+User: "A portfolio website for a design agency showcasing their work and team"
+
+Claude: "Your content website is configured!
+
+Project: Agency Site
+Type: Content Website
+
+Stack (already in your template):
+- Astro frontend with Tailwind
+- Payload CMS with admin panel, SEO, media
+
+Deployment (all on Cloudflare):
+- Backend (Payload): Cloudflare Workers
+- Database: D1 (SQLite)
+- Frontend (Astro): Cloudflare Pages
+- Media: R2
+
+Environment variables updated. Next steps:
+1. Review project/projectbrief.md
+2. Fill in API keys in .env
+3. Tell me what you want to customize first!"
 ```
 
 ---

@@ -15,21 +15,26 @@ Check environment:
 └── package.json present?
         ↓
 Route to appropriate flow:
-├── Empty folder → New Project Flow
-├── Has code → Existing Codebase Flow
+├── Has Astro + Payload code → Content Website Flow (auto-detected, skip project type question)
+├── Has other code → Existing Codebase Flow
+├── Empty folder → Ask Project Type Question
+│   ├── Web application → New Web App Flow
+│   └── Content website → Content Website Flow
 └── Has projectbrief → Analyze & Recommend
 ```
+
+**Auto-detection for content websites:** Before asking any questions, check if the project folder contains both Astro and Payload. Look for `astro` + `payload` in package.json dependencies, or `astro.config.*` + `payload.config.ts` files, or a monorepo with `backend/` and `frontend/` folders containing these. If detected, skip the project type question and go straight to the Content Website Flow (deployment questions only).
 
 ---
 
 ## New Project Flow
 
-### Step 1: Welcome
+### Step 1: Welcome & Project Type
 
 **What to do:**
 - Greet the user warmly
 - Detect project name from folder
-- Set expectations for the process
+- Ask the project type question (this is always the first question)
 
 **Example output:**
 ```
@@ -37,10 +42,17 @@ Welcome! I'll help you set up your project.
 
 Project name: **my-awesome-app** (from your folder)
 
-I'll ask a few quick questions to understand what you're building, then set everything up for you. Ready?
+First question: What type of project are you building?
+
+A. Web application (interactive app with user accounts, database, etc.)
+B. Content website (blog, marketing site, portfolio - powered by CMS)
 ```
 
-### Step 2: Questionnaire
+**Routing:**
+- **Web application** → Continue with Step 2 below (web app questionnaire)
+- **Content website** → Jump to [Content Website Flow](#content-website-flow)
+
+### Step 2: Web App Questionnaire
 
 **Reference:** [questionnaire.md](questionnaire.md)
 
@@ -183,6 +195,101 @@ Your project is now set up!
 
 What would you like to work on?
 ```
+
+---
+
+## Content Website Flow
+
+The content website flow is for projects using Astro + Payload CMS. **The template code is already in the project folder** (Astro frontend + Payload backend monorepo). The wizard only creates documentation and configures environment variables.
+
+**Reference:** [content-questionnaire.md](content-questionnaire.md)
+
+### Step 1: Content Website Questionnaire
+
+Ask these questions one at a time:
+
+1. **Backend deployment** - Where to deploy Payload CMS? (Cloudflare Workers [recommended] / Railway / Vercel / Render / VPS)
+2. **Database** - What database for content? (PostgreSQL [recommended] / SQLite-D1 / MongoDB)
+3. **Frontend deployment** - Where to deploy the Astro website? (Cloudflare Pages [recommended] / Netlify / Vercel)
+4. **Project description** - What is this website about? (free text)
+5. **Code review** - Set up Greptile? (Yes / No)
+
+### Step 2: Present Summary
+
+Show the user what will be configured:
+
+```
+Here's your content website setup:
+
+**Project:** [folder-name]
+**Type:** Content Website
+
+**Stack (already in your template):**
+- Astro - Static site generator
+- Payload CMS - Content management backend
+- Tailwind CSS - Styling
+
+**Deployment:**
+- Backend (Payload): [selected platform]
+- Database: [selected database]
+- Frontend (Astro): [selected platform]
+
+Your project code is already in place. I'll set up the project documentation
+and configure environment variables for your chosen hosting platforms.
+
+Does this look good?
+```
+
+### Step 3: Create Documentation Files
+
+Same documentation files as web app flow, but with a slim projectbrief:
+
+| File | Content |
+|------|---------|
+| `project/projectbrief.md` | Project type, description, fixed stack (Astro + Payload + Tailwind), deployment targets, relevant skills |
+| `project/dev-context.md` | Package manager, code review config |
+| `project/tasks.md` | Configuration and deployment tasks (no scaffolding tasks - template is ready) |
+| `project/changelog.md` | Setup session entry |
+
+**Sections to skip in projectbrief:** Auth, Payments, AI Integration, Database Schema, API Endpoints, Real-time features (all handled by the Payload template).
+
+### Step 4: Update Environment Variables
+
+Update `.env` and `.env.production` based on the user's hosting choices. The template may already have default env files - check first and update rather than overwrite.
+
+**See:** [content-questionnaire.md](content-questionnaire.md) → Environment Variables section
+
+### Step 5: Complete Setup & Getting Started
+
+Mark `.setup-complete`, then walk the user through getting the project running locally.
+
+**See:** [content-questionnaire.md](content-questionnaire.md) -> Getting Started Guide
+
+**Example output:**
+```
+Your content website is configured!
+
+**Created:**
+- .claude/project/projectbrief.md - Your project overview
+- .claude/project/tasks.md - Task tracking
+- .claude/project/changelog.md - Session history
+- Environment variables updated for [Payload platform] + [Frontend platform]
+
+**Your template includes:**
+- Astro frontend with Tailwind
+- Payload CMS with admin panel, SEO, media handling
+- Pre-configured content types
+
+Let's get your project running locally. First, I'll set up your environment files...
+```
+
+Then walk through the Getting Started steps one at a time:
+1. Set up .env files (Claude does this automatically)
+2. Start the database (if Postgres setup)
+3. Install dependencies
+4. Start both dev servers
+5. Create admin account
+6. Start adding content
 
 ---
 

@@ -4,6 +4,32 @@
 
 When setting up a project that already has code, follow this detection process.
 
+## Content Website Auto-Detection
+
+**Before running generic detection, check for the Astro + Payload content website template:**
+
+Look for these signals:
+- `astro` AND `payload` in package.json dependencies (root or in subfolders)
+- `astro.config.mjs` or `astro.config.ts` AND `payload.config.ts` files
+- A monorepo structure with `backend/` (Payload) and `frontend/` (Astro) folders
+
+**If detected:** This is a content website based on the template. Skip the generic detection flow and go directly to the Content Website Flow in [wizard-flow.md](wizard-flow.md). The user only needs to answer deployment questions - no need to confirm the stack (it's fixed).
+
+**Example output:**
+```
+I detected your Astro + Payload CMS template. Let's configure your content website.
+
+Project name: **[folder-name]** (from your folder)
+
+Where do you want to deploy the backend (your content management system)?
+
+A. Cloudflare Workers (Recommended - $5/month, includes D1 database + R2 storage)
+B. Railway ($5/month, built-in Postgres)
+C. Vercel (free tier available)
+D. Render
+E. VPS (own server)
+```
+
 ## What to Scan
 
 ### 1. Package.json Dependencies
@@ -12,6 +38,8 @@ Look for these patterns:
 
 | Dependency | Indicates |
 |------------|-----------|
+| `astro` | Astro framework |
+| `payload` | Payload CMS |
 | `next` | Next.js framework |
 | `@tanstack/start` | TanStack Start framework |
 | `react-native` | Mobile app |
@@ -35,6 +63,8 @@ Look for these patterns:
 
 | Files/Folders | Indicates |
 |---------------|-----------|
+| `src/pages/` + `astro.config.*` | Astro framework |
+| `collections/` or `payload.config.ts` | Payload CMS |
 | `app/` directory | Next.js App Router |
 | `pages/` directory | Next.js Pages Router |
 | `src/routes/` | TanStack Start |
@@ -49,6 +79,8 @@ Look for these patterns:
 
 | File | Indicates |
 |------|-----------|
+| `astro.config.mjs/ts` | Astro |
+| `payload.config.ts` | Payload CMS |
 | `next.config.js/ts` | Next.js |
 | `tailwind.config.js/ts` | Tailwind CSS |
 | `tsconfig.json` | TypeScript |
