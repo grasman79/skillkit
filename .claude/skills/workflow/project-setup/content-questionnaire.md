@@ -352,8 +352,7 @@ Generate these initial tasks in `project/tasks.md`. Since the template is alread
 ## Tasks
 
 ### Getting Started
-- [ ] Set up environment files (copy .env.example to .env in both backend and frontend)
-- [ ] Start the database (Docker Compose or existing Postgres)
+- [ ] Set up environment files (copy .env.example to .env and .env.production in both backend and frontend)
 - [ ] Install dependencies in both backend and frontend
 - [ ] Start both dev servers (backend on :3000, frontend on :4321)
 - [ ] Create first admin account at localhost:3000/admin
@@ -373,37 +372,37 @@ Generate these initial tasks in `project/tasks.md`. Since the template is alread
 - [ ] Add media assets
 ```
 
+**Note:** There is no "Start the database" task. Content websites use external database services (Cloudflare D1, Supabase, Neon, Railway Postgres, etc.), not local Docker containers. The database connection string is configured in the `.env` file during the environment setup step.
+
 ### Getting Started Guide
 
 After the setup wizard completes, walk the user through getting the project running locally. Use the project's detected package manager (replace `[pm]` with bun/npm/pnpm/yarn).
 
 #### Step 1: Set Up Environment Files
 
-Both the backend and frontend have `.env.example` files. Copy them:
+Both the backend and frontend have `.env.example` files. Create two environment files from each:
 
 ```
-Backend: Copy backend/.env.example to backend/.env
-- Change PAYLOAD_SECRET to a new random string (this secures the admin panel)
+Backend:
+- Copy backend/.env.example to backend/.env (local development)
+- Copy backend/.env.example to backend/.env.production (production deployment)
+- In .env: Change PAYLOAD_SECRET to a new random string (this secures the admin panel)
+- In .env.production: Leave all values empty with comments explaining where to find each value
 
-Frontend: Copy frontend/.env.example to frontend/.env
-- Defaults are fine for local development
+Frontend:
+- Copy frontend/.env.example to frontend/.env (local development)
+- Copy frontend/.env.example to frontend/.env.production (production deployment)
+- In .env: Defaults are fine for local development
+- In .env.production: Leave all values empty with comments explaining where to find each value
 ```
 
-**Claude should do this for the user** - read the .env.example files, generate a random PAYLOAD_SECRET, and create the .env files.
+**Claude should do this for the user** - read the .env.example files, generate a random PAYLOAD_SECRET, and create both `.env` (with dev defaults) and `.env.production` (with empty values and helpful comments) for each folder.
 
-#### Step 2: Start the Database
+**For PostgreSQL setups:** The `DATABASE_URL` in `.env` should point to the external database provider (Supabase, Neon, Railway, etc.). There is no local PostgreSQL - content websites use external database services. The user needs to create their database on the chosen provider and paste the connection string.
 
-**For Cloudflare setup (D1):** Payload uses SQLite locally, no database setup needed. Skip this step.
+**For D1/SQLite setups:** No `DATABASE_URL` needed locally - Payload uses a local SQLite file. D1 bindings are configured via `wrangler.toml` for production.
 
-**For Railway / Render / Vercel setup (Postgres):** The backend includes a Docker Compose file with PostgreSQL pre-configured.
-
-```
-cd backend && docker-compose up -d
-```
-
-This starts PostgreSQL on port 5432. If the user already has PostgreSQL running locally, they can skip Docker and point `DATABASE_URI` in their `.env` to the existing database.
-
-#### Step 3: Install Dependencies
+#### Step 2: Install Dependencies
 
 ```
 cd backend && [pm] install
@@ -412,7 +411,7 @@ cd frontend && [pm] install
 
 Or if the root has a workspace setup, just `[pm] install` from the root.
 
-#### Step 4: Start Both Dev Servers
+#### Step 3: Start Both Dev Servers
 
 Two terminal windows needed:
 
@@ -423,11 +422,11 @@ Terminal 2 (frontend): cd frontend && [pm] run dev   -> Astro on localhost:4321
 
 Or from the root folder using convenience scripts: `[pm] run dev:backend` and `[pm] run dev:frontend`.
 
-#### Step 5: Create Admin Account
+#### Step 4: Create Admin Account
 
 Open `localhost:3000/admin` in the browser. Payload will ask to create the first admin user (email + password). This is the login for the content management panel.
 
-#### Step 6: Start Adding Content
+#### Step 5: Start Adding Content
 
 Once logged in, the sidebar shows all collections (Posts, Pages, Categories, Tags, Media). Start creating categories and tags, then write posts and pages.
 
