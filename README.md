@@ -2,10 +2,10 @@
 
 > A skills system for Claude Code that teaches it exactly how to build your app, so you never have to explain the same thing twice.
 
-**Version:** 1.2.6
+**Version:** 1.2.7
 **Author:** Manuel Merz
 **License:** MIT
-**Date:** 16/02/2026
+**Date:** 17/02/2026
 
 ---
 
@@ -376,6 +376,9 @@ The `project-setup` skill automatically recommends this stack and detects your p
 ---
 
 ## Changelog
+
+### v1.2.7 (2026-02-17)
+- **Content website setup fix** - Environment setup now creates both `.env` and `.env.production` files (was only creating `.env`). Removed incorrect "Start PostgreSQL via Docker Compose" task since content websites use external database services (Cloudflare D1, Supabase, Neon, Railway, etc.)
 
 ### v1.2.6 (2026-02-16)
 - **External brief import** - Setup wizard now asks "Do you have a project brief?" before the questionnaire. Users can paste briefs from Claude Projects, Google Docs, or any source. The wizard extracts relevant info, skips already-answered questions, and merges everything into the internal projectbrief format. Works for both web apps and content websites.

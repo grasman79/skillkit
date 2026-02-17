@@ -297,12 +297,11 @@ Let's get your project running locally. First, I'll set up your environment file
 ```
 
 Then walk through the Getting Started steps one at a time:
-1. Set up .env files (Claude does this automatically)
-2. Start the database (if Postgres setup)
-3. Install dependencies
-4. Start both dev servers
-5. Create admin account
-6. Start adding content
+1. Set up .env and .env.production files (Claude does this automatically)
+2. Install dependencies
+3. Start both dev servers
+4. Create admin account
+5. Start adding content
 
 ---
 
