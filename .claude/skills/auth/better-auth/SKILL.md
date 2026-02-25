@@ -15,6 +15,31 @@ Adds user authentication to your app - email & password signup/login, social log
 - User mentions password reset, email verification, 2FA
 - User asks about sessions, protected routes, or auth middleware
 
+## Guide Index - Read the Right File for the Topic
+
+**This skill has multiple reference files. Use this table to find the right one:**
+
+| Topic | Read this file | What it covers |
+|-------|---------------|----------------|
+| **Initial setup / adding auth** | [official-create-auth.md](official-create-auth.md) | Planning wizard, project scanning, step-by-step setup for any framework |
+| **TanStack Start** | [tanstack-start.md](tanstack-start.md) | Server-side auth, beforeLoad, middleware, tanstackStartCookies |
+| **Convex database** | [convex.md](convex.md) | Convex-specific setup (different from standard) |
+| **tRPC integration** | [trpc.md](trpc.md) | Protected procedures, session context |
+| **Email & password** | [official-email-password.md](official-email-password.md) | Email verification, password reset, hashing, timing attack prevention |
+| **Two-factor auth (2FA)** | [official-two-factor.md](official-two-factor.md) | TOTP, OTP, backup codes, trusted devices, QR codes |
+| **Organizations / teams** | [official-organization.md](official-organization.md) | Multi-tenant orgs, RBAC, invitations, teams, dynamic access control |
+| **Security hardening** | [official-security.md](official-security.md) | Rate limiting, CSRF, trusted origins, cookies, OAuth PKCE, IP tracking, audit logging |
+| **Config & best practices** | [official-best-practices.md](official-best-practices.md) | All config options, session management, hooks, plugins, type safety, gotchas |
+| **OAuth / social login** | [oauth.md](oauth.md) | Google, GitHub, and other provider setup |
+| **Route protection** | [middleware.md](middleware.md) | Middleware patterns for all frameworks |
+| **Database schema** | [database.md](database.md) | Prisma schema, table setup |
+| **Forms / UI** | [forms.md](forms.md) | Sign-in/sign-up form examples with error handling |
+| **Full setup reference** | [setup.md](setup.md) | Complete installation walkthrough |
+
+**When in doubt:** Start with this file for a quick overview, then read the specific file for the topic at hand.
+
+---
+
 ## Security: Server-Side Authentication Required
 
 **Authentication MUST be validated server-side.** This applies to ALL frameworks (Next.js, TanStack Start, Remix, etc.).
@@ -183,14 +208,25 @@ if (!session) return new Response("Unauthorized", { status: 401 });
 
 ## Reference Files
 
+### Framework-Specific Guides
 - [tanstack-start.md](tanstack-start.md) - **TanStack Start complete setup** (server-side auth patterns)
 - [trpc.md](trpc.md) - **tRPC authentication** (protected procedures)
+- [convex.md](convex.md) - Convex integration (use when Convex is your database)
+
+### Setup & Configuration
 - [setup.md](setup.md) - Full installation and configuration
 - [forms.md](forms.md) - Complete form examples with error handling
 - [oauth.md](oauth.md) - Social login providers setup
 - [middleware.md](middleware.md) - Route protection patterns (all frameworks)
 - [database.md](database.md) - Prisma schema and database setup
-- [convex.md](convex.md) - Convex integration (use when Convex is your database)
+
+### Official Better Auth Guides (from better-auth/skills)
+- [official-best-practices.md](official-best-practices.md) - Core config, session management, hooks, plugins, type safety, common gotchas
+- [official-security.md](official-security.md) - Rate limiting, CSRF, trusted origins, cookies, OAuth PKCE, IP tracking, audit logging
+- [official-create-auth.md](official-create-auth.md) - Planning wizard for adding auth to any project (auto-detection + questionnaire)
+- [official-email-password.md](official-email-password.md) - Email verification, password reset, password hashing, timing attack prevention
+- [official-organization.md](official-organization.md) - Multi-tenant orgs, teams, RBAC, invitations, dynamic access control
+- [official-two-factor.md](official-two-factor.md) - TOTP, OTP, backup codes, trusted devices, 2FA session flow
 
 ## Tips
 

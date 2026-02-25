@@ -18,11 +18,12 @@ Single command to close out a work session. Handles everything: logs progress, l
 1. Log the session (changelog + tasks)
 2. Run linter and fix issues
 3. Verify build passes
-4. Commit all changes
-5. Push to remote
-6. Create PR (feature branches)
-7. Wait for code review and auto-fix if needed (optional - Greptile)
-8. Merge and clean up
+4. Check branch name matches the work (warn if mismatch)
+5. Commit all changes
+6. Push to remote
+7. Create PR (feature branches)
+8. Wait for code review and auto-fix if needed (optional - Greptile)
+9. Merge and clean up
 
 ## Workflow
 
@@ -88,7 +89,30 @@ If the project has a build command in package.json:
 
 If build fails, fix the errors before committing. Do not push broken code.
 
-### Step 6: Stage and Commit
+### Step 6: Branch Relevance Check
+
+**If on a feature branch**, before committing, verify the branch name relates to the work being committed:
+
+1. Get the current branch name: `git branch --show-current`
+2. Review the changes being committed (from Step 4/5)
+3. Compare the branch name against the actual changes
+
+**If the branch name does NOT match the work being done** (e.g., branch is `feature/add-payments` but changes are about authentication), warn the user:
+
+```
+Warning: Current branch "feature/add-payments" doesn't seem related to the changes being committed (authentication updates).
+
+Options:
+1. Create a new branch (recommended) - stash changes, create a properly named branch, and continue
+2. Continue on this branch anyway
+3. Abort wrap-up
+```
+
+**If option 1:** Stash changes, create new branch from main, pop stash, and continue the workflow on the new branch.
+
+**If on main/dev:** Skip this check.
+
+### Step 7: Stage and Commit
 
 ```bash
 git add .
@@ -111,7 +135,7 @@ EOF
 
 **Commit types:** Feature, Fix, Update, Refactor, Chore
 
-### Step 7: Push to Remote
+### Step 8: Push to Remote
 
 ```bash
 git push origin [current-branch]
@@ -123,7 +147,7 @@ If the branch doesn't exist on remote yet:
 git push -u origin [current-branch]
 ```
 
-### Step 8: Create PR (feature branches only)
+### Step 9: Create PR (feature branches only)
 
 **If on a feature branch** (not main/dev/master):
 
@@ -145,9 +169,9 @@ EOF
 
 Note the PR number from the output.
 
-**If on main/dev:** Skip PR creation, just push directly. Skip to Step 10.
+**If on main/dev:** Skip PR creation, just push directly. Skip to Step 11.
 
-### Step 9: Code Review Cycle (optional - Greptile users only)
+### Step 10: Code Review Cycle (optional - Greptile users only)
 
 **Check if Greptile is configured:** Look for a `## Code Review` section in `project/dev-context.md`. If it exists and specifies Greptile, run the review cycle. If not, skip to Step 9b.
 
@@ -172,11 +196,11 @@ Options:
 2. Cancel and split into smaller PRs
 ```
 
-If user chooses option 1 (or no response), fall back to auto-merge (Step 9b). If option 2, stop and let the user reorganize.
+If user chooses option 1 (or no response), fall back to auto-merge (Step 10b). If option 2, stop and let the user reorganize.
 
 **If file count is 100 or fewer:** Proceed with Greptile review cycle below.
 
-#### Step 9a: Greptile Review Cycle
+#### Step 10a: Greptile Review Cycle
 
 **Poll for review:**
 
@@ -189,7 +213,7 @@ gh api repos/{owner}/{repo}/pulls/{pr_number}/reviews
 Look for a review from Greptile (check the `user.login` field for greptile or greptileai).
 
 **If no Greptile review appears after 10 minutes:**
-Fall back to auto-merge (Step 9b). Show message: "Greptile review not detected - enabling auto-merge."
+Fall back to auto-merge (Step 10b). Show message: "Greptile review not detected - enabling auto-merge."
 
 **If Greptile review appears:**
 
@@ -214,7 +238,7 @@ Merge the PR:
 gh pr merge [pr_number] --squash --delete-branch
 ```
 
-Proceed to Step 10.
+Proceed to Step 11.
 
 **If confidence score < threshold:**
 
@@ -241,7 +265,7 @@ Greptile review: [score]/5
    )"
    ```
 6. Push: `git push origin [branch]`
-7. Go back to the top of Step 9a and poll for a new review
+7. Go back to the top of Step 10a and poll for a new review
 
 **Maximum review cycles:** 3 attempts. If still below threshold after 3 fix cycles, merge anyway and show a warning:
 
@@ -250,7 +274,7 @@ Merged after 3 fix cycles. Greptile score: [score]/5
 Some review comments may need manual attention.
 ```
 
-#### Step 9b: No Code Review (auto-merge)
+#### Step 10b: No Code Review (auto-merge)
 
 If no Greptile is configured, enable auto-merge:
 
@@ -258,7 +282,7 @@ If no Greptile is configured, enable auto-merge:
 gh pr merge --auto --squash --delete-branch
 ```
 
-### Step 10: Clean Up Local Branch
+### Step 11: Clean Up Local Branch
 
 **If on a feature branch:**
 
@@ -272,7 +296,7 @@ git branch -d [feature-branch-name]
 
 **If on main/dev:** Skip this step.
 
-### Step 11: Confirm Everything
+### Step 12: Confirm Everything
 
 **With Greptile review:**
 
