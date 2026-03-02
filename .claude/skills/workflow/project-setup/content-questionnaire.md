@@ -348,36 +348,48 @@ PAYLOAD_ADMIN_PASSWORD=changeme123  # Password for auto-seeded admin accounts
 
 ### Initial Tasks
 
-Generate these initial tasks in `project/tasks.md`. Since the template is already in place, tasks focus on getting running, customization, and deployment:
+Generate these initial tasks in `project/tasks.md`. The checklist is numbered and ordered - follow it top to bottom.
+
+Since the template code is already in place, tasks focus on getting running and deploying. Replace `[selected platform]` with the user's actual choices from the questionnaire.
 
 ```markdown
-## Tasks
+## Setup Checklist
 
-### Getting Started
-- [ ] Set up environment files (.env in both backend and frontend)
-- [ ] Install dependencies (`bun install` in both backend and frontend)
-- [ ] Start both dev servers (backend: `pnpm run dev` on :3000, frontend: `bun run dev` on :4321)
-- [ ] Log into admin panel at localhost:3000/admin
+Follow these steps in order. Each step depends on the previous ones.
 
-### Configuration
-- [ ] Customize Payload collections for this project's content needs
-- [ ] Update Astro pages to match the website's design
+### Phase 1: Local Setup
+- [ ] 1. Edit package.json files (root, backend, frontend) - update project name
+- [ ] 2. Install dependencies (`bun install` in both backend/ and frontend/)
+- [ ] 3. Start dev servers (backend: `pnpm run dev` on :3000, frontend: `bun run dev` on :4321)
+- [ ] 4. Verify admin panel at localhost:3000/admin (auto-seeded admin accounts should work)
+- [ ] 5. Verify frontend at localhost:4321
 
-### Deployment (in this order)
-- [ ] First commit and push to GitHub (needed before connecting Cloudflare Pages)
-- [ ] Set up database (Railway Postgres, Supabase, Neon, or D1)
-- [ ] Deploy Payload backend to [selected platform]
-- [ ] Connect Cloudflare Pages to GitHub repo (see cloudflare-pages-deploy.md)
-- [ ] Configure build settings and environment variables
-- [ ] Verify frontend can fetch content from deployed backend
+### Phase 2: GitHub
+- [ ] 6. Create GitHub repository
+- [ ] 7. First commit and push to main
 
-### Content
-- [ ] Create initial content in Payload admin panel
-- [ ] Set up navigation structure
-- [ ] Add media assets
+### Phase 3: Backend Deployment ([selected platform])
+- [ ] 8. Create [selected platform] project and provision PostgreSQL database
+- [ ] 9. Create backend service, connect to GitHub repo, set root directory to /backend
+- [ ] 10. Set environment variables (DATABASE_URI, PAYLOAD_PUBLIC_SERVER_URL, PAYLOAD_SECRET)
+- [ ] 11. Generate domain, deploy, and verify admin panel works at production URL
+
+### Phase 4: Frontend Deployment (Cloudflare Pages)
+- [ ] 12. Connect Cloudflare Pages to GitHub repo
+- [ ] 13. Configure build settings: command `bun install && bun run build`, output `dist`, root `frontend`
+- [ ] 14. Set PAYLOAD_URL environment variable (production backend URL from step 11)
+- [ ] 15. Save and Deploy, verify site loads at pages.dev URL
+
+### Phase 5: Final Verification
+- [ ] 16. Admin panel works at production URL with seeded credentials
+- [ ] 17. Frontend fetches and displays content from production backend
 ```
 
-**Note:** There is no "Start the database" task. Content websites use external database services (Cloudflare D1, Supabase, Neon, Railway Postgres, etc.), not local Docker containers. The database connection string is configured in the `.env` file during the environment setup step.
+**Notes:**
+- There is no "Start the database" task. Content websites use external database services (Railway Postgres, Supabase, Neon, etc.), not local Docker containers.
+- Steps 3-5 (local dev) are optional before deployment but recommended to verify the template works.
+- The backend must be deployed before the frontend because Cloudflare Pages needs `PAYLOAD_URL`.
+- For detailed commands, see the Railway guide (`railway-payload-deploy.md`) and Cloudflare Pages guide (`cloudflare-pages-deploy.md`).
 
 ### Getting Started Guide
 
