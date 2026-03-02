@@ -358,7 +358,7 @@ Since the template code is already in place, tasks focus on getting running and 
 Follow these steps in order. Each step depends on the previous ones.
 
 ### Phase 1: Local Setup
-- [ ] 1. Edit package.json files (root, backend, frontend) - update project name
+- [ ] 1. Update project name in package.json files (root, backend/, frontend/) - change the `name` field to match the folder name
 - [ ] 2. Install dependencies (`bun install` in both backend/ and frontend/)
 - [ ] 3. Start dev servers (backend: `pnpm run dev` on :3000, frontend: `bun run dev` on :4321)
 - [ ] 4. Verify admin panel at localhost:3000/admin (auto-seeded admin accounts should work)
