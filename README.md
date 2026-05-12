@@ -2,10 +2,10 @@
 
 > A skills system for Claude Code that teaches it exactly how to build your app, so you never have to explain the same thing twice.
 
-**Version:** 1.3.3
+**Version:** 1.3.4
 **Author:** Manu
 **License:** MIT
-**Date:** 11/05/2026
+**Date:** 12/05/2026
 
 ---
 
@@ -260,6 +260,7 @@ Primary source of truth for Cloudflare-related skills: https://developers.cloudf
 | `react-router` | Deploy React Router v7 (ex-Remix) to Workers - Cloudflare Vite Plugin, bindings via context.cloudflare.env, Durable Objects export |
 | `nextjs` | Deploy Next.js to Workers - OpenNext adapter (@opennextjs/cloudflare), ISR with R2, dev vs preview, remote bindings |
 | `agents` | Cloudflare Agents SDK - stateful AI agents with AIChatAgent, state management (setState, SQL), tools (server/client/human-in-the-loop), scheduling (cron, delayed, interval), sub-agents, workflows, MCP, React hooks (useAgent, useAgentChat) |
+| `queues` | Cloudflare Queues - message queue for async processing with producers (send, sendBatch), push consumers (batch handler, ack/retry, exponential backoff), pull consumers (HTTP API), dead letter queues, message delays, Agents SDK integration |
 
 ### Deployment
 | Skill | What It Does |
@@ -397,6 +398,9 @@ The `project-setup` skill automatically recommends this stack and detects your p
 ---
 
 ## Changelog
+
+### v1.3.4 (12/05/2026)
+- **Cloudflare Queues skill** - New `cloudflare/queues` skill for asynchronous message processing on Workers. Covers producers (`send`, `sendBatch` with content types and delays), push consumers (batch `queue()` handler with explicit `ack()`/`retry()`, exponential backoff, `waitUntil` patterns), pull consumers (HTTP API with visibility timeout), dead letter queues, consumer settings (`max_batch_size`, `max_batch_timeout`, `max_retries`, `max_concurrency`), message delays (on send, on retry, queue-level defaults), and integration with the Agents SDK (agent as producer, queue consumer updating agent state). Includes CLI commands, limits reference, and 10 common gotchas.
 
 ### v1.3.3 (11/05/2026)
 - **Cloudflare Agents SDK skill** - New `cloudflare/agents` skill for building stateful AI applications on Cloudflare. Covers the Agent class with TypeScript decorators (`@callable()`), AIChatAgent for streaming chat with automatic message persistence, state management (`setState` with real-time client sync, embedded SQLite via `this.sql`, validation), three tool types (server-side auto-execute, client-side browser tools, human-in-the-loop approval with `needsApproval`), scheduling (`schedule()` for delayed/date/cron, `scheduleEvery()` for intervals, idempotency rules), React hooks (`useAgent` for state sync, `useAgentChat` for chat UI), and AI model integration (Workers AI with no API key, OpenAI, Anthropic, Gemini via AI SDK, AI Gateway). Includes advanced reference covering sub-agents (parallel execution, isolated SQLite, typed RPC), AgentWorkflow for durable multi-step processing with retry, MCP server/client integration, browser tools via Chrome DevTools Protocol, and WebSocket streaming patterns that solve the Workers runtime limit for long-running AI workloads. Architecture patterns reference provides ready-to-use recipes: simple chat, tool-using agents, orchestrator-workers, scheduled processing, and multi-model routing.

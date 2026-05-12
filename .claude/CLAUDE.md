@@ -151,6 +151,7 @@ Reusable across projects: `skills/`, `templates/`, `commands/`
 | Deploy React Router v7 to Cloudflare Workers | `cloudflare/react-router` |
 | Deploy Next.js to Cloudflare Workers (OpenNext) | `cloudflare/nextjs` |
 | Cloudflare Agents SDK, AI agents, AIChatAgent, agent tools, agent scheduling | `cloudflare/agents` |
+| Cloudflare Queues, message queue, async processing, queue consumer, dead letter queue | `cloudflare/queues` |
 | Project setup, new projects | `workflow/project-setup` |
 | Feature planning, "plan feature" | `workflow/feature-planner` |
 | Server issues, port conflicts | `workflow/dev-server` |
