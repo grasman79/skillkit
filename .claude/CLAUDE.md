@@ -138,6 +138,7 @@ Reusable across projects: `skills/`, `templates/`, `commands/`
 | User login, signup, sessions, OAuth | `auth/better-auth` |
 | Payments, checkout, subscriptions | `payments/stripe` |
 | UI components, forms, dialogs, shadcn presets, monorepo UI | `ui/shadcn` |
+| Drag and drop, sortable lists, kanban board, reorder, drag to reorder, file drop zones | `ui/pragmatic-drag-and-drop` |
 | AI features, chat, text generation | `ai/vercel-ai-sdk` |
 | Sending emails, notifications | `email/resend`, `email/autosend`, or `email/unosend` |
 | Email deliverability, SPF/DKIM/DMARC, spam | `email/resend` |
@@ -150,6 +151,7 @@ Reusable across projects: `skills/`, `templates/`, `commands/`
 | Animations, transitions, React Native Ease | `platform/react-native` |
 | Framework-specific patterns, SSR/RSC rendering modes | `framework/nextjs`, `framework/tanstack-start`, or `framework/astro` |
 | CMS, admin panel, content management, Payload collections, fields, hooks, access control, plugins | `cms/payload` |
+| Payload blocks field, flexible page layouts, block types, page builder, blockType, blockName, render blocks | `cms/payload-blocks` |
 | Push local content to live backend, content sync, update live database | `cms/payload` (see content-sync.md) |
 | Migrate from WordPress, Contentful, Strapi, Sanity, Webflow to Payload | `cms/cms-migration` |
 | Railway deployment, services, databases, domains, troubleshooting | `deployment/railway` |
@@ -164,6 +166,7 @@ Reusable across projects: `skills/`, `templates/`, `commands/`
 | Cloudflare Voice agents, voice pipeline, STT, TTS, real-time audio, barge-in, withVoice, withVoiceInput, WorkersAIFluxSTT, WorkersAINova3STT, useVoiceAgent, useVoiceInput, VoiceClient | `cloudflare/agents-voice` |
 | Cloudflare Queues, message queue, async processing, queue consumer, dead letter queue | `cloudflare/queues` |
 | Local dev tunnels, expose localhost, share preview, test webhooks | `cloudflare/local-dev-tunnels` |
+| Cloudflare Tunnel (production), cloudflared daemon, ingress rules, tunnel Docker/K8s, tunnel replicas, tunnel firewall, private network tunnel | `cloudflare/tunnel` |
 | Project setup, new projects | `workflow/project-setup` |
 | Feature planning, "plan feature" | `workflow/feature-planner` |
 | Server issues, port conflicts | `workflow/dev-server` |
