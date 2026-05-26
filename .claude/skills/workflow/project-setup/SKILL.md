@@ -366,7 +366,7 @@ User: "B"
 
 Claude: "Where do you want to deploy the website itself (the pages visitors see)?
 
-A. Cloudflare Pages (Recommended - free, fast, global CDN)
+A. Cloudflare Workers (Recommended - free, fast, global CDN)
 B. Netlify
 C. Vercel"
 
@@ -388,7 +388,7 @@ Stack (already in your template):
 Deployment (all on Cloudflare):
 - Backend (Payload): Cloudflare Workers
 - Database: D1 (SQLite)
-- Frontend (Astro): Cloudflare Pages
+- Frontend (Astro): Cloudflare Workers
 - Media: R2
 
 Environment variables updated.

@@ -317,8 +317,8 @@ grep -rn "secrets\.\|env:" .github/workflows/
 - Environment variables in dashboard
 - Build plugins for security scanning
 
-### Cloudflare Pages
-- Security headers via _headers file or Functions
+### Cloudflare Workers
+- Security headers via _headers file (static assets) or Worker middleware (SSR)
 - Environment variables in dashboard
 - WAF rules available on paid plans
 

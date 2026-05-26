@@ -138,7 +138,7 @@ The Astro frontend deploys separately - not on Railway. Common choices:
 
 | Platform | How |
 |----------|-----|
-| Cloudflare Pages | Connect GitHub repo, set root directory to `frontend/`, build command `bun run build` |
+| Cloudflare Workers | Connect GitHub repo, set root directory to `frontend/`, build command `bun run build` |
 | Netlify | Connect GitHub repo, set base directory to `frontend/`, build command `bun run build` |
 | Vercel | Connect GitHub repo, set root directory to `frontend/`, framework preset "Astro" |
 

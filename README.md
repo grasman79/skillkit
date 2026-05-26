@@ -2,10 +2,10 @@
 
 > A skills system for Claude Code that teaches it exactly how to build your app, so you never have to explain the same thing twice.
 
-**Version:** 1.4.3
+**Version:** 1.4.4
 **Author:** Manu
 **License:** MIT
-**Date:** 24/05/2026
+**Date:** 26/05/2026
 
 ---
 
@@ -404,6 +404,9 @@ The `project-setup` skill automatically recommends this stack and detects your p
 ---
 
 ## Changelog
+
+### v1.4.4 (26/05/2026)
+- **Cloudflare Workers frontend** - Removed all Cloudflare Pages references across 11 skill files. Cloudflare Pages functionality has merged into Workers - all frontend deployments now use Workers. Updated `deployment/cloudflare-pages`, `cloudflare/astro`, `cms/payload/reference/DEPLOYMENT.md`, `cms/payload/reference/HEADLESS-CMS.md`, `framework/astro/headless-cms.md`, `security/deployment-security-audit`, `workflow/project-setup` (wizard, questionnaire, deploy guide, railway guide), and `CLAUDE.md` routing table. Deploy guide (`cloudflare-pages-deploy.md`) rewritten for Workers Builds. URLs updated from `*.pages.dev` to `*.workers.dev`, wrangler config updated from `pages_build_output_dir` to `assets.directory`.
 
 ### v1.4.3 (24/05/2026)
 - **Payload Blocks skill** - New `cms/payload-blocks` skill for building flexible page layouts with Payload's blocks field. Covers block definition (`slug`, `fields`, `labels`, `imageURL`, `imageAltText`, `interfaceName`), directory structure (`src/blocks/`), adding a blocks field to a collection (`minRows`, `maxRows`, `label`, `hidden`, `access`), admin config (`initCollapsed`, `isSortable`), auto-generated `blockType` and `blockName` in the API response, common block patterns (hero, CTA, rich text, content-with-media), TypeScript type generation with named interfaces, and frontend rendering by switching on `blockType` with a `RenderBlocks` component. Includes common gotchas (stable slugs, depth for media, type narrowing, block groups).

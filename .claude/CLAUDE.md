@@ -155,7 +155,7 @@ Reusable across projects: `skills/`, `templates/`, `commands/`
 | Push local content to live backend, content sync, update live database | `cms/payload` (see content-sync.md) |
 | Migrate from WordPress, Contentful, Strapi, Sanity, Webflow to Payload | `cms/cms-migration` |
 | Railway deployment, services, databases, domains, troubleshooting | `deployment/railway` |
-| Cloudflare Pages, Astro + Payload monorepo deploy, deploy hooks | `deployment/cloudflare-pages` |
+| Cloudflare Workers frontend deploy, Astro + Payload monorepo deploy, deploy hooks | `deployment/cloudflare-pages` |
 | Cloudflare Workers setup, wrangler, bindings, secrets, custom domains | `cloudflare/workers-core` |
 | Deploy TanStack Start to Cloudflare Workers | `cloudflare/tanstack-start` |
 | Deploy Astro to Cloudflare Workers (static or SSR) | `cloudflare/astro` |

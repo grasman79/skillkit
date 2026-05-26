@@ -147,11 +147,11 @@ Payload has a Local API example for Astro, but **the Local API does not work wit
 
 ## Deployment
 
-- **Payload:** Railway/Cloudflare Workers/Render/VPS (needs Node.js)
-- **Astro:** Cloudflare Pages (recommended - free, global CDN) / Vercel / Netlify
+- **Payload:** Cloudflare Workers (D1 + R2, recommended) / Railway / Render / VPS
+- **Astro:** Cloudflare Workers (recommended - free, global CDN) / Vercel / Netlify
 - **Workflow:** Content changes in Payload - Trigger Astro rebuild - Deploy updated static site
 
-**Recommended stack:** Payload on Railway (or Cloudflare Workers) + Astro on Cloudflare Pages. See `web-development/astro-payload-website/cloudflare-pages-deploy.md` for the full frontend deployment guide.
+**Recommended stack:** Payload on Cloudflare Workers (D1 + R2) + Astro on Cloudflare Workers. See `deployment/cloudflare-pages` skill for the full Astro frontend deployment guide, or `cloudflare/astro` for Workers-specific patterns.
 
 ## When to Use This Pattern
 

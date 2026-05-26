@@ -20,7 +20,7 @@ For the complete step-by-step Railway deployment guide (project creation, Postgr
 
 ## Deploying Payload on Cloudflare Workers
 
-Payload has official support for Cloudflare Workers. This is the recommended deployment when using Astro on Cloudflare Pages - keep the entire stack on Cloudflare.
+Payload has official support for Cloudflare Workers. This is the recommended deployment - keep the entire stack on Cloudflare (Payload on Workers, Astro frontend on Workers).
 
 **What you get:**
 - **Cloudflare Workers** - Serverless platform running Payload (paid plan, ~$5/month)
@@ -228,7 +228,7 @@ my-website/
 │   ├── wrangler.jsonc
 │   └── package.json
 │
-├── web/                    # Astro on Cloudflare Pages
+├── web/                    # Astro on Cloudflare Workers
 │   ├── src/
 │   │   ├── pages/
 │   │   ├── components/

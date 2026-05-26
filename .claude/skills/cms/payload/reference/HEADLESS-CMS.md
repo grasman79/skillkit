@@ -299,13 +299,13 @@ function getBlockComponent(blockType: string) {
 
 **Option 1: Full Cloudflare Stack (Recommended)**
 - Payload on Cloudflare Workers (D1 database + R2 storage)
-- Astro on Cloudflare Pages
+- Astro on Cloudflare Workers
 - Single platform, ~$5/month total
 - See deployment.md for full details
 
-**Option 2: Railway + Cloudflare Pages**
+**Option 2: Railway + Cloudflare Workers**
 - Payload on Railway (MongoDB/PostgreSQL)
-- Astro on Cloudflare Pages
+- Astro on Cloudflare Workers
 - ~$28/month
 
 **Architecture: Monorepo (Recommended)**
@@ -344,11 +344,11 @@ Start Command: npm run serve
 Environment Variables:
   DATABASE_URI=mongodb://...
   PAYLOAD_SECRET=your-secret-key
-  CORS_ORIGIN=https://your-site.pages.dev
+  CORS_ORIGIN=https://your-site.workers.dev
   NODE_ENV=production
 ```
 
-**Cloudflare Pages (Astro Frontend) Configuration:**
+**Cloudflare Workers (Astro Frontend) Configuration:**
 
 ```
 Build command: npm run build
@@ -380,9 +380,9 @@ PAYLOAD_API_URL=http://localhost:3000/api
 Railway (Payload):
 - `DATABASE_URI` - Production MongoDB/PostgreSQL URI
 - `PAYLOAD_SECRET` - Secure random string
-- `CORS_ORIGIN` - Your Astro site URL (e.g., `https://yoursite.pages.dev`)
+- `CORS_ORIGIN` - Your Astro site URL (e.g., `https://yoursite.workers.dev`)
 
-Cloudflare Pages (Astro):
+Cloudflare Workers (Astro):
 - `PAYLOAD_API_URL` - Your Payload Railway URL (e.g., `https://your-payload.railway.app/api`)
 
 ## Build Trigger Strategies
@@ -451,7 +451,7 @@ const triggerDebouncedRebuild = async () => {
 }
 ```
 
-Most hosting platforms (Vercel, Netlify, Cloudflare Pages) provide deploy hook URLs you can use as `ASTRO_BUILD_WEBHOOK`.
+Most hosting platforms (Vercel, Netlify, Cloudflare Workers) provide deploy hook URLs you can use as `ASTRO_BUILD_WEBHOOK`.
 
 ## Live Preview with Astro
 

@@ -68,7 +68,7 @@ D. Render
 E. VPS (own server)
 ```
 
-**Why Cloudflare Workers is recommended:** Everything under one roof with Cloudflare Pages for the frontend. $5/month Workers paid plan (Payload exceeds the free tier's 10MB limit), but D1 database and R2 media storage are included. If the user also deploys the frontend on Cloudflare Pages, they manage everything from one dashboard.
+**Why Cloudflare Workers is recommended:** Everything under one roof on Cloudflare. $5/month Workers paid plan (Payload exceeds the free tier's 10MB limit), but D1 database and R2 media storage are included. If the user also deploys the Astro frontend on Cloudflare Workers, they manage everything from one dashboard.
 
 **If Railway is selected:** Read [railway-payload-deploy.md](railway-payload-deploy.md) for the complete step-by-step deployment flow (project creation, Postgres setup, GitHub connection, monorepo paths, environment variables).
 
@@ -112,14 +112,14 @@ C. I have my own database
 ```
 Where do you want to deploy the website itself (the pages visitors see)?
 
-A. Cloudflare Pages (Recommended - free, fast, global CDN)
+A. Cloudflare Workers (Recommended - free, fast, global CDN)
 B. Netlify
 C. Vercel
 ```
 
-**Why Cloudflare Pages is recommended:** Free tier with unlimited bandwidth, global CDN, fast builds. If the backend is also on Cloudflare, everything is managed from one dashboard.
+**Why Cloudflare Workers is recommended:** Free tier with unlimited bandwidth, global CDN, fast builds. If the backend is also on Cloudflare, everything is managed from one dashboard. Cloudflare Pages functionality has merged into Workers.
 
-**If Cloudflare Pages is selected:** Read [cloudflare-pages-deploy.md](cloudflare-pages-deploy.md) for the complete step-by-step deployment flow (GitHub connection, build settings, environment variables, verification, and troubleshooting).
+**If Cloudflare Workers is selected:** Read [cloudflare-pages-deploy.md](cloudflare-pages-deploy.md) for the complete step-by-step deployment flow (GitHub connection, build settings, environment variables, verification, and troubleshooting).
 
 ---
 
@@ -280,7 +280,7 @@ Check if `backend/.env` exists and contains template-specific values (non-empty 
 - `R2_PUBLIC_URL` - Tied to new R2 bucket
 - `R2_ACCESS_KEY_ID` - New API token recommended per project
 - `R2_SECRET_ACCESS_KEY` - New API token recommended per project
-- `CLOUDFLARE_DEPLOY_HOOK_URL` - New Cloudflare Pages project = new hook
+- `CLOUDFLARE_DEPLOY_HOOK_URL` - New Cloudflare Workers project = new hook
 
 **Set to localhost defaults (`.env` only):**
 - `PAYLOAD_PUBLIC_SERVER_URL` = `http://localhost:3000`
@@ -309,7 +309,7 @@ Here's what you need to set up (I'll walk you through each one):
 3. **R2 API Token** - Create an R2 API token with Object Read & Write
    → Gives you: R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY
 
-4. **Cloudflare Pages** - Connect your GitHub repo to Cloudflare Pages
+4. **Cloudflare Workers** - Connect your GitHub repo to Cloudflare Workers
    → Gives you: CLOUDFLARE_DEPLOY_HOOK_URL
 
 Let's start with step 1. Do you have a database ready, or should I help you set one up?
@@ -416,7 +416,7 @@ PAYLOAD_ADMIN_PASSWORD=changeme123  # Password for auto-seeded admin accounts
 | Vercel | None (serverless, no PORT needed) |
 | Render | `PORT=3000` |
 
-**Frontend platforms (Cloudflare Pages / Netlify / Vercel):** No extra variables needed for static Astro sites.
+**Frontend platforms (Cloudflare Workers / Netlify / Vercel):** No extra variables needed for static Astro sites.
 
 ### Initial Tasks
 
@@ -452,13 +452,13 @@ Follow these steps in order. Each step depends on the previous ones.
 - [ ] 16. Set environment variables (DATABASE_URI, PAYLOAD_PUBLIC_SERVER_URL, PAYLOAD_SECRET, R2 keys)
 - [ ] 17. Generate domain, deploy, and verify admin panel works at production URL
 
-### Phase 4: Frontend Deployment (Cloudflare Pages)
-- [ ] 18. Connect Cloudflare Pages to GitHub repo
+### Phase 4: Frontend Deployment (Cloudflare Workers)
+- [ ] 18. Connect Cloudflare Workers to GitHub repo (Workers & Pages > Create > Workers Builds)
 - [ ] 19. Configure build settings: command `bun install && bun run build`, output `dist`, root `frontend`
 - [ ] 20. Set environment variables: Production (`main`) gets production PAYLOAD_URL, Preview (`staging`) gets staging PAYLOAD_URL
 - [ ] 21. Create deploy hook, add CLOUDFLARE_DEPLOY_HOOK_URL to backend `.env` and `.env.production`
-- [ ] 22. Save and Deploy, verify site loads at pages.dev URL
-- [ ] 23. Verify staging deploys automatically at `staging.{project}.pages.dev` (push to staging branch to test)
+- [ ] 22. Save and Deploy, verify site loads at workers.dev URL
+- [ ] 23. Verify staging deploys automatically (push to staging branch to test)
 
 ### Phase 5: CI & Performance Monitoring
 - [ ] 24. Add `PAYLOAD_URL` as a GitHub Actions secret (pointing to a reachable Payload instance)
@@ -469,17 +469,17 @@ Follow these steps in order. Each step depends on the previous ones.
 - [ ] 27. Admin panel works at production URL with seeded credentials
 - [ ] 28. Upload a test image in production - verify it stores in R2 and displays on frontend
 - [ ] 29. Frontend fetches and displays content from production backend
-- [ ] 30. Staging site works at `staging.{project}.pages.dev` with noindex robots.txt
+- [ ] 30. Staging site works at staging preview URL with noindex robots.txt
 ```
 
 **Notes:**
 - There is no "Start the database" task. Content websites use external database services (Railway Postgres, Supabase, Neon, etc.), not local Docker containers.
 - **R2 must be set up before starting dev servers** (step 4 before step 7). Without R2 credentials, the s3Storage plugin is disabled and uploads go to local disk.
 - **Migrations must run before starting dev servers** (step 6 before step 7). The fresh database has no tables - starting the backend without migrations causes errors because Payload queries non-existent tables. This creates a problem: files on local disk won't exist in production, and re-uploading everything to R2 later is tedious. Set up R2 early so all uploads go there from the start.
-- The backend must be deployed before the frontend because Cloudflare Pages needs `PAYLOAD_URL`.
-- **Staging branch** - Create before deploying. Cloudflare Pages auto-deploys all branches: `main` to production, `staging` to `staging.{project}.pages.dev`. Set different env vars per branch in Cloudflare dashboard (Settings > Environment variables > Production vs Preview).
+- The backend must be deployed before the frontend because Cloudflare Workers needs `PAYLOAD_URL` to fetch content at build time.
+- **Staging branch** - Create before deploying. Cloudflare Workers auto-deploys all branches: `main` to production, `staging` to a preview URL. Set different env vars per branch in Cloudflare dashboard (Settings > Environment variables > Production vs Preview).
 - **CI workflows** - Lighthouse CI and Performance Budget workflows are pre-configured in `.github/workflows/`. They need `PAYLOAD_URL` as a GitHub Actions secret to build the frontend during checks.
-- For detailed commands, see the Railway guide (`railway-payload-deploy.md`) and Cloudflare Pages guide (`cloudflare-pages-deploy.md`).
+- For detailed commands, see the Railway guide (`railway-payload-deploy.md`) and Cloudflare Workers guide (`cloudflare-pages-deploy.md`).
 
 ### Getting Started Guide
 
