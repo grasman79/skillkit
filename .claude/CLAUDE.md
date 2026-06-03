@@ -167,6 +167,7 @@ Reusable across projects: `skills/`, `templates/`, `commands/`
 | Cloudflare Queues, message queue, async processing, queue consumer, dead letter queue | `cloudflare/queues` |
 | Local dev tunnels, expose localhost, share preview, test webhooks | `cloudflare/local-dev-tunnels` |
 | Cloudflare Tunnel (production), cloudflared daemon, ingress rules, tunnel Docker/K8s, tunnel replicas, tunnel firewall, private network tunnel | `cloudflare/tunnel` |
+| Cloudflare Sandbox SDK tunnels, expose sandbox port, sandbox.tunnels, trycloudflare.com sandbox URL | `cloudflare/sandbox-tunnels` |
 | Project setup, new projects | `workflow/project-setup` |
 | Feature planning, "plan feature" | `workflow/feature-planner` |
 | Server issues, port conflicts | `workflow/dev-server` |
@@ -180,6 +181,7 @@ Reusable across projects: `skills/`, `templates/`, `commands/`
 | TanStack Start security headers (Nitro) | `security/tanstack-nitro-security` |
 | Debugging errors | `workflow/debugger` |
 | Linting before commits | `tooling/ultracite-setup` |
+| React code health scan, health score, react-doctor, React linting, React Native linting | `tooling/react-doctor` |
 | Development best practices | `workflow/best-practices` |
 | Updating SkillKit | `workflow/update-system` (trigger: "skillkit update") |
 | Updating dependencies | `workflow/update-stack` |

@@ -2,10 +2,10 @@
 
 > A skills system for Claude Code that teaches it exactly how to build your app, so you never have to explain the same thing twice.
 
-**Version:** 1.4.4
+**Version:** 1.4.6
 **Author:** Manu
 **License:** MIT
-**Date:** 26/05/2026
+**Date:** 03/06/2026
 
 ---
 
@@ -267,6 +267,7 @@ Primary source of truth for Cloudflare-related skills: https://developers.cloudf
 | `queues` | Cloudflare Queues - message queue for async processing with producers (send, sendBatch), push consumers (batch handler, ack/retry, exponential backoff), pull consumers (HTTP API), dead letter queues, message delays, Agents SDK integration |
 | `tunnel` | Production Cloudflare Tunnel (cloudflared daemon) - dashboard and CLI tunnel creation, config.yml with ingress rules, origin parameters, run parameters, Docker and Kubernetes deployment, system service, replicas for HA, firewall rules (port 7844), Prometheus metrics, troubleshooting |
 | `local-dev-tunnels` | Expose local dev server via Cloudflare Tunnel - quick tunnels (random trycloudflare.com URLs), named tunnels (stable hostnames), Wrangler flags (--tunnel, --tunnel-name), Vite plugin tunnel config, security considerations, Cloudflare Access protection |
+| `sandbox-tunnels` | Cloudflare Sandbox SDK tunnels API - expose a service inside a sandbox container on a zero-config *.trycloudflare.com URL via sandbox.tunnels.get/list/destroy, TunnelInfo type, RPC transport requirement, glibc image constraint, limitations (no SSE, no persistent hostname, DNS warm-up, WARP egress) |
 
 ### Deployment
 | Skill | What It Does |
@@ -301,6 +302,7 @@ Primary source of truth for Cloudflare-related skills: https://developers.cloudf
 | Skill | What It Does |
 |-------|--------------|
 | `bun` | Bun runtime |
+| `react-doctor` | React Doctor code health scanning, ESLint integration, and CI gating for web and React Native projects |
 | `ultracite-setup` | Ultracite linting setup and configuration |
 | `validation` | Zod/Valibot/ArkType validation |
 
@@ -404,6 +406,12 @@ The `project-setup` skill automatically recommends this stack and detects your p
 ---
 
 ## Changelog
+
+### v1.4.6 (03/06/2026)
+- **Cloudflare Sandbox Tunnels skill** - New `cloudflare/sandbox-tunnels` skill for the `@cloudflare/sandbox` SDK tunnels API. Covers `sandbox.tunnels.get()` (expose a port, idempotent), `sandbox.tunnels.list()` (all active tunnels), `sandbox.tunnels.destroy()` (tear down by port or TunnelInfo record), the `TunnelInfo` type, RPC transport requirement, glibc image constraint (musl/Alpine not supported), and all limitations (no persistent hostname across restarts, no uptime guarantee, no SSE support, DNS warm-up delay, WARP/Zero Trust egress blocking).
+
+### v1.4.5 (03/06/2026)
+- **React Doctor skill** - New `tooling/react-doctor` skill for React code health scanning. Covers CLI one-off scans, ESLint integration with official framework configs (`recommended`, `next`, `react-native`, `tanstack-start`, `tanstack-query`), CLI config (`react-doctor.config.json`), GitHub Actions CI gating with score thresholds, and agent skill installation. Includes `reference/FRAMEWORKS.md` with per-framework setup guides and rule suppression lists - especially for React Native/Expo where web-only rules (hydration, anchor, iframe, server) should be disabled when using the CLI scanner.
 
 ### v1.4.4 (26/05/2026)
 - **Cloudflare Workers frontend** - Removed all Cloudflare Pages references across 11 skill files. Cloudflare Pages functionality has merged into Workers - all frontend deployments now use Workers. Updated `deployment/cloudflare-pages`, `cloudflare/astro`, `cms/payload/reference/DEPLOYMENT.md`, `cms/payload/reference/HEADLESS-CMS.md`, `framework/astro/headless-cms.md`, `security/deployment-security-audit`, `workflow/project-setup` (wizard, questionnaire, deploy guide, railway guide), and `CLAUDE.md` routing table. Deploy guide (`cloudflare-pages-deploy.md`) rewritten for Workers Builds. URLs updated from `*.pages.dev` to `*.workers.dev`, wrangler config updated from `pages_build_output_dir` to `assets.directory`.
