@@ -168,6 +168,8 @@ Reusable across projects: `skills/`, `templates/`, `commands/`
 | Local dev tunnels, expose localhost, share preview, test webhooks | `cloudflare/local-dev-tunnels` |
 | Cloudflare Tunnel (production), cloudflared daemon, ingress rules, tunnel Docker/K8s, tunnel replicas, tunnel firewall, private network tunnel | `cloudflare/tunnel` |
 | Cloudflare Sandbox SDK tunnels, expose sandbox port, sandbox.tunnels, trycloudflare.com sandbox URL | `cloudflare/sandbox-tunnels` |
+| Cloudflare Dynamic Workers, spawn worker at runtime, user code execution, sandboxed worker, LOADER binding, env.LOADER, multi-tenant workers, per-tenant worker, AI code mode, dynamic code execution | `cloudflare/dynamic-workers` |
+| Cloudflare Flagship, feature flags, feature toggles, flag evaluation, gradual rollout, targeting rules, percentage rollout | `cloudflare/flagship` |
 | Project setup, new projects | `workflow/project-setup` |
 | Feature planning, "plan feature" | `workflow/feature-planner` |
 | Server issues, port conflicts | `workflow/dev-server` |
@@ -190,6 +192,7 @@ Reusable across projects: `skills/`, `templates/`, `commands/`
 | People/company enrichment, Apollo, sales intelligence | `api/apollo` |
 | Typography, font sizes, line height, readability | `design/typography` |
 | Animations, transitions, hover effects, scroll reveals, motion | `design/animation` |
+| Web app UI animations, button press feedback, icon animations, loaders, skeleton screens, spring animations, number tickers, state transitions, micro-interactions | `ui/animation-patterns` |
 | Web design, UI polish, redesigns, visual style | `web-development/webdesign` |
 | Web scraping, crawling, Firecrawl, parse PDF/DOCX, extract web data, search web | `scraping/firecrawl` |
 
