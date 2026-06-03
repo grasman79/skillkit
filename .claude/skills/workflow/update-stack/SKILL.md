@@ -1,17 +1,16 @@
 ---
 name: update-stack
-description: Use this skill when safely updating all project dependencies, frameworks, or packages to their latest versions. Activate when the user mentions updating dependencies, upgrading packages, updating the tech stack, or running dependency updates with npm or bun.
+description: Use this skill when safely updating all project dependencies, frameworks, or packages to their latest versions. Activate when the user mentions updating dependencies, upgrading packages, updating the tech stack, running dependency updates, or checking for outdated packages.
 ---
 
 # Update Stack
 
-Safely updates all project dependencies to their latest compatible versions, checks for breaking changes, and fixes any issues that arise.
+Safely updates all project dependencies to their latest versions. Lists available updates, researches breaking changes in major version jumps, classifies migration effort, then applies updates based on user choice.
 
 ## When to Use This Skill
 
-- User says "update stack", "update dependencies", or "upgrade packages"
+- User says "update stack", "update dependencies", "upgrade packages", or "check for outdated packages"
 - User wants to update to latest versions of frameworks
-- User asks about outdated packages
 - Periodic maintenance (recommended: monthly)
 
 ## Instructions
@@ -20,72 +19,134 @@ Safely updates all project dependencies to their latest compatible versions, che
 
 Check for lock files:
 
-| Lock File | Package Manager | Update Command |
-|-----------|-----------------|----------------|
-| `bun.lockb` | bun | `bun update` |
-| `pnpm-lock.yaml` | pnpm | `pnpm update` |
-| `yarn.lock` | yarn | `yarn upgrade` |
-| `package-lock.json` | npm | `npm update` |
+| Lock File | Package Manager | Outdated Command | Update Command |
+|-----------|-----------------|------------------|----------------|
+| `bun.lockb` or `bun.lock` | bun | `bun outdated` | `bun update` |
+| `pnpm-lock.yaml` | pnpm | `pnpm outdated` | `pnpm update` |
+| `yarn.lock` | yarn | `yarn outdated` | `yarn upgrade` |
+| `package-lock.json` | npm | `npm outdated` | `npm update` |
 
-### Step 2: Check Current State
+### Step 2: Audit Current State
 
-Before updating, analyze the project:
-
-1. **Read package.json** - List current dependencies and versions
-2. **Check for outdated packages:**
-
-```bash
-# For bun
-bun outdated
-
-# For pnpm
-pnpm outdated
-
-# For npm
-npm outdated
-
-# For yarn
-yarn outdated
-```
-
-3. **Identify major version updates** - These may have breaking changes
+1. **Read `package.json`** to understand the dependency list
+2. **Run the outdated command** for the detected package manager
+3. **Parse the output** - note current version, latest version, and whether it's a patch, minor, or major bump
 
 ### Step 3: Categorize Updates
 
-Present updates to user in categories:
+Split updates into two groups:
+
+**Safe (patch/minor):** `x.y.Z` or `x.Y.z` bumps - apply automatically, no review needed.
+
+**Major version jumps:** `X.y.z` bumps - breaking changes likely, require changelog research before touching.
+
+### Step 4: Research Major Version Changelogs
+
+For each major version jump found, fetch its changelog and summarize:
+
+1. **Look up the changelog URL** - use the reference table below, or derive it:
+   - Check `package.json` homepage/repository field: `npm info {package} repository.url`
+   - GitHub releases: `https://github.com/{owner}/{repo}/releases`
+   - Package docs site migration guide
+
+2. **Fetch and read the changelog** for the version range being jumped (e.g., all changes from v1.x to v2.0)
+
+3. **Extract:**
+   - What APIs, methods, or config options changed or were removed
+   - Whether a migration script or CLI tool exists
+   - Estimated code impact (how many files/patterns affected)
+
+4. **Classify migration effort:**
+
+| Effort | Time | Signal |
+|--------|------|--------|
+| Easy | 15-30 min | Only import paths, renamed config keys, or type-only changes. No component or hook logic changes. |
+| Medium | 1-3 hours | Some API methods renamed, prop changes, a handful of files to update. |
+| Hard | Half day+ | Architecture changes, major API redesign, migration script required, or many files affected. |
+
+**Known changelog URLs for common packages:**
+
+| Package | Changelog / Migration Guide |
+|---------|----------------------------|
+| `tailwindcss` | https://tailwindcss.com/docs/upgrade-guide |
+| `@tanstack/react-query` | https://tanstack.com/query/latest/docs/framework/react/guides/migrating |
+| `@tanstack/react-router` | https://tanstack.com/router/latest/docs/framework/react/guide/migrating |
+| `@tanstack/react-start` | https://tanstack.com/start/latest/docs/framework/react/guide/migrating |
+| `better-auth` | https://www.better-auth.com/docs/changelog |
+| `drizzle-orm` | https://orm.drizzle.team/docs/changelog |
+| `drizzle-kit` | https://orm.drizzle.team/docs/changelog |
+| `next` | https://nextjs.org/docs/app/building-your-application/upgrading |
+| `react` / `react-dom` | https://react.dev/blog (check major release post) |
+| `supabase-js` | https://supabase.com/docs/reference/javascript/upgrade-guide |
+| `payload` | https://payloadcms.com/docs/getting-started/changelog |
+| `astro` | https://docs.astro.build/en/guides/upgrade-to/v5/ |
+| `vite` | https://vite.dev/guide/migration |
+| `vitest` | https://vitest.dev/guide/migration |
+| `eslint` | https://eslint.org/docs/latest/use/migrate-to-9.0.0 |
+| `stripe` | https://github.com/stripe/stripe-node/blob/master/CHANGELOG.md |
+| `resend` | https://github.com/resendlabs/resend-node/releases |
+| `zod` | https://zod.dev/changelog |
+| `hono` | https://github.com/honojs/hono/releases |
+| `lucia` | https://v3.luciaauth.com/upgrade-v2 |
+| `uploadthing` | https://docs.uploadthing.com/changelog |
+
+For packages not in this list: fetch `https://github.com/{owner}/{repo}/releases` or the npm package page.
+
+### Step 5: Present Full Picture to User
+
+Present a single consolidated view before taking any action:
 
 ```
-I found the following updates available:
+Dependency audit complete. Here's what I found:
 
-**Safe updates (patch/minor - no breaking changes expected):**
+SAFE UPDATES (patch/minor - will apply automatically)
 - @tanstack/react-query: 5.90.0 → 5.92.0
 - tailwindcss: 4.0.6 → 4.0.8
 - drizzle-orm: 0.45.0 → 0.45.2
+- typescript: 5.4.0 → 5.5.2
+(12 more patch/minor updates)
 
-**Major updates (may have breaking changes - review recommended):**
-- better-auth: 1.4.12 → 2.0.0 ⚠️
-- @tanstack/react-start: 1.157.17 → 2.0.0 ⚠️
+MAJOR VERSION JUMPS
 
-**Recommendations:**
-- Safe updates: Apply all
-- Major updates: Review changelog before updating
+📦 better-auth: 1.4.12 → 2.0.0  [Medium - ~2 hours]
+  Breaking changes:
+  - auth.api renamed to auth.handler in all server routes
+  - Session cookie name changed - existing sessions will be invalidated
+  - Plugin config moved from plugins[] to a new pluginConfig object
+  Migration guide: https://www.better-auth.com/docs/changelog
+
+📦 next: 14.2.0 → 15.0.0  [Medium - ~1-2 hours]
+  Breaking changes:
+  - fetch() caching now opt-in (no-store by default)
+  - cookies() and headers() are now async - await required
+  - Turbopack is stable, now default in dev
+  Migration guide: https://nextjs.org/docs/app/building-your-application/upgrading
+
+📦 tailwindcss: 3.4.17 → 4.0.0  [Hard - ~half day]
+  Breaking changes:
+  - Config format changed from JS (tailwind.config.js) to CSS (@import "tailwindcss")
+  - Many utility class names renamed (e.g. shadow-sm → shadow-xs)
+  - PostCSS plugin replaced with a new package (@tailwindcss/postcss)
+  - Official upgrade tool available: npx @tailwindcss/upgrade
+  Migration guide: https://tailwindcss.com/docs/upgrade-guide
 
 How would you like to proceed?
-A. Update safe packages only (recommended)
-B. Update everything including major versions
-C. Let me pick specific packages
+A. Safe updates only (recommended - apply all patch/minor now, skip majors)
+B. Safe updates + easy/medium majors (better-auth + next)
+C. Everything including Tailwind v4 (longest, most work)
+D. Let me pick specific packages
 ```
 
-### Step 4: Perform Updates
+### Step 6: Perform Updates
 
 Based on user choice:
 
-**For safe updates only:**
+**Applying safe (patch/minor) updates:**
 ```bash
-# Bun
-bun update --latest
+# Bun - updates within semver range
+bun update
 
-# pnpm (updates within semver range)
+# pnpm
 pnpm update
 
 # npm
@@ -95,7 +156,7 @@ npm update
 yarn upgrade
 ```
 
-**For specific major version updates:**
+**Applying specific major version updates:**
 ```bash
 # Bun
 bun add package-name@latest
@@ -110,135 +171,94 @@ npm install package-name@latest
 yarn add package-name@latest
 ```
 
-### Step 5: Verify Updates
+**If an official upgrade CLI exists, run it first** (e.g. `npx @tailwindcss/upgrade`, `npx @next/codemod`).
 
-After updating:
+Update one major package at a time, then verify before moving to the next.
 
-1. **Check for TypeScript errors:**
+### Step 7: Verify After Each Major Update
+
+After each major update (or after applying all safe updates):
+
+1. **TypeScript check:**
 ```bash
-# Run type check
-bun run typecheck
-# or
-pnpm typecheck
-# or
-npx tsc --noEmit
+bun run typecheck   # or pnpm typecheck / npx tsc --noEmit
 ```
 
-2. **Run the linter:**
+2. **Linter:**
 ```bash
-npx ultracite fix
+npx ultracite fix   # or biome check --write .
 ```
 
-3. **Start the dev server:**
+3. **Dev server:**
 ```bash
-bun dev
-# or
-pnpm dev
+bun dev   # or pnpm dev
 ```
 
-4. **Run tests (if they exist):**
+4. **Tests (if they exist):**
 ```bash
-bun test
-# or
-pnpm test
+bun test   # or pnpm test
 ```
 
-### Step 6: Handle Breaking Changes
+Fix any errors before moving to the next major update.
+
+### Step 8: Handle Breaking Changes
 
 If errors occur after updating:
 
-1. **Read the error message** - Identify which package caused it
-2. **Check the changelog** - Look for migration guides:
-   - TanStack: https://tanstack.com/router/latest/docs/framework/react/guide/migrating
-   - Better Auth: https://www.better-auth.com/docs/changelog
-   - Drizzle: https://orm.drizzle.team/docs/changelog
-   - Supabase: https://supabase.com/docs/guides/resources/migrating
-
-3. **Apply fixes** - Update code to match new API
-4. **If stuck, rollback:**
+1. **Read the error** - identify which package caused it
+2. **Refer to the breaking changes summary** from Step 4
+3. **Apply the migration** - update code to match the new API
+4. **If stuck, rollback that package:**
 ```bash
 # Restore lock file from git
-git checkout -- bun.lockb  # or pnpm-lock.yaml, etc.
+git checkout -- bun.lockb   # or pnpm-lock.yaml / package-lock.json
 
-# Reinstall
+# Reinstall at previous version
 bun install
 ```
 
-### Step 7: Report Results
-
-After successful update:
+### Step 9: Final Report
 
 ```
-Stack updated successfully!
+Stack updated!
 
-**Updated packages:**
+APPLIED (15 packages):
+- typescript: 5.4.0 → 5.5.2
 - @tanstack/react-query: 5.90.0 → 5.92.0
-- tailwindcss: 4.0.6 → 4.0.8
-- [... list all updated packages ...]
-
-**Verification:**
-- TypeScript: No errors
-- Linter: Passed
-- Dev server: Running
-
-**Skipped (major version - manual review needed):**
+- drizzle-orm: 0.45.0 → 0.45.2
 - better-auth: 1.4.12 → 2.0.0
+- next: 14.2.0 → 15.0.0
+[... full list ...]
 
-Your project is up to date!
-```
+VERIFICATION:
+- TypeScript: no errors
+- Linter: passed
+- Dev server: running
 
-## Common Package-Specific Notes
+SKIPPED (deferred for later):
+- tailwindcss: 3.4.17 → 4.0.0 (Hard migration - set aside ~half day)
 
-### TanStack Start / Router
-- Check router migration guide for major versions
-- Route definitions may change between versions
-- `beforeLoad` API may change
-
-### Better Auth
-- Session handling may change
-- Check for new required config options
-- Plugin APIs may be updated
-
-### Drizzle
-- Schema syntax may change
-- Migration commands may differ
-- Check for deprecated methods
-
-### Supabase
-- Client initialization may change
-- RLS policy syntax updates
-- Realtime API changes
-
-### Tailwind CSS
-- v4 has significant changes from v3
-- Config file format changed
-- Some utility classes renamed
-
-## Automated Update Script
-
-For users who want to run this regularly, suggest adding to package.json:
-
-```json
-{
-  "scripts": {
-    "update:check": "bun outdated",
-    "update:safe": "bun update",
-    "update:all": "bun update --latest"
-  }
-}
+Commit suggested: "chore: update dependencies - patch/minor + better-auth v2, next v15"
 ```
 
 ## Tips
 
-- Update regularly (monthly) to avoid large jumps
-- Always commit before updating so you can rollback
-- Read changelogs for major versions before updating
-- Test the app after updates before deploying
-- Keep lock files in git for reproducible builds
+- Always commit before updating so you can rollback with `git checkout`
+- Update monthly to avoid large version jumps accumulating
+- Tackle one Hard migration per session - don't bundle them
+- If a major version just released, wait a week for hotfixes before upgrading
+- When NOT to update: right before a launch, during active feature development, or when under time pressure
 
-## When NOT to Update
+## Adding npm Scripts
 
-- Right before a deadline/launch
-- If you don't have time to fix potential issues
-- During active feature development (finish first, then update)
-- If a major version just released (wait a week for hotfixes)
+Suggest adding to `package.json` for regular use:
+
+```json
+{
+  "scripts": {
+    "deps:check": "bun outdated",
+    "deps:update": "bun update",
+    "deps:update-all": "bun update --latest"
+  }
+}
+```

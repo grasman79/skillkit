@@ -138,6 +138,7 @@ Reusable across projects: `skills/`, `templates/`, `commands/`
 | User login, signup, sessions, OAuth | `auth/better-auth` |
 | Payments, checkout, subscriptions | `payments/stripe` |
 | UI components, forms, dialogs, shadcn presets, monorepo UI | `ui/shadcn` |
+| Drag and drop, sortable lists, kanban board, reorder, drag to reorder, file drop zones | `ui/pragmatic-drag-and-drop` |
 | AI features, chat, text generation | `ai/vercel-ai-sdk` |
 | Sending emails, notifications | `email/resend`, `email/autosend`, or `email/unosend` |
 | Email deliverability, SPF/DKIM/DMARC, spam | `email/resend` |
@@ -150,10 +151,11 @@ Reusable across projects: `skills/`, `templates/`, `commands/`
 | Animations, transitions, React Native Ease | `platform/react-native` |
 | Framework-specific patterns, SSR/RSC rendering modes | `framework/nextjs`, `framework/tanstack-start`, or `framework/astro` |
 | CMS, admin panel, content management, Payload collections, fields, hooks, access control, plugins | `cms/payload` |
+| Payload blocks field, flexible page layouts, block types, page builder, blockType, blockName, render blocks | `cms/payload-blocks` |
 | Push local content to live backend, content sync, update live database | `cms/payload` (see content-sync.md) |
 | Migrate from WordPress, Contentful, Strapi, Sanity, Webflow to Payload | `cms/cms-migration` |
 | Railway deployment, services, databases, domains, troubleshooting | `deployment/railway` |
-| Cloudflare Pages, Astro + Payload monorepo deploy, deploy hooks | `deployment/cloudflare-pages` |
+| Cloudflare Workers frontend deploy, Astro + Payload monorepo deploy, deploy hooks | `deployment/cloudflare-pages` |
 | Cloudflare Workers setup, wrangler, bindings, secrets, custom domains | `cloudflare/workers-core` |
 | Deploy TanStack Start to Cloudflare Workers | `cloudflare/tanstack-start` |
 | Deploy Astro to Cloudflare Workers (static or SSR) | `cloudflare/astro` |
@@ -164,6 +166,10 @@ Reusable across projects: `skills/`, `templates/`, `commands/`
 | Cloudflare Voice agents, voice pipeline, STT, TTS, real-time audio, barge-in, withVoice, withVoiceInput, WorkersAIFluxSTT, WorkersAINova3STT, useVoiceAgent, useVoiceInput, VoiceClient | `cloudflare/agents-voice` |
 | Cloudflare Queues, message queue, async processing, queue consumer, dead letter queue | `cloudflare/queues` |
 | Local dev tunnels, expose localhost, share preview, test webhooks | `cloudflare/local-dev-tunnels` |
+| Cloudflare Tunnel (production), cloudflared daemon, ingress rules, tunnel Docker/K8s, tunnel replicas, tunnel firewall, private network tunnel | `cloudflare/tunnel` |
+| Cloudflare Sandbox SDK tunnels, expose sandbox port, sandbox.tunnels, trycloudflare.com sandbox URL | `cloudflare/sandbox-tunnels` |
+| Cloudflare Dynamic Workers, spawn worker at runtime, user code execution, sandboxed worker, LOADER binding, env.LOADER, multi-tenant workers, per-tenant worker, AI code mode, dynamic code execution | `cloudflare/dynamic-workers` |
+| Cloudflare Flagship, feature flags, feature toggles, flag evaluation, gradual rollout, targeting rules, percentage rollout | `cloudflare/flagship` |
 | Project setup, new projects | `workflow/project-setup` |
 | Feature planning, "plan feature" | `workflow/feature-planner` |
 | Server issues, port conflicts | `workflow/dev-server` |
@@ -177,6 +183,7 @@ Reusable across projects: `skills/`, `templates/`, `commands/`
 | TanStack Start security headers (Nitro) | `security/tanstack-nitro-security` |
 | Debugging errors | `workflow/debugger` |
 | Linting before commits | `tooling/ultracite-setup` |
+| React code health scan, health score, react-doctor, React linting, React Native linting | `tooling/react-doctor` |
 | Development best practices | `workflow/best-practices` |
 | Updating SkillKit | `workflow/update-system` (trigger: "skillkit update") |
 | Updating dependencies | `workflow/update-stack` |
@@ -185,6 +192,7 @@ Reusable across projects: `skills/`, `templates/`, `commands/`
 | People/company enrichment, Apollo, sales intelligence | `api/apollo` |
 | Typography, font sizes, line height, readability | `design/typography` |
 | Animations, transitions, hover effects, scroll reveals, motion | `design/animation` |
+| Web app UI animations, button press feedback, icon animations, loaders, skeleton screens, spring animations, number tickers, state transitions, micro-interactions | `ui/animation-patterns` |
 | Web design, UI polish, redesigns, visual style | `web-development/webdesign` |
 | Web scraping, crawling, Firecrawl, parse PDF/DOCX, extract web data, search web | `scraping/firecrawl` |
 

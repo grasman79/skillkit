@@ -1,11 +1,11 @@
 ---
-name: cloudflare-pages
-description: Use this skill when deploying an Astro + Payload CMS monorepo to Railway (backend) and Cloudflare Pages (frontend). Activate when the user mentions deploying to Cloudflare Pages, Railway + Cloudflare, monorepo deployment, deploy hooks, or static frontend deployment.
+name: cloudflare-workers-deploy
+description: Use this skill when deploying an Astro + Payload CMS monorepo where the Astro frontend deploys to Cloudflare Workers. Activate when the user mentions deploying to Cloudflare Workers, Railway + Cloudflare, monorepo deployment, deploy hooks, or static frontend deployment. Cloudflare Pages functionality has merged into Workers - do not use Pages terminology.
 ---
 
 # Astro + Payload CMS Monorepo Deployment
 
-Deploy pattern for projects using the astro-payload-template: Payload CMS on Railway (Docker + PostgreSQL), media storage on Cloudflare R2, and Astro frontend on Cloudflare Pages (static).
+Deploy pattern for projects using Payload CMS backend + Astro frontend. The frontend deploys to Cloudflare Workers (formerly Pages - same underlying platform). Backend options: Cloudflare Workers (recommended) or Railway.
 
 ## Monorepo Structure
 
@@ -13,22 +13,60 @@ Deploy pattern for projects using the astro-payload-template: Payload CMS on Rai
 project/
 ├── package.json              # Root (dev scripts only)
 ├── backend/                  # Payload CMS (Next.js)
-│   ├── Dockerfile            # Multi-stage Node 22 Alpine
+│   ├── Dockerfile            # Multi-stage Node 22 Alpine (Railway option)
 │   ├── package.json          # pnpm, engines, start script
-│   ├── next.config.mjs       # output: 'standalone'
-│   ├── .env.production       # Template for Railway env vars
+│   ├── next.config.mjs       # output: 'standalone' (Railway) or standard (Workers)
+│   ├── wrangler.jsonc        # Cloudflare Workers config (Workers option)
 │   └── src/
-│       ├── payload.config.ts # CORS, S3 storage, deploy endpoint
+│       ├── payload.config.ts # CMS config, D1/R2 bindings or S3 storage
 │       ├── endpoints/deploy.ts
 │       └── components/DeployButton.tsx
 ├── frontend/                 # Astro (static)
-│   ├── astro.config.mjs      # cloudflare adapter, output: 'static'
-│   ├── wrangler.jsonc        # Cloudflare Pages config
+│   ├── astro.config.mjs      # No adapter for static, or cloudflare adapter for SSR
+│   ├── wrangler.jsonc        # Cloudflare Workers config
 │   ├── .env.production       # Build-time env vars
 │   └── public/_headers       # Security headers
 ```
 
-## Step 1: Railway (Backend)
+## Option A: Full Cloudflare Stack (Recommended)
+
+Both Payload backend and Astro frontend on Cloudflare Workers. See `cms/payload/reference/DEPLOYMENT.md` for the complete Payload on Workers setup (D1 + R2 + OpenNext).
+
+**Cost:** ~$5/month total (Workers paid plan covers both)
+
+**Frontend wrangler.jsonc (static Astro):**
+```jsonc
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "my-site",
+  "compatibility_date": "2026-04-21",
+  "assets": {
+    "directory": "./dist"
+  },
+  "vars": {
+    "PAYLOAD_URL": "https://my-cms.workers.dev"
+  }
+}
+```
+
+**Environment variables:**
+
+Workers (Payload backend):
+- `PAYLOAD_SECRET` - Set via `wrangler secret put PAYLOAD_SECRET`
+- D1 and R2 bindings configured in wrangler.jsonc
+
+Workers (Astro frontend):
+- `PAYLOAD_URL` - Your Payload Worker URL (set via wrangler.jsonc vars or dashboard)
+
+---
+
+## Option B: Railway Backend + Cloudflare Workers Frontend
+
+Payload CMS on Railway (Docker + PostgreSQL), Astro frontend on Cloudflare Workers.
+
+**Cost:** ~$28/month
+
+## Step 1: Railway (Backend) - Option B only
 
 ### 1.1 Create Railway Project
 
@@ -55,10 +93,8 @@ All 10 variables needed for the Payload backend on Railway:
 | `R2_PUBLIC_URL` | `https://pub-{hash}.r2.dev` or custom domain | After R2 setup (Step 2) |
 | `R2_ACCESS_KEY_ID` | From R2 API token | After R2 setup (Step 2) |
 | `R2_SECRET_ACCESS_KEY` | From R2 API token | After R2 setup (Step 2) |
-| `CLIENT_URI` | `https://{project}.pages.dev` | After CF Pages setup (Step 4) |
-| `CLOUDFLARE_DEPLOY_HOOK_URL` | Webhook URL | After deploy hook setup (Step 4) |
-
-The `backend/.env.production` file in the template lists all these variables as a reference. Set the first 3 during initial Railway setup, R2 variables after Step 2, and the last 2 after Cloudflare Pages is created.
+| `CLIENT_URI` | `https://{project}.workers.dev` | After Workers setup (Step 3) |
+| `CLOUDFLARE_DEPLOY_HOOK_URL` | Webhook URL | After deploy hook setup (Step 3) |
 
 ### 1.4 How the Dockerfile Works
 
@@ -78,7 +114,7 @@ Multi-stage build (no configuration needed):
 
 ---
 
-## Step 2: Cloudflare R2 Storage
+## Step 2: Cloudflare R2 Storage (Option B)
 
 ### 2.1 Create R2 Bucket
 
@@ -117,12 +153,13 @@ railway variable set "R2_SECRET_ACCESS_KEY={secret-key}" --service {service-name
 
 ---
 
-## Step 3: Cloudflare Pages (Frontend)
+## Step 3: Cloudflare Workers (Frontend)
 
-### 3.1 Create Pages Project
+### 3.1 Create Workers Project from Git
 
-1. Workers & Pages > Create > Pages > Connect to Git
-2. Select the repo
+1. Cloudflare dashboard > Workers & Pages > Create
+2. Select **Workers** tab > **Workers Builds** (Git-connected deployment)
+3. Connect to Git and select the repo
 
 ### 3.2 Build Settings
 
@@ -139,24 +176,23 @@ railway variable set "R2_SECRET_ACCESS_KEY={secret-key}" --service {service-name
 |---------|-------|
 | `PAYLOAD_URL` | `https://{service}-production.up.railway.app` |
 
-This is the only variable needed. The code reads `PUBLIC_PAYLOAD_URL` from `.env.production` (committed to git) and `PAYLOAD_URL` from wrangler.jsonc. Both point to the same Railway backend URL.
-
-### 3.4 wrangler.jsonc
-
-This file is committed to git and Cloudflare reads it automatically:
+### 3.4 wrangler.jsonc (static Astro)
 
 ```jsonc
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "project-name",
-  "compatibility_date": "2025-04-01",
-  "compatibility_flags": ["nodejs_compat"],
-  "pages_build_output_dir": "./dist",
+  "compatibility_date": "2026-04-21",
+  "assets": {
+    "directory": "./dist"
+  },
   "vars": {
     "PAYLOAD_URL": "https://{service}-production.up.railway.app"
   }
 }
 ```
+
+**Note:** For SSR Astro, add `main`, `compatibility_flags: ["nodejs_compat"]`, and `assets.binding: "ASSETS"`. See `cloudflare/astro` skill.
 
 ### 3.5 .env.production
 
@@ -170,7 +206,7 @@ PUBLIC_SITE_NAME=Site Name
 
 ### 3.6 Security Headers
 
-`frontend/public/_headers` is served by Cloudflare Pages automatically:
+`frontend/public/_headers` is served by Cloudflare Workers automatically for static assets:
 
 ```
 /*
@@ -186,26 +222,26 @@ Adjust `style-src`, `font-src`, and `img-src` per project (e.g., add R2 domain t
 
 ### 3.7 Verify
 
-- Pages URL: `https://{project}.pages.dev`
+- Workers URL: `https://{project}.workers.dev`
 - Check that content loads from CMS
 - Check security headers with browser DevTools (Network tab > Response Headers)
 
 ---
 
-## Step 4: Connect Services
+## Step 4: Connect Services (Option B)
 
 ### 4.1 Set CLIENT_URI on Railway
 
 ```bash
-railway variable set "CLIENT_URI=https://{project}.pages.dev" --service {service-name}
+railway variable set "CLIENT_URI=https://{project}.workers.dev" --service {service-name}
 ```
 
 This configures CORS so the Astro frontend can access the Payload API.
 
 ### 4.2 Create Deploy Hook
 
-1. Cloudflare Pages project > Settings > Build & Deployments > Deploy hooks
-2. Add hook: Name "Payload", Branch "main"
+1. Cloudflare dashboard > Workers & Pages > your Worker project > Settings > Builds
+2. Add deploy hook: Name "Payload", Branch "main"
 3. Copy the webhook URL
 4. Set on Railway:
 
@@ -219,7 +255,7 @@ railway variable set "CLOUDFLARE_DEPLOY_HOOK_URL={webhook-url}" --service {servi
 Admin clicks "Deploy Website" in Payload sidebar
   -> POST /api/deploy (authenticated, backend)
   -> fetch(CLOUDFLARE_DEPLOY_HOOK_URL, { method: 'POST' })
-  -> Cloudflare Pages triggers new build
+  -> Cloudflare Workers triggers new build
   -> Astro fetches latest content from Payload API during build
   -> Static site deployed with fresh content
 ```
@@ -229,28 +265,8 @@ The deploy endpoint (`backend/src/endpoints/deploy.ts`) requires authentication 
 ### 4.4 Verify End-to-End
 
 - Media uploads: Upload an image in Payload admin, verify it's stored in R2 and loads via the public URL
-- Deploy hook: Click "Deploy Website" in Payload admin, verify Cloudflare Pages build triggers
+- Deploy hook: Click "Deploy Website" in Payload admin, verify Cloudflare Workers build triggers
 - Content flow: Create a test post with an image, trigger rebuild, verify it appears on the frontend
-
----
-
-## Environment Variable Flow
-
-```
-Railway (backend)                    Cloudflare Pages (frontend)
-├── DATABASE_URI                     ├── wrangler.jsonc
-├── PAYLOAD_SECRET                   │   └── vars.PAYLOAD_URL ──────────┐
-├── PAYLOAD_PUBLIC_SERVER_URL        ├── .env.production                │
-├── CLIENT_URI (CORS)                │   └── PUBLIC_PAYLOAD_URL ────────┤
-├── CLOUDFLARE_DEPLOY_HOOK_URL       └── Dashboard env var              │
-├── R2_BUCKET                            └── PAYLOAD_URL ───────────────┤
-├── R2_ENDPOINT                                                         v
-├── R2_PUBLIC_URL                    frontend/src/lib/payload.ts reads it
-├── R2_ACCESS_KEY_ID                 as: import.meta.env.PUBLIC_PAYLOAD_URL
-└── R2_SECRET_ACCESS_KEY
-```
-
-**Why three places for the same URL?** Cloudflare Pages merges them with this priority: Dashboard > wrangler.jsonc > .env.production. Having `.env.production` in git gives a working default. The dashboard override lets you change it without code changes.
 
 ---
 
@@ -263,7 +279,7 @@ Railway (backend)                    Cloudflare Pages (frontend)
 3. [ ] Update `frontend/.env.production` - PUBLIC_PAYLOAD_URL
 4. [ ] Update `backend/src/payload.config.ts` - CORS origins if custom domain
 
-### Railway
+### Railway (Option B only)
 
 1. [ ] Create project + PostgreSQL
 2. [ ] Set root directory to `backend`
@@ -271,7 +287,7 @@ Railway (backend)                    Cloudflare Pages (frontend)
 4. [ ] Verify admin panel loads
 5. [ ] Create admin account
 
-### Cloudflare R2
+### Cloudflare R2 (Option B only)
 
 1. [ ] Create R2 bucket (`{project}-media`)
 2. [ ] Enable public access (R2.dev subdomain or custom domain)
@@ -282,22 +298,22 @@ Railway (backend)                    Cloudflare Pages (frontend)
 7. [ ] Commit the updated import map and redeploy
 8. [ ] Test media upload in Payload admin
 
-### Cloudflare Pages
+### Cloudflare Workers (Frontend)
 
-1. [ ] Create Pages project from Git
+1. [ ] Create Workers project from Git (Workers & Pages > Create > Workers Builds)
 2. [ ] Set build command: `bun install && bun run build`
 3. [ ] Set output directory: `dist`
 4. [ ] Set root directory: `frontend`
 5. [ ] Set `PAYLOAD_URL` env var
 6. [ ] Verify site loads with CMS content
 
-### Connect Services
+### Connect Services (Option B only)
 
-1. [ ] Set `CLIENT_URI` on Railway (Cloudflare Pages URL)
-2. [ ] Create deploy hook in Cloudflare Pages settings
+1. [ ] Set `CLIENT_URI` on Railway (Cloudflare Workers URL)
+2. [ ] Create deploy hook in Cloudflare Workers settings (Settings > Builds)
 3. [ ] Set `CLOUDFLARE_DEPLOY_HOOK_URL` on Railway
 4. [ ] Test: click "Deploy Website" in Payload admin
-5. [ ] Verify Cloudflare Pages build triggers
+5. [ ] Verify Cloudflare Workers build triggers
 6. [ ] Add R2 public domain to CSP `img-src` in `_headers`
 
 ---
@@ -312,17 +328,13 @@ Root directory not set to `backend`. Railway is reading the root package.json.
 
 Dependencies in `package.json` but not in `pnpm-lock.yaml`. Run `cd backend && pnpm install` and commit the updated lockfile.
 
-### Cloudflare: "Unterminated string literal"
-
-Astro frontmatter has imports placed after runtime code. Move all `import` statements to the top of the frontmatter block (before any `const` or function calls).
-
 ### Cloudflare: Build succeeds but pages show fallback content
 
 `PAYLOAD_URL` points to wrong backend or backend isn't reachable during build. Check Railway URL and ensure backend is deployed and running.
 
 ### Deploy button: "Deploy hook URL not configured"
 
-`CLOUDFLARE_DEPLOY_HOOK_URL` not set in Railway. Add the webhook URL from Cloudflare Pages settings.
+`CLOUDFLARE_DEPLOY_HOOK_URL` not set in Railway. Add the webhook URL from Cloudflare Workers settings (Settings > Builds > Deploy hooks).
 
 ### Media images return 404
 

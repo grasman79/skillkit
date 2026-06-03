@@ -202,8 +202,8 @@ Add to `wrangler.jsonc`:
 
 For content websites using Astro frontend + Payload CMS backend:
 
-- **Backend (Payload):** Still deploys to Railway with PostgreSQL (Payload requires Node.js)
-- **Frontend (Astro):** Deploys to Cloudflare Workers instead of Pages
+- **Backend (Payload):** Cloudflare Workers (D1 + R2, recommended) or Railway with PostgreSQL
+- **Frontend (Astro):** Deploys to Cloudflare Workers
 - The deploy hook pattern works the same - Payload triggers a rebuild via webhook
 
 The main differences from the old Pages deployment:

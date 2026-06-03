@@ -257,7 +257,7 @@ Ask these questions one at a time:
 
 1. **Backend deployment** - Where to deploy Payload CMS? (Cloudflare Workers [recommended] / Railway / Vercel / Render / VPS)
 2. **Database** - What database for content? (PostgreSQL [recommended] / SQLite-D1 / MongoDB)
-3. **Frontend deployment** - Where to deploy the Astro website? (Cloudflare Pages [recommended] / Netlify / Vercel)
+3. **Frontend deployment** - Where to deploy the Astro website? (Cloudflare Workers [recommended] / Netlify / Vercel)
 4. **Project description** - What is this website about? (free text)
 5. **Code review** - Set up Greptile? (Yes / No)
 

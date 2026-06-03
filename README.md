@@ -2,10 +2,10 @@
 
 > A skills system for Claude Code that teaches it exactly how to build your app, so you never have to explain the same thing twice.
 
-**Version:** 1.4.0
+**Version:** 1.4.1
 **Author:** Manu
 **License:** MIT
-**Date:** 21/05/2026
+**Date:** 03/06/2026
 
 ---
 
@@ -184,7 +184,7 @@ Next session, Claude picks up exactly where you left off.
 | `skill-creator` | Create new skills from successful patterns |
 | `code-reviewer` | Review code for quality, security, maintainability |
 | `debugger` | Systematically investigate and fix errors |
-| `update-stack` | Safely update all dependencies with breaking change detection |
+| `update-stack` | Update all dependencies - audits outdated packages, fetches changelogs for major version jumps, classifies migration effort (Easy/Medium/Hard), then applies updates by choice |
 
 ### Framework
 | Skill | What It Does |
@@ -220,6 +220,8 @@ Next session, Claude picks up exactly where you left off.
 |-------|--------------|
 | `shadcn` | Shadcn UI component patterns (CLI v4: skills, presets, monorepo, dry-run, Base UI) |
 | `untitledui` | Untitled UI React components |
+| `pragmatic-drag-and-drop` | Atlassian's framework-agnostic drag-and-drop toolkit - draggable/drop target/monitor primitives, sortable lists, kanban boards, file drops, optional hitbox/auto-scroll/accessibility packages |
+| `animation-patterns` | Web app UI animation patterns - button press feedback, icon states, skeleton loaders, toasts, modals, dropdowns, number tickers, spring physics, layout animations, state transitions |
 
 ### AI
 | Skill | What It Does |
@@ -231,6 +233,7 @@ Next session, Claude picks up exactly where you left off.
 | Skill | What It Does |
 |-------|--------------|
 | `payload` | Payload CMS - collections, fields, hooks, access control, queries, adapters, plugins, custom endpoints, Form Builder, headless CMS patterns, deployment (official Payload skills + SkillKit extensions) |
+| `payload-blocks` | Payload blocks field - define blocks, add blocks to collections, configure admin options (initCollapsed, isSortable, minRows, maxRows), render blocks on the frontend by blockType |
 | `cms-migration` | Migrate from any CMS (WordPress, Contentful, Strapi, Sanity, Webflow) to Payload - interactive config-first workflow with field type reference |
 
 ### API
@@ -263,7 +266,11 @@ Primary source of truth for Cloudflare-related skills: https://developers.cloudf
 | `agents` | Cloudflare Agents SDK - stateful AI agents with AIChatAgent and Think, state management (setState, SQL), tools (server/client/human-in-the-loop), scheduling (cron/delayed/interval), sub-agents (facets), managed fiber jobs, agent tool orchestration (agentTool), workflows, MCP, codemode (dynamic JS execution), shell/workspace, Chat SDK adapter, Postgres session providers, React hooks (useAgent, useAgentChat) |
 | `agents-voice` | Voice AI agents on Cloudflare Workers - withVoice/withVoiceInput mixins, STT providers (WorkersAIFluxSTT, WorkersAINova3STT), TTS, barge-in interruption, React hooks (useVoiceAgent, useVoiceInput), framework-agnostic VoiceClient |
 | `queues` | Cloudflare Queues - message queue for async processing with producers (send, sendBatch), push consumers (batch handler, ack/retry, exponential backoff), pull consumers (HTTP API), dead letter queues, message delays, Agents SDK integration |
+| `tunnel` | Production Cloudflare Tunnel (cloudflared daemon) - dashboard and CLI tunnel creation, config.yml with ingress rules, origin parameters, run parameters, Docker and Kubernetes deployment, system service, replicas for HA, firewall rules (port 7844), Prometheus metrics, troubleshooting |
 | `local-dev-tunnels` | Expose local dev server via Cloudflare Tunnel - quick tunnels (random trycloudflare.com URLs), named tunnels (stable hostnames), Wrangler flags (--tunnel, --tunnel-name), Vite plugin tunnel config, security considerations, Cloudflare Access protection |
+| `sandbox-tunnels` | Cloudflare Sandbox SDK tunnels API - expose a service inside a sandbox container on a zero-config *.trycloudflare.com URL via sandbox.tunnels.get/list/destroy, TunnelInfo type, RPC transport requirement, glibc image constraint, limitations (no SSE, no persistent hostname, DNS warm-up, WARP egress) |
+| `flagship` | Cloudflare Flagship feature flag service - wrangler binding, binding API (getBooleanValue/getStringValue/getNumberValue/getObjectValue/get + *Details variants), OpenFeature SDK (server provider for Workers/Node.js, client provider for browsers), targeting rules with 11 operators, percentage rollouts with consistent hashing, evaluation context, evaluation reasons and error codes |
+| `dynamic-workers` | Cloudflare Dynamic Workers - spawn isolated Workers at runtime from code strings via LOADER.load()/get(), WorkerCode config, module types, egress control, custom bindings, Tail Workers observability, Durable Object Facets, Dynamic Workflows, runtime bundling with @cloudflare/worker-bundler |
 
 ### Deployment
 | Skill | What It Does |
@@ -298,6 +305,7 @@ Primary source of truth for Cloudflare-related skills: https://developers.cloudf
 | Skill | What It Does |
 |-------|--------------|
 | `bun` | Bun runtime |
+| `react-doctor` | React Doctor code health scanning, ESLint integration, and CI gating for web and React Native projects |
 | `ultracite-setup` | Ultracite linting setup and configuration |
 | `validation` | Zod/Valibot/ArkType validation |
 
@@ -401,6 +409,18 @@ The `project-setup` skill automatically recommends this stack and detects your p
 ---
 
 ## Changelog
+
+### v1.4.1 (03/06/2026)
+- **Pragmatic Drag and Drop skill** - New `ui/pragmatic-drag-and-drop` skill for Atlassian's framework-agnostic drag-and-drop toolkit. Covers the three adapters (element, text-selection, external/files), draggable/dropTarget/monitor primitives with React `useEffect` cleanup pattern using `combine`, sortable list with closest-edge detection from `@atlaskit/pragmatic-drag-and-drop-hitbox`, kanban board (cards as draggables, columns as drop targets, board-level monitor), and OS file drop via the external adapter. Includes optional packages table (hitbox, react-drop-indicator, flourish, auto-scroll, react-accessibility, live-region, react-beautiful-dnd-migration, unit-testing), accessibility guidance (react-accessibility package + live-region announcements), and 8 common gotchas (cleanup leaks, untyped payloads, hot canDrop, mobile touch-action, external adapter for files, empty dropTargets guard).
+- **Payload Blocks skill** - New `cms/payload-blocks` skill for building flexible page layouts with Payload's blocks field. Covers block definition (`slug`, `fields`, `labels`, `imageURL`, `imageAltText`, `interfaceName`), directory structure (`src/blocks/`), adding a blocks field to a collection (`minRows`, `maxRows`, `label`, `hidden`, `access`), admin config (`initCollapsed`, `isSortable`), auto-generated `blockType` and `blockName` in the API response, common block patterns (hero, CTA, rich text, content-with-media), TypeScript type generation with named interfaces, and frontend rendering by switching on `blockType` with a `RenderBlocks` component. Includes common gotchas (stable slugs, depth for media, type narrowing, block groups).
+- **Cloudflare Tunnel skill** - New `cloudflare/tunnel` skill for production Cloudflare Tunnel (`cloudflared`) deployment and operations. Covers the full lifecycle: `cloudflared` installation (macOS/Linux/Windows/Docker/source), quick tunnels (TryCloudflare for testing), dashboard (remotely-managed) and CLI (locally-managed) tunnel creation, `config.yml` structure with ingress rules (HTTP, HTTPS, SSH, RDP, TCP, Unix sockets, wildcards, path-based routing), origin parameters (TLS, HTTP, connection, access settings), all run parameters with environment variables, Docker deployment (run, Compose, networking), Kubernetes deployment (Secret, Deployment manifest with liveness probe, security context, service discovery), system service installation (systemd/launchd/Windows), replicas for high availability (failover only, no load balancing, no autoscaling), complete firewall IP tables (global, US, FedRAMP regions with SNI-based rules), Prometheus metrics (tunnel health, sessions, QUIC RTT, Go runtime), health check endpoint (`/ready`), notifications, log streaming, and comprehensive troubleshooting.
+- **Cloudflare Workers frontend** - Removed all Cloudflare Pages references across 11 skill files. All frontend deployments now use Workers. Updated `deployment/cloudflare-pages`, `cloudflare/astro`, Payload deployment and headless CMS docs, Astro framework headless-cms guide, security audit, and `workflow/project-setup`. Deploy guide rewritten for Workers Builds. URLs updated from `*.pages.dev` to `*.workers.dev`, wrangler config updated from `pages_build_output_dir` to `assets.directory`.
+- **Cloudflare Sandbox Tunnels skill** - New `cloudflare/sandbox-tunnels` skill for the `@cloudflare/sandbox` SDK tunnels API. Covers `sandbox.tunnels.get()` (expose a port, idempotent), `sandbox.tunnels.list()`, `sandbox.tunnels.destroy()`, the `TunnelInfo` type, RPC transport requirement, glibc image constraint, and all limitations (no persistent hostname, no SSE support, DNS warm-up delay, WARP/Zero Trust egress blocking).
+- **Cloudflare Flagship skill** - New `cloudflare/flagship` skill for Cloudflare's feature flag service. Covers dashboard app/flag setup, wrangler binding configuration, full binding API (getBooleanValue, getStringValue, getNumberValue, getObjectValue, plus all *Details variants), OpenFeature SDK integration, targeting rules with all 11 operators, AND/OR logical grouping up to 6 levels deep, percentage rollouts with consistent hashing, all evaluation reasons and error codes, TypeScript types, and 8 common gotchas.
+- **Cloudflare Dynamic Workers skill** - New `cloudflare/dynamic-workers` skill for spawning isolated Workers at runtime from code strings. Covers the Worker Loader binding, `load()` vs `get()`, the full `WorkerCode` config object, all module types (ES module, CJS, Python, text, binary, JSON), egress control, custom bindings via `WorkerEntrypoint`, observability via Tail Workers, Durable Object Facets, Dynamic Workflows, and runtime bundling with `@cloudflare/worker-bundler`.
+- **React Doctor skill** - New `tooling/react-doctor` skill for React code health scanning. Covers CLI one-off scans, ESLint integration with official framework configs (`recommended`, `next`, `react-native`, `tanstack-start`, `tanstack-query`), CLI config (`react-doctor.config.json`), GitHub Actions CI gating with score thresholds, and agent skill installation. Includes `reference/FRAMEWORKS.md` with per-framework setup and rule suppression lists for React Native/Expo.
+- **UI Animation Patterns skill** - New `ui/animation-patterns` skill for web app component animations. Covers button press feedback, icon animations, skeleton/shimmer loaders, toast notifications, modal and dropdown entrance/exit, number ticker, typewriter effect, layout animations, state transitions, rubber-banding drag, and spring presets. Includes accessible motion setup (useReducedMotion), performance rules, and 8 common gotchas. Distinct from `design/animation` which covers marketing page animations.
+- **Update Stack skill enhanced** - Rewrote `workflow/update-stack` to add automatic changelog research for major version jumps. Now fetches and summarizes breaking changes for each major bump before asking what to do, classifies migration effort as Easy/Medium/Hard with time estimates, includes a reference table of changelog URLs for 20+ common packages, and presents a consolidated view with effort labels so the user can make an informed choice before any updates are applied.
 
 ### v1.4.0 (21/05/2026)
 - **Cloudflare Agents SDK skill overhaul** - Major restructure of `cloudflare/agents` to cover agents@0.13.x and the sibling package ecosystem. Rewrote SKILL.md as a router pointing to dedicated reference files for each capability: sub-agents/facets (`subAgent()`, `parentAgent()`, facet-only wrangler config rules), agent tool orchestration (`agentTool()`, `runAgentTool()` from `agents/agent-tools`), managed fiber jobs (`runFiber()`, `keepAlive()`, terminal status, cancellation), Think class (`@cloudflare/think` - opinionated chat base with lifecycle hooks and workspace tools), codemode (`@cloudflare/codemode` - dynamic JS execution via LLM-generated code), shell/workspace (`@cloudflare/shell` - in-memory and durable filesystems with git), Chat SDK adapter (`agents/chat-sdk` - `createChatSdkState`, sharding), and Postgres session providers (experimental Hyperdrive-backed session/context/search). Updated patterns reference with agent tool orchestration pattern. Trimmed advanced.md to remove duplicated sub-agents content.
