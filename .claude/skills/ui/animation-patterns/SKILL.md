@@ -1,6 +1,6 @@
 ---
 name: animation-patterns
-description: Use this skill when adding animations to web app UI components - buttons, icons, loaders, modals, toasts, dropdowns, number tickers, skeleton screens, spring physics, or state transitions. Activate when the user mentions button press feedback, icon animation, loading spinner, skeleton loader, shimmer, toast animation, modal entrance, number counter, typewriter, spring animation, layout animation, or micro-interactions inside an app. This is for interactive app components, not marketing page scroll reveals (use design/animation for those).
+description: Use this skill when adding animations to web app UI components - buttons, icons, loaders, modals, toasts, dropdowns, number tickers, skeleton screens, spring physics, or state transitions. Activate when the user mentions button press feedback, icon animation, loading spinner, skeleton loader, shimmer, toast animation, modal entrance, number counter, typewriter, spring animation, layout animation, or micro-interactions inside an app. This is for interactive app components, not marketing page scroll reveals (use design/ui-ux for motion design judgment).
 ---
 
 # UI Animation Patterns
@@ -16,7 +16,7 @@ Practical animation patterns for web app components. Covers the full vocabulary 
 - Applying spring physics or layout animations (Framer Motion)
 - Transitioning between UI states (success, error, loading, empty)
 
-**Use `design/animation` instead** for marketing page animations: hero fade-ins, scroll reveals, parallax, or FAQ accordions.
+**Use `design/ui-ux` (motion reference) instead** for motion design judgment - whether to animate at all, marketing page animations (hero fade-ins, scroll reveals, parallax, FAQ accordions), and the tasteful-defaults/anti-patterns rules. This skill is the component how-to; `design/ui-ux` is the design decision.
 
 ## Library Decision
 

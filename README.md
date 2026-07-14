@@ -2,7 +2,7 @@
 
 > A skills system for Claude Code that teaches it exactly how to build your app, so you never have to explain the same thing twice.
 
-**Version:** 1.5.0
+**Version:** 1.6.0
 **Author:** Manu
 **License:** MIT
 **Date:** 14/07/2026
@@ -314,8 +314,7 @@ Primary source of truth for Cloudflare-related skills: https://developers.cloudf
 ### Design
 | Skill | What It Does |
 |-------|--------------|
-| `typography` | Web typography rules - font sizes, line height, line length, font pairing, headings, spacing |
-| `animation` | Web animation rules - where to animate, anti-patterns, exact durations/easing, hover effects, scroll reveals, form feedback |
+| `ui-ux` | Master UI/UX design skill for **web and mobile** - one entry point covering craft (8pt grid, red square method, block framing, proximity, typography, color, depth), UX patterns (adaptive UI, empty/search states, input methods, post-purchase), conversion/decision design (framing, anchoring, trust, component tactics), and platform conventions (mobile touch/tab/safe-area/iOS-Material, web click/nav/responsive/hover). Folds in the former `typography` and `animation` skills. Cross-links `ui/shadcn`, `ui/animation-patterns`, `platform/expo`. **Third-party**, adapted from multiple sources (Malewicz/Hype4, UX Peak, Sips, Butterick, Supafast), see [Credits](#credits) |
 
 ### Web Development
 | Skill | What It Does |
@@ -338,8 +337,13 @@ Most skills in SkillKit are original work. A few are third-party skills, include
 |----------|-----------------|--------|---------|
 | `hallmark` | Hassan El Mghari (Nutlope) | [github.com/Nutlope/hallmark](https://github.com/Nutlope/hallmark) | MIT |
 | `improve` | shadcn | [github.com/shadcn/improve](https://github.com/shadcn/improve) | MIT |
+| `ui-ux` (craft + mobile conventions) | Michal Malewicz | [hype4.academy](https://hype4.academy) | - |
+| `ui-ux` (UX patterns + conversion) | UX Peak | [uxpeak.com](https://uxpeak.com) | - |
+| `ui-ux` (design philosophy) | Tim, Sips (Sips App) | - | - |
+| `ui-ux` (web typography) | Butterick's Practical Typography | [practicaltypography.com](https://practicaltypography.com) | - |
+| `ui-ux` (web motion) | Supafast | [withsupafast.com](https://withsupafast.com) | - |
 
-If you maintain one of these and want the attribution changed or the skill removed, open an issue.
+The `ui-ux` sources are educational material (courses, talks, articles) whose rules and frameworks were adapted into skill form with attribution; they are not code libraries with a software license. If you are one of these creators and want the attribution changed or the content removed, open an issue.
 
 ---
 
@@ -425,6 +429,10 @@ The `project-setup` skill automatically recommends this stack and detects your p
 ---
 
 ## Changelog
+
+### v1.6.0 (14/07/2026)
+- **New `design/ui-ux` master skill (web + mobile)** - One consolidated design skill replacing the separate `typography` and `animation` skills. Thin dispatcher (`SKILL.md`) plus eight on-demand references: `foundations` (8pt grid, red square method, block framing, proximity, hierarchy), `typography` (web + mobile scales), `color-and-depth` (palette, contrast/WCAG, shadows, gradients), `motion` (tasteful defaults, anti-patterns), `patterns` (adaptive UI, empty/search states, input methods, post-purchase), `conversion` (framing, anchoring, specificity, trust, component tactics), `mobile` (44pt touch, tab bars, safe areas, iOS/Material), and `web` (click targets, top nav, responsive, hover/focus). Opens with a thin "build experiences, not screens" philosophy layer. Cross-links `ui/shadcn`, `ui/animation-patterns`, `platform/expo`, and the copy skills rather than duplicating them. Content adapted with attribution from Michal Malewicz/Hype4 Academy, UX Peak, Sips, Butterick's Practical Typography, and Supafast - see [Credits](README.md#credits).
+- **Retired `design/typography` and `design/animation`** - folded into `design/ui-ux` (their sources, Butterick and Supafast, carried forward into Credits). Repointed `ui/animation-patterns` cross-references accordingly.
 
 ### v1.5.0 (14/07/2026)
 - **Web Development skills consolidated** - Added `scroll-cinematic` (3D scroll site builder, requires Higgsfield MCP) and `tailwind-polish` into `web-development/` - both original work. Also added `hallmark` (anti-AI-slop design audits/redesigns), a third-party skill by [Hassan El Mghari (Nutlope)](https://github.com/Nutlope/hallmark) (MIT) - see [Credits](README.md#credits). Fifteen third-party design-system presets adapted from MengTo/Skills were evaluated and removed to avoid overlap with `webdesign` and `hallmark` - kept the skill kit to one design orchestrator (`webdesign`) plus one specialist (`hallmark`) instead of three competing entry points for the same job.

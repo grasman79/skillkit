@@ -192,9 +192,14 @@ Reusable across projects: `skills/`, `templates/`, `commands/`
 | Background jobs, workflows, event-driven | `backend/motia` |
 | Swiss company lookup, Zefix, UID search | `api/zefix` |
 | People/company enrichment, Apollo, sales intelligence | `api/apollo` |
-| Typography, font sizes, line height, readability | `design/typography` |
-| Animations, transitions, hover effects, scroll reveals, motion | `design/animation` |
-| Web app UI animations, button press feedback, icon animations, loaders, skeleton screens, spring animations, number tickers, state transitions, micro-interactions | `ui/animation-patterns` |
+| UI/UX design for web or mobile apps, layout, spacing, visual hierarchy, screen design, redesign, "make this look better", design review | `design/ui-ux` |
+| Typography, font sizes, line height, readability, font pairing | `design/ui-ux` (typography reference) |
+| Motion design judgment, whether to animate, transitions, hover effects, scroll reveals, marketing page animation | `design/ui-ux` (motion reference) |
+| Color palette, contrast, accessibility (WCAG), shadows, gradients, elevation | `design/ui-ux` (color-and-depth reference) |
+| Touch targets, tab bars, safe areas, mobile navigation, iOS HIG / Material conventions | `design/ui-ux` (mobile reference) |
+| Empty states, search states, adaptive UI by user stage, input-method choice, post-purchase/order screens | `design/ui-ux` (patterns reference) |
+| Paywall, pricing screen, product page, booking, checkout conversion, "why isn't this converting" | `design/ui-ux` (conversion reference) |
+| Web app UI animation implementation, button press feedback, icon animations, loaders, skeleton screens, spring animations, number tickers, state transitions, micro-interactions | `ui/animation-patterns` |
 | Web design, UI polish, redesigns, visual style | `web-development/webdesign` |
 | Anti-AI-slop design system, greenfield page build, design audit/redesign, design extraction from URL/screenshot | `web-development/hallmark` |
 | 3D scroll cinematic site, scroll-scrubbed canvas hero (requires Higgsfield MCP) | `web-development/scroll-cinematic` |
