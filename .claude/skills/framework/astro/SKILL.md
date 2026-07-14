@@ -640,3 +640,15 @@ export default defineConfig({
 - Build fails: Ensure `getStaticPaths` returns all dynamic routes
 - Zod import errors: Use `import { z } from 'astro/zod'` (not `astro:content`)
 - Node version errors: Astro 6 requires Node 22+
+- Blank white page with no error: destructure `Astro.props` as the very first statement in frontmatter. Any `const` that references a prop before the destructure throws a TDZ `ReferenceError` that Astro swallows silently. A short-circuit `||` on the homepage can mask this bug on subpages:
+  ```astro
+  ---
+  // CORRECT - destructure first
+  const { title, hasHero = false } = Astro.props
+  const hasHeroSection = isHomePage || hasHero
+
+  // BROKEN - hasHero used before declared
+  const hasHeroSection = isHomePage || hasHero  // silent blank page on subpages
+  const { title, hasHero = false } = Astro.props
+  ---
+  ```

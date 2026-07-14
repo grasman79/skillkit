@@ -149,6 +149,7 @@ Reusable across projects: `skills/`, `templates/`, `commands/`
 | Internationalization, i18n, translations, multi-language | `platform/expo` (for mobile) |
 | Expo UI, SwiftUI, Jetpack Compose, Host view, platform colors | `platform/expo` |
 | Animations, transitions, React Native Ease | `platform/react-native` |
+| Mobile app onboarding flow, questionnaire-style onboarding, subscription paywall onboarding | `platform/app-onboarding` |
 | Framework-specific patterns, SSR/RSC rendering modes | `framework/nextjs`, `framework/tanstack-start`, or `framework/astro` |
 | CMS, admin panel, content management, Payload collections, fields, hooks, access control, plugins | `cms/payload` |
 | Payload blocks field, flexible page layouts, block types, page builder, blockType, blockName, render blocks | `cms/payload-blocks` |
@@ -175,6 +176,7 @@ Reusable across projects: `skills/`, `templates/`, `commands/`
 | Server issues, port conflicts | `workflow/dev-server` |
 | Creating new skills | `workflow/skill-creator` |
 | Code review, quality checks | `workflow/code-reviewer` |
+| Codebase audit, improvement opportunities, prioritized handoff plans for another agent | `workflow/improve` |
 | Database security, access patterns | `security/database-security-audit` |
 | Auth security, session management | `security/auth-security-audit` |
 | API security, input validation | `security/api-security-audit` |
@@ -194,6 +196,24 @@ Reusable across projects: `skills/`, `templates/`, `commands/`
 | Animations, transitions, hover effects, scroll reveals, motion | `design/animation` |
 | Web app UI animations, button press feedback, icon animations, loaders, skeleton screens, spring animations, number tickers, state transitions, micro-interactions | `ui/animation-patterns` |
 | Web design, UI polish, redesigns, visual style | `web-development/webdesign` |
+| Anti-AI-slop design system, greenfield page build, design audit/redesign, design extraction from URL/screenshot | `web-development/hallmark` |
+| Minimal agency design system, editorial grid, oversized typography | `web-development/agency-grid-layout-minimal` |
+| Scroll-reveal, animate-on-scroll, IntersectionObserver animation trigger | `web-development/animation-on-scroll` |
+| Tailwind shadow utilities, card/panel/popover elevation | `web-development/beautiful-shadows` |
+| Archival book-reader design system, serif pages, mono index nav | `web-development/book-serif-index` |
+| Clean minimal beige light-mode design system | `web-development/clean-minimal-beige-light-mode` |
+| Company logo strip using Iconify Simple Icons instead of text logos | `web-development/company-logos` |
+| Editorial magazine + product-tech design system, asymmetrical grids | `web-development/editorial-tech` |
+| Image-led grid design system, full-bleed photography | `web-development/image-first-grid-layout` |
+| High-converting landing page structure, copywriting, SEO/AEO | `web-development/landing-page` |
+| Light-mode paper/technical design system, bracketed geometry | `web-development/light-mode-paper-technical` |
+| Infinite marquee loop, duplicated scrolling items | `web-development/marquee-loop` |
+| Decorative 01/02/03 numeric detail markers | `web-development/number-details` |
+| Clean paper-toned SaaS design system, orange accents | `web-development/orange-clean-paper-saas` |
+| High-converting SaaS pricing page structure, plan design, FAQs | `web-development/pricing-page` |
+| 3D scroll cinematic site, scroll-scrubbed canvas hero (requires Higgsfield MCP) | `web-development/scroll-cinematic` |
+| Word-by-word staggered text reveal animation | `web-development/staggered-word-reveal` |
+| Tailwind CSS UI polish techniques, production-quality implementation | `web-development/tailwind-polish` |
 | Web scraping, crawling, Firecrawl, parse PDF/DOCX, extract web data, search web | `scraping/firecrawl` |
 
 Cloudflare-related skills must treat the official Cloudflare developer docs as the main source of truth: https://developers.cloudflare.com/

@@ -38,6 +38,8 @@ Payload is a Next.js native CMS with TypeScript-first architecture, providing ad
 | Add fields to collection | Map collections, spread fields            | [PLUGIN-DEVELOPMENT.md#adding-fields-to-collections](reference/PLUGIN-DEVELOPMENT.md#adding-fields-to-collections)               |
 | Plugin hooks             | Preserve existing hooks in array          | [PLUGIN-DEVELOPMENT.md#adding-hooks](reference/PLUGIN-DEVELOPMENT.md#adding-hooks)                                               |
 | Check field type         | Type guard functions                      | [FIELD-TYPE-GUARDS.md](reference/FIELD-TYPE-GUARDS.md)                                                                           |
+| Migrations don't auto-run on dev start | Run `migrate:create` + `migrate` manually | [MIGRATIONS.md](reference/MIGRATIONS.md)                                                     |
+| Versioned collection save missing from admin | Backfill `_pages_v` via Payload API, not raw SQL | [MIGRATIONS.md#versioned-collections](reference/MIGRATIONS.md#versioned-collections) |
 
 ## Quick Start
 
@@ -388,6 +390,7 @@ import type { Post, User } from '@/payload-types'
 
 ## Reference Documentation
 
+- **[MIGRATIONS.md](reference/MIGRATIONS.md)** - Migration workflow, manual SQL migrations, versioned collection gotchas (delete+insert, `_pages_v` backfill), R2/S3 empty-credential crash
 - **[FIELDS.md](reference/FIELDS.md)** - All field types, validation, admin options
 - **[FIELD-TYPE-GUARDS.md](reference/FIELD-TYPE-GUARDS.md)** - Type guards for runtime field type checking and narrowing
 - **[COLLECTIONS.md](reference/COLLECTIONS.md)** - Collection configs, auth, upload, drafts, live preview

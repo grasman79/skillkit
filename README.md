@@ -2,10 +2,10 @@
 
 > A skills system for Claude Code that teaches it exactly how to build your app, so you never have to explain the same thing twice.
 
-**Version:** 1.4.1
+**Version:** 1.5.0
 **Author:** Manu
 **License:** MIT
-**Date:** 03/06/2026
+**Date:** 14/07/2026
 
 ---
 
@@ -185,6 +185,7 @@ Next session, Claude picks up exactly where you left off.
 | `code-reviewer` | Review code for quality, security, maintainability |
 | `debugger` | Systematically investigate and fix errors |
 | `update-stack` | Update all dependencies - audits outdated packages, fetches changelogs for major version jumps, classifies migration effort (Easy/Medium/Hard), then applies updates by choice |
+| `improve` | Survey a codebase as a senior advisor and produce prioritized, self-contained implementation plans for other agents to execute (read-only) |
 
 ### Framework
 | Skill | What It Does |
@@ -295,6 +296,7 @@ Primary source of truth for Cloudflare-related skills: https://developers.cloudf
 | `expo` | Expo mobile apps, i18n, Expo UI (SwiftUI/Jetpack Compose) |
 | `react-native` | React Native patterns, animations with React Native Ease |
 | `wordpress` | WordPress plugins |
+| `app-onboarding` | Design and build a high-converting questionnaire-style mobile app onboarding flow |
 
 ### Scraping
 | Skill | What It Does |
@@ -319,6 +321,24 @@ Primary source of truth for Cloudflare-related skills: https://developers.cloudf
 | Skill | What It Does |
 |-------|--------------|
 | `webdesign` | Master web design skill - orchestrates sub-skills for design philosophy, Tailwind implementation, UI polish, redesigns, and visual style systems |
+| `hallmark` | Anti-AI-slop design skill for greenfield pages, audits, redesigns, and design extraction from URLs or screenshots |
+| `agency-grid-layout-minimal` | Minimal agency design system - disciplined editorial grid, oversized typography, quiet uppercase labels |
+| `animation-on-scroll` | On-scroll animation trigger using IntersectionObserver with Tailwind-friendly animation classes |
+| `beautiful-shadows` | Exact Tailwind arbitrary shadow utilities for polished, layered neutral elevation |
+| `book-serif-index` | Archival book-reader design system - serif pages, mono index navigation, aged paper surfaces |
+| `clean-minimal-beige-light-mode` | Clean minimal beige light-mode design system - warm neutrals, restrained accent color |
+| `company-logos` | Company logo strip using Iconify Simple Icons (64x64) instead of text logos |
+| `editorial-tech` | Editorial magazine composition blended with precision product-tech detailing |
+| `image-first-grid-layout` | Image-led grid design system - full-bleed photography, structural guide lines |
+| `landing-page` | High-converting landing page structure, layout patterns, copywriting, SEO/AEO for SaaS/apps/services |
+| `light-mode-paper-technical` | Light-mode technical design system - warm paper surfaces, dark outer framing, bracketed geometry |
+| `marquee-loop` | Seamless infinite marquee loops using duplicated items |
+| `number-details` | Decorative 01, 02, 03 numeric detail markers |
+| `orange-clean-paper-saas` | Clean paper-toned SaaS design system - warm neutrals, orange accent signals |
+| `pricing-page` | High-converting SaaS pricing page structure, plan design, copywriting, FAQs |
+| `scroll-cinematic` | Award-winning "3D scroll" website builder - cinematic hero + scroll-scrubbed canvas (requires Higgsfield MCP) |
+| `staggered-word-reveal` | Subtle editorial word-by-word text reveal animations for headlines and hero copy |
+| `tailwind-polish` | Tailwind CSS implementation techniques for production-quality UI polish |
 
 ### Tools
 | Skill | What It Does |
@@ -409,6 +429,13 @@ The `project-setup` skill automatically recommends this stack and detects your p
 ---
 
 ## Changelog
+
+### v1.5.0 (14/07/2026)
+- **Web Development skills expanded** - Migrated 18 design-system and page-strategy skills into `web-development/`: `hallmark` (anti-AI-slop design audits/redesigns), `agency-grid-layout-minimal`, `animation-on-scroll`, `beautiful-shadows`, `book-serif-index`, `clean-minimal-beige-light-mode`, `company-logos`, `editorial-tech`, `image-first-grid-layout`, `landing-page`, `light-mode-paper-technical`, `marquee-loop`, `number-details`, `orange-clean-paper-saas`, `pricing-page`, `scroll-cinematic` (requires Higgsfield MCP), `staggered-word-reveal`, and `tailwind-polish`.
+- **Improve skill** - New `workflow/improve` skill: surveys a codebase as a senior advisor and produces prioritized, self-contained implementation plans for other agents to execute. Strictly read-only.
+- **App Onboarding skill** - New `platform/app-onboarding` skill: designs and builds a high-converting questionnaire-style mobile app onboarding flow (goal question, pain points, social proof, permission priming, app demo, paywall) modelled on top subscription apps.
+- **Payload migrations reference** - New `cms/payload/reference/MIGRATIONS.md` covering manual SQL migration patterns, versioned collection gotchas (delete+insert semantics, `_pages_v` backfill, `_uuid` column on version array tables), and R2/S3 empty-credential crashes.
+- **Astro props gotcha** - Documented a silent blank-page bug in `framework/astro` caused by referencing `Astro.props` before destructuring it (TDZ `ReferenceError` swallowed by Astro).
 
 ### v1.4.1 (03/06/2026)
 - **Pragmatic Drag and Drop skill** - New `ui/pragmatic-drag-and-drop` skill for Atlassian's framework-agnostic drag-and-drop toolkit. Covers the three adapters (element, text-selection, external/files), draggable/dropTarget/monitor primitives with React `useEffect` cleanup pattern using `combine`, sortable list with closest-edge detection from `@atlaskit/pragmatic-drag-and-drop-hitbox`, kanban board (cards as draggables, columns as drop targets, board-level monitor), and OS file drop via the external adapter. Includes optional packages table (hitbox, react-drop-indicator, flourish, auto-scroll, react-accessibility, live-region, react-beautiful-dnd-migration, unit-testing), accessibility guidance (react-accessibility package + live-region announcements), and 8 common gotchas (cleanup leaks, untyped payloads, hot canDrop, mobile touch-action, external adapter for files, empty dropTargets guard).
