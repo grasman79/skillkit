@@ -148,6 +148,7 @@ Reusable across projects: `skills/`, `templates/`, `commands/`
 | File uploads, image storage, S3/R2 | `storage/cloudflare-r2` |
 | Internationalization, i18n, translations, multi-language | `platform/expo` (for mobile) |
 | Expo UI, SwiftUI, Jetpack Compose, Host view, platform colors | `platform/expo` |
+| Expo MCP, expo doctor, build log debugging, simulator control, Expo AI tooling, expo.dev/skills | `platform/expo` (ai-tooling.md) |
 | Animations, transitions, React Native Ease | `platform/react-native` |
 | Mobile app onboarding flow, questionnaire-style onboarding, subscription paywall onboarding | `platform/app-onboarding` |
 | Framework-specific patterns, SSR/RSC rendering modes | `framework/nextjs`, `framework/tanstack-start`, or `framework/astro` |

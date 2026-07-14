@@ -273,6 +273,12 @@ For these topics, read the corresponding reference file in this skill's director
 - MCP-assisted product and offering creation
 - Purchase UI patterns, entitlement checks, and production deployment
 
+### AI Tooling for Expo (see `ai-tooling.md`)
+
+- Expo MCP (`expo.dev/ai`) - read dashboard build logs, control the simulator (screenshots, taps, logs)
+- `expo doctor` to catch version mismatches before debugging
+- Expo skills registry (`expo.dev/skills`) and the Expo UI liquid-glass tab bar
+
 ---
 
 ## Internationalization (i18n)
@@ -688,3 +694,4 @@ For Jetpack Compose modifiers, pass native colors directly:
 |------|---------|
 | `advanced-router.md` | API routes, bottom sheets, route groups, protected routes, link preview, native tabs, RSC, headless tabs, SSG, deep links |
 | `in-app-purchases.md` | RevenueCat setup, test store, MCP integration, purchase UI, production deployment |
+| `ai-tooling.md` | Expo MCP (build logs, simulator control), server vs local capabilities, `expo doctor`, Expo skills registry, liquid-glass tab bar |
