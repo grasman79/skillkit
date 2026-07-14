@@ -83,6 +83,7 @@ Reusable across projects: `skills/`, `templates/`, `commands/`
 ### Plan Before Building
 - Enter plan mode for any non-trivial task (3+ steps or architectural decisions)
 - Write detailed specs upfront to reduce ambiguity
+- After drafting a non-trivial plan, run `workflow/plan-review` to have critic subagents attack it before presenting it for approval
 - If something goes sideways, STOP and re-plan immediately - don't keep pushing
 - Use plan mode for verification steps, not just building
 
@@ -178,6 +179,7 @@ Reusable across projects: `skills/`, `templates/`, `commands/`
 | Creating new skills | `workflow/skill-creator` |
 | Code review, quality checks | `workflow/code-reviewer` |
 | Codebase audit, improvement opportunities, prioritized handoff plans for another agent | `workflow/improve` |
+| Adversarial plan review, stress-test / red-team a plan before coding | `workflow/plan-review` |
 | Database security, access patterns | `security/database-security-audit` |
 | Auth security, session management | `security/auth-security-audit` |
 | API security, input validation | `security/api-security-audit` |

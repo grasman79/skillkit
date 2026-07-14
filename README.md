@@ -2,7 +2,7 @@
 
 > A skills system for Claude Code that teaches it exactly how to build your app, so you never have to explain the same thing twice.
 
-**Version:** 1.6.0
+**Version:** 1.6.1
 **Author:** Manu
 **License:** MIT
 **Date:** 14/07/2026
@@ -186,6 +186,7 @@ Next session, Claude picks up exactly where you left off.
 | `debugger` | Systematically investigate and fix errors |
 | `update-stack` | Update all dependencies - audits outdated packages, fetches changelogs for major version jumps, classifies migration effort (Easy/Medium/Hard), then applies updates by choice |
 | `improve` | Survey a codebase as a senior advisor and produce prioritized, self-contained implementation plans for other agents to execute (read-only) — **third-party**, by [shadcn](https://github.com/shadcn/improve) (MIT), see [Credits](#credits) |
+| `plan-review` | Draft a plan, dispatch critic subagents to attack it, then present a hardened plan |
 
 ### Framework
 | Skill | What It Does |
@@ -429,6 +430,9 @@ The `project-setup` skill automatically recommends this stack and detects your p
 ---
 
 ## Changelog
+
+### v1.6.1 (14/07/2026)
+- **New `workflow/plan-review` skill** - Adversarial plan review: after a plan is drafted (by `feature-planner`, `improve`, or Plan Mode), dispatches fresh-context critic subagents to attack it across three lenses (blast radius, over-engineering, convention/principle compliance), vets their objections against the actual code before accepting any of them, folds accepted ones into the plan, then presents a hardened plan with a Review Summary before implementation starts. Complements `feature-planner` rather than replacing it. Inspired by a third-party Claude Code setup's adversarial `/plan` review step.
 
 ### v1.6.0 (14/07/2026)
 - **New `design/ui-ux` master skill (web + mobile)** - One consolidated design skill replacing the separate `typography` and `animation` skills. Thin dispatcher (`SKILL.md`) plus eight on-demand references: `foundations` (8pt grid, red square method, block framing, proximity, hierarchy), `typography` (web + mobile scales), `color-and-depth` (palette, contrast/WCAG, shadows, gradients), `motion` (tasteful defaults, anti-patterns), `patterns` (adaptive UI, empty/search states, input methods, post-purchase), `conversion` (framing, anchoring, specificity, trust, component tactics), `mobile` (44pt touch, tab bars, safe areas, iOS/Material), and `web` (click targets, top nav, responsive, hover/focus). Opens with a thin "build experiences, not screens" philosophy layer. Cross-links `ui/shadcn`, `ui/animation-patterns`, `platform/expo`, and the copy skills rather than duplicating them. Content adapted with attribution from Michal Malewicz/Hype4 Academy, UX Peak, Sips, Butterick's Practical Typography, and Supafast - see [Credits](README.md#credits).
