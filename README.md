@@ -322,22 +322,7 @@ Primary source of truth for Cloudflare-related skills: https://developers.cloudf
 |-------|--------------|
 | `webdesign` | Master web design skill - orchestrates sub-skills for design philosophy, Tailwind implementation, UI polish, redesigns, and visual style systems |
 | `hallmark` | Anti-AI-slop design skill for greenfield pages, audits, redesigns, and design extraction from URLs or screenshots — **third-party**, by [Nutlope (Hassan El Mghari)](https://github.com/Nutlope/hallmark) (MIT), see [Credits](#credits) |
-| `agency-grid-layout-minimal` | Minimal agency design system - disciplined editorial grid, oversized typography, quiet uppercase labels — **third-party**, adapted from [MengTo/Skills](https://github.com/MengTo/Skills) (MIT), see [Credits](#credits) |
-| `animation-on-scroll` | On-scroll animation trigger using IntersectionObserver with Tailwind-friendly animation classes — **third-party**, adapted from [MengTo/Skills](https://github.com/MengTo/Skills) (MIT), see [Credits](#credits) |
-| `beautiful-shadows` | Exact Tailwind arbitrary shadow utilities for polished, layered neutral elevation — **third-party**, adapted from [MengTo/Skills](https://github.com/MengTo/Skills) (MIT), see [Credits](#credits) |
-| `book-serif-index` | Archival book-reader design system - serif pages, mono index navigation, aged paper surfaces — **third-party**, adapted from [MengTo/Skills](https://github.com/MengTo/Skills) (MIT), see [Credits](#credits) |
-| `clean-minimal-beige-light-mode` | Clean minimal beige light-mode design system - warm neutrals, restrained accent color — **third-party**, adapted from [MengTo/Skills](https://github.com/MengTo/Skills) (MIT), see [Credits](#credits) |
-| `company-logos` | Company logo strip using Iconify Simple Icons (64x64) instead of text logos — **third-party**, adapted from [MengTo/Skills](https://github.com/MengTo/Skills) (MIT), see [Credits](#credits) |
-| `editorial-tech` | Editorial magazine composition blended with precision product-tech detailing — **third-party**, adapted from [MengTo/Skills](https://github.com/MengTo/Skills) (MIT), see [Credits](#credits) |
-| `image-first-grid-layout` | Image-led grid design system - full-bleed photography, structural guide lines — **third-party**, adapted from [MengTo/Skills](https://github.com/MengTo/Skills) (MIT), see [Credits](#credits) |
-| `landing-page` | High-converting landing page structure, layout patterns, copywriting, SEO/AEO for SaaS/apps/services — **third-party**, adapted from [MengTo/Skills](https://github.com/MengTo/Skills) (MIT), see [Credits](#credits) |
-| `light-mode-paper-technical` | Light-mode technical design system - warm paper surfaces, dark outer framing, bracketed geometry — **third-party**, adapted from [MengTo/Skills](https://github.com/MengTo/Skills) (MIT), see [Credits](#credits) |
-| `marquee-loop` | Seamless infinite marquee loops using duplicated items — **third-party**, adapted from [MengTo/Skills](https://github.com/MengTo/Skills) (MIT), see [Credits](#credits) |
-| `number-details` | Decorative 01, 02, 03 numeric detail markers — **third-party**, adapted from [MengTo/Skills](https://github.com/MengTo/Skills) (MIT), see [Credits](#credits) |
-| `orange-clean-paper-saas` | Clean paper-toned SaaS design system - warm neutrals, orange accent signals — **third-party**, adapted from [MengTo/Skills](https://github.com/MengTo/Skills) (MIT), see [Credits](#credits) |
-| `pricing-page` | High-converting SaaS pricing page structure, plan design, copywriting, FAQs — **third-party**, adapted from [MengTo/Skills](https://github.com/MengTo/Skills) (MIT), see [Credits](#credits) |
 | `scroll-cinematic` | Award-winning "3D scroll" website builder - cinematic hero + scroll-scrubbed canvas (requires Higgsfield MCP) |
-| `staggered-word-reveal` | Subtle editorial word-by-word text reveal animations for headlines and hero copy — **third-party**, adapted from [MengTo/Skills](https://github.com/MengTo/Skills) (MIT), see [Credits](#credits) |
 | `tailwind-polish` | Tailwind CSS implementation techniques for production-quality UI polish |
 
 ### Tools
@@ -353,7 +338,6 @@ Most skills in SkillKit are original work. A few are third-party skills, include
 |----------|-----------------|--------|---------|
 | `hallmark` | Hassan El Mghari (Nutlope) | [github.com/Nutlope/hallmark](https://github.com/Nutlope/hallmark) | MIT |
 | `improve` | shadcn | [github.com/shadcn/improve](https://github.com/shadcn/improve) | MIT |
-| `agency-grid-layout-minimal`, `animation-on-scroll`, `beautiful-shadows`, `book-serif-index`, `clean-minimal-beige-light-mode`, `company-logos`, `editorial-tech`, `image-first-grid-layout`, `landing-page`, `light-mode-paper-technical`, `marquee-loop`, `number-details`, `orange-clean-paper-saas`, `pricing-page`, `staggered-word-reveal` | Meng To | [github.com/MengTo/Skills](https://github.com/MengTo/Skills) | MIT |
 
 If you maintain one of these and want the attribution changed or the skill removed, open an issue.
 
@@ -443,7 +427,7 @@ The `project-setup` skill automatically recommends this stack and detects your p
 ## Changelog
 
 ### v1.5.0 (14/07/2026)
-- **Web Development skills expanded** - Added 18 design-system and page-strategy skills into `web-development/`. Two are original: `scroll-cinematic` (3D scroll site builder, requires Higgsfield MCP) and `tailwind-polish`. Fifteen are third-party, adapted from [MengTo/Skills](https://github.com/MengTo/Skills) (MIT) - see [Credits](README.md#credits): `agency-grid-layout-minimal`, `animation-on-scroll`, `beautiful-shadows`, `book-serif-index`, `clean-minimal-beige-light-mode`, `company-logos`, `editorial-tech`, `image-first-grid-layout`, `landing-page`, `light-mode-paper-technical`, `marquee-loop`, `number-details`, `orange-clean-paper-saas`, `pricing-page`, `staggered-word-reveal`. One is a separate third-party project: `hallmark` (anti-AI-slop design audits/redesigns), by [Hassan El Mghari (Nutlope)](https://github.com/Nutlope/hallmark) (MIT).
+- **Web Development skills consolidated** - Added `scroll-cinematic` (3D scroll site builder, requires Higgsfield MCP) and `tailwind-polish` into `web-development/` - both original work. Also added `hallmark` (anti-AI-slop design audits/redesigns), a third-party skill by [Hassan El Mghari (Nutlope)](https://github.com/Nutlope/hallmark) (MIT) - see [Credits](README.md#credits). Fifteen third-party design-system presets adapted from MengTo/Skills were evaluated and removed to avoid overlap with `webdesign` and `hallmark` - kept the skill kit to one design orchestrator (`webdesign`) plus one specialist (`hallmark`) instead of three competing entry points for the same job.
 - **Improve skill** - Added `workflow/improve`, a third-party skill by [shadcn](https://github.com/shadcn/improve) (MIT) - see [Credits](README.md#credits): surveys a codebase as a senior advisor and produces prioritized, self-contained implementation plans for other agents to execute. Strictly read-only.
 - **App Onboarding skill** - New original `platform/app-onboarding` skill: designs and builds a high-converting questionnaire-style mobile app onboarding flow (goal question, pain points, social proof, permission priming, app demo, paywall) modelled on top subscription apps.
 - **Payload migrations reference** - New `cms/payload/reference/MIGRATIONS.md` covering manual SQL migration patterns, versioned collection gotchas (delete+insert semantics, `_pages_v` backfill, `_uuid` column on version array tables), and R2/S3 empty-credential crashes.
