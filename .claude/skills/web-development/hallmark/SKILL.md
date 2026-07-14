@@ -6,6 +6,8 @@ version: 1.1.0
 
 # Hallmark
 
+> Third-party skill by Hassan El Mghari (Nutlope) — [github.com/Nutlope/hallmark](https://github.com/Nutlope/hallmark), MIT License. See [LICENSE](LICENSE).
+
 A design skill for AI coding assistants. Makes the UIs they generate look made, not generated.
 
 Hallmark is opinionated, short, and boring on purpose. It encodes a tight set of rules — drawn from the consensus of the anti-AI-slop design field (Anthropic's frontend-design skill, the Claude cookbook on frontend aesthetics, and the 2026 "tactile rebellion" movement) — and refuses to let the model fall back to the defaults every LLM was trained on.

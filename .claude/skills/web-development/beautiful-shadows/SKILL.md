@@ -5,6 +5,8 @@ description: Apply exact Tailwind arbitrary shadow utilities for polished, layer
 
 # Beautiful Shadows
 
+> Third-party skill adapted from [MengTo/Skills](https://github.com/MengTo/Skills) by Meng To, MIT License.
+
 ## Use When
 - A surface needs polished, layered elevation.
 - Default Tailwind shadows feel too generic or blunt.

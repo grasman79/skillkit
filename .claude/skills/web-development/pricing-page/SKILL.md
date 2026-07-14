@@ -5,6 +5,8 @@ description: Use when designing or rewriting a high-converting SaaS pricing page
 
 # Pricing Page (High‑Conversion) — Web Design Skill
 
+> Third-party skill adapted from [MengTo/Skills](https://github.com/MengTo/Skills) by Meng To, MIT License.
+
 Design a pricing page that helps visitors **choose** and feel good about it.
 Your job is not to “show prices.”
 Your job is to **reduce uncertainty**.

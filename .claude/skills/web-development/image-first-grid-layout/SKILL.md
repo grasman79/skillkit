@@ -5,6 +5,8 @@ description: "Create an image-led grid design system with full-bleed photography
 
 # Image First Grid Layout Skill
 
+> Third-party skill adapted from [MengTo/Skills](https://github.com/MengTo/Skills) by Meng To, MIT License.
+
 ## Use When
 - Create an image-led grid design system with full-bleed photography, structural guide lines, anchored content blocks, and restrained technical overlays.
 

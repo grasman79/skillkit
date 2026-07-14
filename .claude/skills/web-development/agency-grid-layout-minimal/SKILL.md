@@ -5,6 +5,8 @@ description: "Create a minimal agency design system with a disciplined editorial
 
 # Agency Grid Layout Minimal Skill
 
+> Third-party skill adapted from [MengTo/Skills](https://github.com/MengTo/Skills) by Meng To, MIT License.
+
 ## Use When
 - Create a minimal agency design system with a disciplined editorial grid, oversized typography, quiet uppercase utility labels, restrained image blocks, and subtle structural detail.
 

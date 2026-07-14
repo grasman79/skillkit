@@ -5,6 +5,8 @@ description: "Blend editorial magazine composition with precision product-tech d
 
 # Editorial Tech Skill
 
+> Third-party skill adapted from [MengTo/Skills](https://github.com/MengTo/Skills) by Meng To, MIT License.
+
 ## Use When
 - Blend editorial magazine composition with precision product-tech detailing using asymmetrical grids, cinematic media bands, mono utility labels, and restrained accent color.
 

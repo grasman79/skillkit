@@ -5,6 +5,8 @@ description: "Use Iconify Simple Icons logos (64x64) instead of text logos."
 
 # Company Logos Skill
 
+> Third-party skill adapted from [MengTo/Skills](https://github.com/MengTo/Skills) by Meng To, MIT License.
+
 ## Use When
 - A design needs recognizable brand marks without embedding custom SVG files or rendering company names as plain text.
 - Logo rows, integrations grids, customer proof, partner lists, and tool badges need consistent icon treatment.

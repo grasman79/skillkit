@@ -5,6 +5,8 @@ description: "Create a light-mode technical design system with warm paper surfac
 
 # Light Mode Paper Technical Skill
 
+> Third-party skill adapted from [MengTo/Skills](https://github.com/MengTo/Skills) by Meng To, MIT License.
+
 ## Use When
 - Create a light-mode technical design system with warm paper surfaces, dark outer framing, subtle diagonal texture, precise bracketed geometry, and restrained accent signals.
 

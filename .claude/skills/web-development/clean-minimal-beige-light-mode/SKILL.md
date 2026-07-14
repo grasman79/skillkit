@@ -5,6 +5,8 @@ description: "Create a clean minimal beige light-mode design system with warm ne
 
 # Clean Minimal Beige Light Mode Skill
 
+> Third-party skill adapted from [MengTo/Skills](https://github.com/MengTo/Skills) by Meng To, MIT License.
+
 ## Use When
 - Create a clean minimal beige light-mode design system with warm neutral shells, quiet process grids, restrained accent color, and elegant low-contrast structure.
 

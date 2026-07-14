@@ -5,6 +5,8 @@ description: Create subtle editorial word-by-word text reveal animations where e
 
 # Staggered Word Reveal
 
+> Third-party skill adapted from [MengTo/Skills](https://github.com/MengTo/Skills) by Meng To, MIT License.
+
 ## Use When
 - A short headline, intro, or pull quote should reveal word by word.
 - The motion should feel editorial, premium, and restrained.

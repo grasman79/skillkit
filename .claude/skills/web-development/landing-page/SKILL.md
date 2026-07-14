@@ -5,6 +5,8 @@ description: Use when designing or rewriting a high-converting landing page (sin
 
 # Landing Page (High‑Conversion) — Web Design Skill
 
+> Third-party skill adapted from [MengTo/Skills](https://github.com/MengTo/Skills) by Meng To, MIT License.
+
 A landing page is not a homepage.
 A homepage serves multiple intents.
 A landing page wins one intent: **one offer → one audience → one primary action**.

@@ -5,6 +5,8 @@ description: "Create a clean paper-toned SaaS design system with warm neutrals, 
 
 # Orange Clean Paper SaaS Skill
 
+> Third-party skill adapted from [MengTo/Skills](https://github.com/MengTo/Skills) by Meng To, MIT License.
+
 ## Use When
 - Create a clean paper-toned SaaS design system with warm neutrals, orange accent signals, rounded premium forms, and polished product illustration surfaces.
 

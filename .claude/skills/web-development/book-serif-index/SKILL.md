@@ -5,6 +5,8 @@ description: "Create an archival book-reader design system with serif-led pages,
 
 # Book Serif Index Skill
 
+> Third-party skill adapted from [MengTo/Skills](https://github.com/MengTo/Skills) by Meng To, MIT License.
+
 ## Use When
 - Create an archival book-reader design system with serif-led pages, mono index navigation, aged paper surfaces, margin notes, and a premium catalog frame.
 

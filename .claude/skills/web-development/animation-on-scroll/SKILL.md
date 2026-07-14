@@ -5,6 +5,8 @@ description: Create an on-scroll animation trigger using IntersectionObserver wi
 
 # Animation On Scroll Skill
 
+> Third-party skill adapted from [MengTo/Skills](https://github.com/MengTo/Skills) by Meng To, MIT License.
+
 ## Workflow
 1. Confirm animation style, timing, and whether animations should run once or repeat.
 2. Provide the keyframes + JS observer snippet and the exact Tailwind class to apply.

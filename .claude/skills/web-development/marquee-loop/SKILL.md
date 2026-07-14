@@ -5,6 +5,8 @@ description: "Apply seamless infinite marquee loops using duplicated items."
 
 # Marquee Skill
 
+> Third-party skill adapted from [MengTo/Skills](https://github.com/MengTo/Skills) by Meng To, MIT License.
+
 ## Use When
 - A design needs a seamless infinite loop for logos, testimonials, screenshots, tags, or short feature chips.
 
