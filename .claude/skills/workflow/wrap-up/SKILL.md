@@ -17,13 +17,14 @@ Single command to close out a work session. Handles everything: logs progress, l
 
 1. Log the session (changelog + tasks)
 2. Run linter and fix issues
-3. Verify build passes
-4. Check branch name matches the work (warn if mismatch)
-5. Commit all changes
-6. Push to remote
-7. Create PR (feature branches)
-8. Wait for code review and auto-fix if needed (optional - Greptile)
-9. Merge and clean up
+3. Run the test suite (blocking - a failing suite stops the wrap-up)
+4. Verify build passes
+5. Check branch name matches the work (warn if mismatch)
+6. Commit all changes
+7. Push to remote
+8. Create PR (feature branches)
+9. Wait for code review and auto-fix if needed (optional - Greptile)
+10. Merge and clean up
 
 ## Workflow
 
@@ -79,7 +80,33 @@ If a `README.md` exists in the project root with a date field, update it to toda
 
 If there are errors that can't be auto-fixed, fix them manually before continuing. Do not skip or bypass the linter.
 
-### Step 5: Verify Build (if applicable)
+### Step 5: Run the Test Suite
+
+If `package.json` has a `test` script:
+
+```bash
+[package-manager] run test
+```
+
+**A failing suite stops the wrap-up.** Fix the failures before continuing. Never commit over a red suite, and never report the session as done while tests fail.
+
+If a check fails because the behaviour deliberately changed this session, update the check and say so plainly in the summary. Deleting or skipping a check to get green is not allowed. If a check genuinely needs to go, that is a decision to raise with the user, not to make silently.
+
+**If there is no `test` script**, do not block. Note it once in the summary:
+
+```
+No test suite in this project. Ran lint and build only.
+```
+
+**If the session added a feature and wrote no checks for it**, say so in the summary rather than staying quiet:
+
+```
+Note: [feature] shipped without acceptance checks. Worth adding before this grows.
+```
+
+This is a flag, not a blocker. Prototype work legitimately ships without checks. The point is that the user knows, rather than assuming coverage that does not exist.
+
+### Step 6: Verify Build (if applicable)
 
 If the project has a build command in package.json:
 
@@ -89,12 +116,12 @@ If the project has a build command in package.json:
 
 If build fails, fix the errors before committing. Do not push broken code.
 
-### Step 6: Branch Relevance Check
+### Step 7: Branch Relevance Check
 
 **If on a feature branch**, before committing, verify the branch name relates to the work being committed:
 
 1. Get the current branch name: `git branch --show-current`
-2. Review the changes being committed (from Step 4/5)
+2. Review the changes being committed (from Steps 4-6)
 3. Compare the branch name against the actual changes
 
 **If the branch name does NOT match the work being done** (e.g., branch is `feature/add-payments` but changes are about authentication), warn the user:
@@ -112,7 +139,7 @@ Options:
 
 **If on main/dev:** Skip this check.
 
-### Step 7: Stage and Commit
+### Step 8: Stage and Commit
 
 ```bash
 git add .
@@ -135,7 +162,7 @@ EOF
 
 **Commit types:** Feature, Fix, Update, Refactor, Chore
 
-### Step 8: Push to Remote
+### Step 9: Push to Remote
 
 ```bash
 git push origin [current-branch]
@@ -147,7 +174,7 @@ If the branch doesn't exist on remote yet:
 git push -u origin [current-branch]
 ```
 
-### Step 9: Create PR (feature branches only)
+### Step 10: Create PR (feature branches only)
 
 **If on a feature branch** (not main/dev/master):
 
@@ -169,11 +196,11 @@ EOF
 
 Note the PR number from the output.
 
-**If on main/dev:** Skip PR creation, just push directly. Skip to Step 11.
+**If on main/dev:** Skip PR creation, just push directly. Skip to Step 12.
 
-### Step 10: Code Review Cycle (optional - Greptile users only)
+### Step 11: Code Review Cycle (optional - Greptile users only)
 
-**Check if Greptile is configured:** Look for a `## Code Review` section in `project/dev-context.md`. If it exists and specifies Greptile, run the review cycle. If not, skip to Step 9b.
+**Check if Greptile is configured:** Look for a `## Code Review` section in `project/dev-context.md`. If it exists and specifies Greptile, run the review cycle. If not, skip to Step 11b.
 
 #### Greptile File Limit Check
 
@@ -196,11 +223,11 @@ Options:
 2. Cancel and split into smaller PRs
 ```
 
-If user chooses option 1 (or no response), fall back to auto-merge (Step 10b). If option 2, stop and let the user reorganize.
+If user chooses option 1 (or no response), fall back to auto-merge (Step 11b). If option 2, stop and let the user reorganize.
 
 **If file count is 100 or fewer:** Proceed with Greptile review cycle below.
 
-#### Step 10a: Greptile Review Cycle
+#### Step 11a: Greptile Review Cycle
 
 **Poll for review:**
 
@@ -213,7 +240,7 @@ gh api repos/{owner}/{repo}/pulls/{pr_number}/reviews
 Look for a review from Greptile (check the `user.login` field for greptile or greptileai).
 
 **If no Greptile review appears after 10 minutes:**
-Fall back to auto-merge (Step 10b). Show message: "Greptile review not detected - enabling auto-merge."
+Fall back to auto-merge (Step 11b). Show message: "Greptile review not detected - enabling auto-merge."
 
 **If Greptile review appears:**
 
@@ -238,7 +265,7 @@ Merge the PR:
 gh pr merge [pr_number] --squash --delete-branch
 ```
 
-Proceed to Step 11.
+Proceed to Step 12.
 
 **If confidence score < threshold:**
 
@@ -265,7 +292,7 @@ Greptile review: [score]/5
    )"
    ```
 6. Push: `git push origin [branch]`
-7. Go back to the top of Step 10a and poll for a new review
+7. Go back to the top of Step 11a and poll for a new review
 
 **Maximum review cycles:** 3 attempts. If still below threshold after 3 fix cycles, merge anyway and show a warning:
 
@@ -274,7 +301,7 @@ Merged after 3 fix cycles. Greptile score: [score]/5
 Some review comments may need manual attention.
 ```
 
-#### Step 10b: No Code Review (auto-merge)
+#### Step 11b: No Code Review (auto-merge)
 
 If no Greptile is configured, enable auto-merge:
 
@@ -282,7 +309,7 @@ If no Greptile is configured, enable auto-merge:
 gh pr merge --auto --squash --delete-branch
 ```
 
-### Step 11: Clean Up Local Branch
+### Step 12: Clean Up Local Branch
 
 **If on a feature branch:**
 
@@ -296,7 +323,7 @@ git branch -d [feature-branch-name]
 
 **If on main/dev:** Skip this step.
 
-### Step 12: Confirm Everything
+### Step 13: Confirm Everything
 
 **With Greptile review:**
 
@@ -309,6 +336,7 @@ Logged:
 
 Code:
 - Linter: passed
+- Tests: X passed, 0 failed (or "no test suite")
 - Build: passed (or N/A)
 - Committed: [commit message summary]
 - Pushed to: [branch-name]
@@ -330,6 +358,7 @@ Logged:
 
 Code:
 - Linter: passed
+- Tests: X passed, 0 failed (or "no test suite")
 - Build: passed (or N/A)
 - Committed: [commit message summary]
 - Pushed to: [branch-name]
@@ -343,6 +372,9 @@ Next session: [suggested next task from tasks.md]
 
 **Linter fails and can't auto-fix:**
 Fix the issues before continuing. Show what needs fixing and resolve it.
+
+**Tests fail:**
+Stop. Fix the code, or fix the check if the behaviour changed on purpose and say so in the summary. Never skip, delete, or comment out a check to reach green.
 
 **Build fails:**
 Fix build errors before committing. Do not push broken code.

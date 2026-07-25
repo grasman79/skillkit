@@ -2,10 +2,10 @@
 
 > A skills system for Claude Code that teaches it exactly how to build your app, so you never have to explain the same thing twice.
 
-**Version:** 1.6.1
+**Version:** 1.7.0
 **Author:** Manu
 **License:** MIT
-**Date:** 14/07/2026
+**Date:** 25/07/2026
 
 ---
 
@@ -157,8 +157,11 @@ Claude will:
 1. Create a git branch automatically
 2. Generate a detailed plan with ASCII UI mockups
 3. List all required components (asks before installing)
-4. Show database changes, API endpoints, testing strategy
+4. Show database changes, API endpoints, and the acceptance checks in plain language
 5. Wait for your approval before implementing
+6. Write the checkable items as failing tests, then build until they pass
+
+Step 4 is where you catch a misunderstanding for free. The acceptance checks are written as sentences you can read without knowing code ("a logged-out visitor cannot see another user's data"), so if one of them is wrong, you say so before anything has been built on top of it.
 
 ### Ending Your Session
 
@@ -177,7 +180,7 @@ Next session, Claude picks up exactly where you left off.
 | Skill | What It Does |
 |-------|--------------|
 | `project-setup` | Initialize new projects with recommended stack (TanStack Start, Supabase, Drizzle) |
-| `feature-planner` | Create detailed implementation plans with ASCII mockups |
+| `feature-planner` | Create detailed implementation plans with ASCII mockups, agree the acceptance checks up front, then write them as failing tests before any implementation code |
 | `session-log` | Save progress at session end |
 | `task-tracker` | Track tasks and progress |
 | `dev-server` | Manage dev servers, kill ports |
@@ -309,6 +312,7 @@ Primary source of truth for Cloudflare-related skills: https://developers.cloudf
 |-------|--------------|
 | `bun` | Bun runtime |
 | `react-doctor` | React Doctor code health scanning, ESLint integration, and CI gating for web and React Native projects |
+| `test-harness` | Set up a test runner (Vitest for fast checks, Playwright for browser journeys) so acceptance checks have somewhere to live |
 | `ultracite-setup` | Ultracite linting setup and configuration |
 | `validation` | Zod/Valibot/ArkType validation |
 
@@ -430,6 +434,11 @@ The `project-setup` skill automatically recommends this stack and detects your p
 ---
 
 ## Changelog
+
+### v1.7.0 (25/07/2026)
+- **Test-first workflow across `feature-planner` and `wrap-up`** - The plan's old "Testing Strategy" bullet list becomes **Acceptance Checks**, split into machine-checked (one correct answer: data ownership, auth boundaries, money/credit arithmetic, response and error shapes, persistence, rejection cases) and human-judged (design, wording, generated content quality). The checks are written in plain language and approved by the user *before* implementation, which is where a misunderstanding surfaces cheaply. After approval, `feature-planner` writes the machine-checked items as real tests, confirms they fail for the right reason, then builds until green. Editing a check to make it pass is explicitly disallowed.
+- **`wrap-up` now gates on the test suite** - New Step 5 runs the tests between lint and build. A red suite stops the wrap-up: no committing over failures, no reporting the session as done. Skipping or deleting a check to reach green is not allowed; a check that needs to change is raised with the user. Projects with no `test` script are not blocked, but the summary says so instead of implying coverage that does not exist, and a feature that shipped with no checks gets flagged. Session summaries now report test status alongside lint and build.
+- **New `tooling/test-harness` skill** - Sets up the runner so the above has somewhere to live. Two layers with different jobs: Vitest for fast checks that run on every commit, Playwright for five to eight browser journeys pointed at a real deployed URL (which is what catches a silently broken staging deploy when nobody tests locally). Covers config, directory layout mirroring the source tree, role/label-based selectors over CSS classes, test credentials via env rather than hardcoded, and CI wiring. Includes an explicit "what not to do" list: no coverage thresholds, no second runner, no asserting on AI-generated content, no mocking the thing under test.
 
 ### v1.6.1 (14/07/2026)
 - **New `workflow/plan-review` skill** - Adversarial plan review: after a plan is drafted (by `feature-planner`, `improve`, or Plan Mode), dispatches fresh-context critic subagents to attack it across three lenses (blast radius, over-engineering, convention/principle compliance), vets their objections against the actual code before accepting any of them, folds accepted ones into the plan, then presents a hardened plan with a Review Summary before implementation starts. Complements `feature-planner` rather than replacing it. Inspired by a third-party Claude Code setup's adversarial `/plan` review step.

@@ -90,11 +90,15 @@ Branch: feature/[name]
 
 **Action needed:** Approve packages before installation.
 
-## Testing Strategy
+## Acceptance Checks
 
-- [ ] Unit tests for [component/function]
-- [ ] Integration test for [flow]
-- [ ] Manual test: [scenario]
+**Machine-checked** (written before any implementation code):
+- [ ] [Plain-language statement of something that must be true]
+- [ ] [Rejection case: what must be refused, and how]
+- [ ] [Boundary case: who must NOT be able to reach this]
+
+**Human-judged** (you decide by looking):
+- [ ] [Anything about feel, taste, wording, or visual result]
 
 ## Risks & Considerations
 
@@ -109,11 +113,33 @@ After presenting the plan:
 
 1. **Ask about components:** "Which components should I use? You may have premium alternatives."
 2. **Ask about packages:** "Should I install these dependencies?"
-3. **Confirm scope:** "Does this plan cover everything you need?"
+3. **Confirm the acceptance checks:** "These are the things I'll prove are true before calling this done. Is anything missing or wrong?"
+4. **Confirm scope:** "Does this plan cover everything you need?"
+
+Point 3 matters most. The acceptance checks are where a misunderstanding surfaces cheaply, before any code exists. If the user reads a check and says "no, that's not what I meant", the plan was wrong and the code would have been wrong too.
 
 Only proceed to implementation after explicit approval.
 
-### Step 4: Create Task Entry
+### Step 4: Write the Checks Before the Code
+
+Once the plan is approved, the approved acceptance checks become real, failing checks **before** any implementation code is written.
+
+1. If the project has no test runner, use `tooling/test-harness` to set one up
+2. Translate each machine-checked item into a real test
+3. Run them and confirm they **fail** for the right reason (feature does not exist yet)
+4. Only then start implementing
+
+A check that passes before the feature is built is checking nothing. Confirming the red state is what proves the check is wired to the thing it claims to cover.
+
+Skip this step only when every acceptance check is human-judged. Some work is purely visual and has nothing a machine can assert. Say so explicitly rather than inventing hollow tests to satisfy the process.
+
+### Step 5: Build Until Green
+
+Implement against the checks. The feature is done when every machine-checked item passes and nothing that passed before now fails.
+
+Do not edit a check to make it pass. If a check turns out to be wrong, say so and get agreement on the change. Silently relaxing an assertion is how a suite becomes decorative.
+
+### Step 6: Create Task Entry
 
 After approval, add the feature to `project/tasks.md`:
 
@@ -130,8 +156,8 @@ After approval, add the feature to `project/tasks.md`:
 ### Implementation Notes:
 [Link back to this plan discussion if needed]
 
-### Test Strategy:
-[Copy from plan]
+### Acceptance Checks:
+[Copy from plan - keep the machine-checked / human-judged split]
 ```
 
 ## ASCII Mockup Format
@@ -179,6 +205,31 @@ These components need to be installed:
 Which would you like me to install?
 ```
 
+## Writing Acceptance Checks
+
+The value of this step comes entirely from sorting honestly. Put something in the wrong column and the process either wastes effort or gives false confidence.
+
+**Machine-checked** - one correct answer, no judgment involved:
+
+- Data ownership: user A cannot read, edit, or delete user B's records
+- Auth boundaries: logged-out requests are refused, not redirected into a half-state
+- Money and credits: the arithmetic, and that it cannot go negative or be spent twice
+- Contracts: what the endpoint returns on success, and the exact shape it returns on failure
+- Persistence: what was saved is what comes back
+- Names that must agree across places: config, database, deployed infrastructure
+- The rejection cases: bad input, missing fields, expired tokens, duplicate submissions
+
+**Human-judged** - depends on taste or context:
+
+- Visual design, spacing, motion, whether it feels right
+- Wording and tone
+- Generated or AI-produced content quality
+- Whether the flow makes sense to a real person
+
+**The rule of thumb:** if breaking it would be invisible until a user complains, it belongs in the machine column. Silent breakage is exactly what a person reviewing by eye will miss, and exactly what a check catches for free forever.
+
+**Write them in plain language first.** The user approving the plan may not read code. "A user who is not logged in cannot see another user's campaigns" is reviewable by anyone. `expect(res.status).toBe(403)` is not.
+
 ## Examples
 
 **User:** "Plan feature: user settings page"
@@ -194,9 +245,10 @@ Which would you like me to install?
    - Implementation steps
    - Database changes for preferences
    - API endpoints
-   - Testing strategy
-4. Asks for component approval
-5. After approval, creates task in project/tasks.md
+   - Acceptance checks, split into machine-checked and human-judged
+4. Asks for component approval and confirms the acceptance checks read correctly
+5. Writes the machine-checked items as failing tests, confirms they fail
+6. Builds until they pass, then creates the task entry in project/tasks.md
 
 ---
 

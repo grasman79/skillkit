@@ -187,6 +187,7 @@ Reusable across projects: `skills/`, `templates/`, `commands/`
 | Deployment security, headers, secrets | `security/deployment-security-audit` |
 | TanStack Start security headers (Nitro) | `security/tanstack-nitro-security` |
 | Debugging errors | `workflow/debugger` |
+| Setting up a test runner, "we have no tests", e2e / browser journey tests | `tooling/test-harness` |
 | Linting before commits | `tooling/ultracite-setup` |
 | React code health scan, health score, react-doctor, React linting, React Native linting | `tooling/react-doctor` |
 | Development best practices | `workflow/best-practices` |
