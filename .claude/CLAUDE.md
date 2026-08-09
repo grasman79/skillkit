@@ -152,6 +152,7 @@ Reusable across projects: `skills/`, `templates/`, `commands/`
 | Expo MCP, expo doctor, build log debugging, simulator control, Expo AI tooling, expo.dev/skills | `platform/expo` (ai-tooling.md) |
 | Animations, transitions, React Native Ease | `platform/react-native` |
 | Mobile app onboarding flow, questionnaire-style onboarding, subscription paywall onboarding | `platform/app-onboarding` |
+| App Store Connect assets, app icon, screenshots, app previews, product page header, search results creative, In-App Events, avoiding App Store asset rejection | `platform/app-store` |
 | Framework-specific patterns, SSR/RSC rendering modes | `framework/nextjs`, `framework/tanstack-start`, or `framework/astro` |
 | CMS, admin panel, content management, Payload collections, fields, hooks, access control, plugins | `cms/payload` |
 | Payload blocks field, flexible page layouts, block types, page builder, blockType, blockName, render blocks | `cms/payload-blocks` |

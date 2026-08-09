@@ -2,10 +2,10 @@
 
 > A skills system for Claude Code that teaches it exactly how to build your app, so you never have to explain the same thing twice.
 
-**Version:** 1.7.0
+**Version:** 1.7.1
 **Author:** Manu
 **License:** MIT
-**Date:** 25/07/2026
+**Date:** 08/08/2026
 
 ---
 
@@ -301,6 +301,7 @@ Primary source of truth for Cloudflare-related skills: https://developers.cloudf
 | `react-native` | React Native patterns, animations with React Native Ease |
 | `wordpress` | WordPress plugins |
 | `app-onboarding` | Design and build a high-converting questionnaire-style mobile app onboarding flow |
+| `app-store` | Apple App Store asset best practices - app icon, screenshots, app previews, product page header, search results creative, In-App Events, submission checklist |
 
 ### Scraping
 | Skill | What It Does |
@@ -434,6 +435,9 @@ The `project-setup` skill automatically recommends this stack and detects your p
 ---
 
 ## Changelog
+
+### v1.7.1 (08/08/2026)
+- **New `platform/app-store` skill** - Apple App Store Connect asset best practices: app icon, product page header, search results creative, screenshots, app preview videos, and In-App Events, plus content rules (no pricing/URLs/unverified awards, 4+ age rating for all assets) and a pre-submission checklist. Sourced from [Apple's official App Store asset best practices page](https://developer.apple.com/app-store/asset-best-practices/). Cross-links `platform/app-onboarding` (in-app first-run experience) and `platform/expo` (build/submit via EAS).
 
 ### v1.7.0 (25/07/2026)
 - **Test-first workflow across `feature-planner` and `wrap-up`** - The plan's old "Testing Strategy" bullet list becomes **Acceptance Checks**, split into machine-checked (one correct answer: data ownership, auth boundaries, money/credit arithmetic, response and error shapes, persistence, rejection cases) and human-judged (design, wording, generated content quality). The checks are written in plain language and approved by the user *before* implementation, which is where a misunderstanding surfaces cheaply. After approval, `feature-planner` writes the machine-checked items as real tests, confirms they fail for the right reason, then builds until green. Editing a check to make it pass is explicitly disallowed.
