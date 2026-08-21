@@ -225,6 +225,7 @@ Adjust `style-src`, `font-src`, and `img-src` per project (e.g., add R2 domain t
 - Workers URL: `https://{project}.workers.dev`
 - Check that content loads from CMS
 - Check security headers with browser DevTools (Network tab > Response Headers)
+- Check Cloudflare Security settings (Security > Bots, Security > WAF) aren't blocking Googlebot or other legitimate search/AI crawlers - see Troubleshooting below
 
 ---
 
@@ -306,6 +307,7 @@ The deploy endpoint (`backend/src/endpoints/deploy.ts`) requires authentication 
 4. [ ] Set root directory: `frontend`
 5. [ ] Set `PAYLOAD_URL` env var
 6. [ ] Verify site loads with CMS content
+7. [ ] Confirm Security > Bots (Bot Fight Mode / Super Bot Fight Mode / Crawl Control) and any WAF custom rules allow Googlebot and other legitimate crawlers - do not enable blanket bot-blocking without allowlisting search engines first
 
 ### Connect Services (Option B only)
 
@@ -353,3 +355,13 @@ This updates `src/app/(payload)/importMap.js`. Commit the file and redeploy.
 ### R2 upload fails with 403
 
 R2 API token doesn't have write permissions, or is scoped to the wrong bucket. Verify the token in Cloudflare dashboard > R2 > Manage R2 API Tokens.
+
+### Organic rankings/traffic drop sharply after a Cloudflare change (not a Google algorithm update)
+
+Cloudflare's bot-protection tools (Bot Fight Mode, Super Bot Fight Mode, Crawl Control) and WAF custom rules operate at the edge, in front of the app - a misconfiguration here blocks Googlebot before any request reaches the site, and it looks identical to a ranking drop or spam update from the outside. Real-world cases: a Managed IT Provider toggling on Crawl Control to "stop bots" blocked Googlebot entirely, breaking Google Ads (kept charging with no impressions), wiping Merchant Center listings, and tanking organic traffic for two weeks before anyone traced it back to Cloudflare. Another case involved bot-mitigation WAF rules added under load that had the same effect.
+
+**Fix/check:**
+- Cloudflare dashboard > Security > Bots - confirm Bot Fight Mode / Super Bot Fight Mode / Crawl Control isn't blocking verified search bots (Cloudflare has a "verified bots" allowlist toggle - keep it on)
+- Cloudflare dashboard > Security > WAF > Custom rules - check any rule with broad bot/rate-limit conditions doesn't match Googlebot's user agent or ASN
+- Google Search Console > Settings > Crawl stats, or the URL Inspection tool - confirm Googlebot can fetch the site (Live Test) if traffic/indexing looks off after any Cloudflare security change
+- Any time bot-mitigation rules are added under load pressure (traffic spikes, scraping, AI crawlers), treat it as a deploy that needs the same Googlebot-access verification as a normal release, not just a security-team change

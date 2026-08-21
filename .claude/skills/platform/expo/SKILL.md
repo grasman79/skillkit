@@ -178,6 +178,38 @@ const token = await SecureStore.getItemAsync('authToken');
 await SecureStore.deleteItemAsync('authToken');
 ```
 
+### Password Field Handling
+
+Password/auth `TextInput` fields need explicit configuration or iOS's autofill/keychain behavior produces inconsistent UX (wrong autofill suggestions, stale values surviving navigation):
+
+```tsx
+<TextInput
+  secureTextEntry
+  textContentType="password"        // or "newPassword" on a signup/create-password field
+  autoComplete="off"
+  autoCapitalize="none"
+/>
+```
+
+On sign-out or after a failed auth attempt, explicitly clear the field's state and add a short delay before navigating away - navigating immediately while the field still holds a stale value is a common source of "why did the old password show up again" bugs on iOS.
+
+## App Tracking Transparency (ATT) & Attribution SDKs
+
+**Ordering rule: request the ATT prompt before initializing any tracking-capable SDK** - attribution platforms (AppsFlyer, Adjust) and ad-network SDKs (TikTok Ads SDK, Meta SDK) collect IDFA-linked data once granted consent. Initializing them before the ATT prompt either means they silently can't access IDFA (attribution data gets underreported) or risks App Review flagging tracking behavior that ran before consent was captured. RevenueCat itself doesn't require ATT to function, but the attribution/ad SDKs that typically run alongside it do.
+
+```tsx
+import { requestTrackingPermissionsAsync } from 'expo-tracking-transparency';
+
+async function initTrackingAndSDKs() {
+  const { status } = await requestTrackingPermissionsAsync();
+  // Now initialize attribution/ad SDKs (AppsFlyer, TikTok Ads SDK, etc.)
+  // status === 'granted' unlocks IDFA-based attribution; proceed either way,
+  // but don't initialize these SDKs before this call resolves.
+}
+```
+
+Sequence this at app launch, before or alongside other SDK initialization (Sentry, Mixpanel, RevenueCat) - those aren't tracking-gated the same way, but attribution/ad SDKs specifically must wait for the ATT result.
+
 ## Tab Navigator
 
 ```tsx
