@@ -2,10 +2,10 @@
 
 > A skills system for Claude Code that teaches it exactly how to build your app, so you never have to explain the same thing twice.
 
-**Version:** 1.7.0
+**Version:** 1.8.0
 **Author:** Manu
 **License:** MIT
-**Date:** 25/07/2026
+**Date:** 21/08/2026
 
 ---
 
@@ -301,6 +301,7 @@ Primary source of truth for Cloudflare-related skills: https://developers.cloudf
 | `react-native` | React Native patterns, animations with React Native Ease |
 | `wordpress` | WordPress plugins |
 | `app-onboarding` | Design and build a high-converting questionnaire-style mobile app onboarding flow |
+| `app-store` | Apple App Store asset best practices - app icon, screenshots, app previews, product page header, search results creative, In-App Events, submission checklist |
 
 ### Scraping
 | Skill | What It Does |
@@ -320,6 +321,7 @@ Primary source of truth for Cloudflare-related skills: https://developers.cloudf
 | Skill | What It Does |
 |-------|--------------|
 | `ui-ux` | Master UI/UX design skill for **web and mobile** - one entry point covering craft (8pt grid, red square method, block framing, proximity, typography, color, depth), UX patterns (adaptive UI, empty/search states, input methods, post-purchase), conversion/decision design (framing, anchoring, trust, component tactics), and platform conventions (mobile touch/tab/safe-area/iOS-Material, web click/nav/responsive/hover). Folds in the former `typography` and `animation` skills. Cross-links `ui/shadcn`, `ui/animation-patterns`, `platform/expo`. **Third-party**, adapted from multiple sources (Malewicz/Hype4, UX Peak, Sips, Butterick, Supafast), see [Credits](#credits) |
+| `emil-kowalski/*` | Eleven vendored skills for animation and UI polish decisions - `emil-design-eng` (overall philosophy), `animate`/`animate-expo` (build web/RN animations from scratch), `review-animations`/`improve-animations` (critique a diff / audit a whole codebase), `find-animation-opportunities` (where to add motion, and where not to), `animation-vocabulary` (name a motion effect), `apple-design` (Apple HIG translated for web), `ask-sonner` (Sonner toast library guide), `pick-ui-library` and `prototype` (manual-invoke only). **Third-party**, vendored unmodified from Emil Kowalski (creator of Sonner/Vaul), see [Credits](#credits) |
 
 ### Web Development
 | Skill | What It Does |
@@ -347,6 +349,7 @@ Most skills in SkillKit are original work. A few are third-party skills, include
 | `ui-ux` (design philosophy) | Tim, Sips (Sips App) | - | - |
 | `ui-ux` (web typography) | Butterick's Practical Typography | [practicaltypography.com](https://practicaltypography.com) | - |
 | `ui-ux` (web motion) | Supafast | [withsupafast.com](https://withsupafast.com) | - |
+| `design/emil-kowalski/*` | Emil Kowalski | [github.com/emilkowalski/skills](https://github.com/emilkowalski/skills) | MIT |
 
 The `ui-ux` sources are educational material (courses, talks, articles) whose rules and frameworks were adapted into skill form with attribution; they are not code libraries with a software license. If you are one of these creators and want the attribution changed or the content removed, open an issue.
 
@@ -434,6 +437,16 @@ The `project-setup` skill automatically recommends this stack and detects your p
 ---
 
 ## Changelog
+
+### v1.8.0 (21/08/2026)
+- **New `design/emil-kowalski/*` skill family** - Eleven skills for animation and UI polish decisions, vendored unmodified from [Emil Kowalski's skills repo](https://github.com/emilkowalski/skills) (creator of Sonner/Vaul, design engineering background at Vercel and Linear): `emil-design-eng` (overall philosophy), `animate`/`animate-expo` (web/React Native animation implementation), `review-animations`/`improve-animations` (diff-level critique / codebase-wide audit), `find-animation-opportunities`, `animation-vocabulary`, `apple-design`, `ask-sonner`, plus manual-invoke-only `pick-ui-library` and `prototype`. **Third-party**, MIT licensed, see [Credits](#credits).
+- **`platform/app-store` expanded to cover App Review, not just assets** - New section on getting the app binary approved: pre-submission fundamentals, dark patterns to avoid on an initial submission (vs. higher-risk patterns to save for later versions with an approval history), how to write review notes and a demo video, expedited review / requesting a call from Apple, and why scope creep in the first submission is the biggest speed killer.
+- **`platform/expo` gains password-field and App Tracking Transparency guidance** - `TextInput` `textContentType`/`autoComplete` configuration to avoid iOS autofill/keychain bugs, and the ordering rule for requesting the ATT prompt before initializing attribution/ad SDKs (AppsFlyer, Adjust, TikTok Ads SDK, Meta SDK).
+- **`deployment/cloudflare-pages` documents a Cloudflare bot-protection SEO trap** - Bot Fight Mode / Super Bot Fight Mode / Crawl Control and WAF custom rules can silently block Googlebot, presenting as an organic ranking drop. Added to the verification checklist and troubleshooting section with concrete fix steps.
+- **`design/ui-ux` adds Refero style-reference search and a scoped-redesign triage order** - Search [Refero Styles](https://styles.refero.design) for real extracted `DESIGN.md` design systems before designing from scratch, and a priority order (onboarding, home screen, core action screen, paywall, empty/success/progress states) for engagements where a full redesign isn't in scope.
+
+### v1.7.1 (08/08/2026)
+- **New `platform/app-store` skill** - Apple App Store Connect asset best practices: app icon, product page header, search results creative, screenshots, app preview videos, and In-App Events, plus content rules (no pricing/URLs/unverified awards, 4+ age rating for all assets) and a pre-submission checklist. Sourced from [Apple's official App Store asset best practices page](https://developer.apple.com/app-store/asset-best-practices/). Cross-links `platform/app-onboarding` (in-app first-run experience) and `platform/expo` (build/submit via EAS).
 
 ### v1.7.0 (25/07/2026)
 - **Test-first workflow across `feature-planner` and `wrap-up`** - The plan's old "Testing Strategy" bullet list becomes **Acceptance Checks**, split into machine-checked (one correct answer: data ownership, auth boundaries, money/credit arithmetic, response and error shapes, persistence, rejection cases) and human-judged (design, wording, generated content quality). The checks are written in plain language and approved by the user *before* implementation, which is where a misunderstanding surfaces cheaply. After approval, `feature-planner` writes the machine-checked items as real tests, confirms they fail for the right reason, then builds until green. Editing a check to make it pass is explicitly disallowed.

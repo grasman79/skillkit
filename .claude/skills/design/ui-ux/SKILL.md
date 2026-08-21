@@ -1,6 +1,6 @@
 ---
 name: ui-ux
-description: Master UI/UX design skill for web and mobile apps. Use when designing or reviewing any interface - layout, spacing, hierarchy, typography, color, motion, screen states, navigation, or conversion. Covers the visual craft (grid, proximity, type, color, depth), UX patterns (adaptive UI, empty states, input methods, post-purchase), conversion/decision design (framing, anchoring, trust), and platform conventions (iOS/Material for mobile, responsive/hover for web). Trigger words - UI design, UX design, interface design, layout, spacing, visual hierarchy, typography, font sizes, line height, color palette, contrast, accessibility, shadows, animation, motion, micro-interactions, empty state, loading state, onboarding screen, app screen, mobile app design, screen design, redesign a screen, make this look better, design review, touch targets, tab bar, navigation design, paywall, pricing screen, product page, conversion, why isn't this converting.
+description: Master UI/UX design skill for web and mobile apps. Use when designing or reviewing any interface - layout, spacing, hierarchy, typography, color, motion, screen states, navigation, or conversion. Covers the visual craft (grid, proximity, type, color, depth), UX patterns (adaptive UI, empty states, input methods, post-purchase), conversion/decision design (framing, anchoring, trust), platform conventions (iOS/Material for mobile, responsive/hover for web), and pulling real style references (Refero Styles) for a niche before designing. Trigger words - UI design, UX design, interface design, layout, spacing, visual hierarchy, typography, font sizes, line height, color palette, contrast, accessibility, shadows, animation, motion, micro-interactions, empty state, loading state, onboarding screen, app screen, mobile app design, screen design, redesign a screen, make this look better, design review, touch targets, tab bar, navigation design, paywall, pricing screen, product page, conversion, why isn't this converting, website examples, design examples, style reference, show me examples.
 ---
 
 # UI/UX Design
@@ -23,6 +23,20 @@ This skill covers the "what good looks like and why." For the "how to build it i
 - **Web:** ShadCN + Tailwind + React. The 8pt grid maps directly onto Tailwind spacing (`2`=8px, `4`=16px, `6`=24px, `8`=32px, `12`=48px). Render patterns as ShadCN primitives - see `ui/shadcn`.
 - **Mobile:** React Native + Expo. Design in points; the mobile rules here map 1:1 to RN units. See `platform/expo`.
 
+## Style Reference Search (Refero)
+
+Before designing a new screen/page from scratch, or when the user wants to see real examples for a niche or vibe ("show me some real estate website examples," "what do fintech landing pages look like"), search [Refero Styles](https://styles.refero.design) - a curated library of 2,000+ AI-readable `DESIGN.md` design systems (colors, typography, spacing, components) extracted from real product websites.
+
+**Query pattern:** append the search term to the URL as a `q` param, spaces as `+`:
+
+```
+https://styles.refero.design/?q=real+estate
+https://styles.refero.design/?q=fintech
+https://styles.refero.design/?q=saas+dashboard
+```
+
+Fetch the URL, present the matching styles/sites to the user, and pull the actual `DESIGN.md` for whichever one they pick (or the closest match to the brief) as a concrete style anchor before starting layout work - real extracted systems (actual color values, actual type scales) beat inventing a palette from a vague brand-vibe description. Use this as a starting reference, not a template to copy wholesale - still apply this skill's own craft/pattern/conversion judgment on top of whatever style gets pulled in.
+
 ## Design Philosophy: Build Experiences, Not Screens
 
 Before the tactics, the frame. The apps that survive don't win on features - competitors copy features in a weekend. They win on experiences that compound over years. Three meta-patterns (Sips):
@@ -38,6 +52,18 @@ Keep this as the north star. Everything below is how you actually earn it.
 ## The Three Tactical Pillars
 
 Load the reference for the decision in front of you. Do not read them all at once.
+
+## Scoped Redesign Triage (limited budget/time)
+
+When the ask is "make this app feel significantly better" but a full redesign isn't in scope, don't spread effort evenly across every screen - a handful of screens carry disproportionate weight on how polished the whole app feels. Prioritize in this order:
+
+1. **Onboarding** - decides whether the user understands the product and wants to continue. Keep it short and personal; show value instead of explaining everything; ask only questions that visibly change what comes next. See `platform/app-onboarding` for the full screen-by-screen blueprint.
+2. **Home screen** - should make the next action obvious, not showcase every feature at once. Decide what matters most to this user and build the hierarchy around that single thing - it should feel like the app knows why they came, not like a dashboard. See `references/foundations.md` for hierarchy and `references/patterns.md` for adaptive-by-journey-stage guidance.
+3. **The core action screen** - every app has the one thing people actually open it to do (booking, tracking, creating, generating, messaging). Identify it and spend the most effort simplifying it: cut unnecessary taps, choices, and steps. If the core action feels effortless, the whole product reads as polished, disproportionate to how much else got touched.
+4. **The paywall** - explain the outcome the upgrade produces, not just a feature list against a price. See `references/conversion.md` for framing/anchoring tactics, and note that *when* the paywall shows is often as consequential as how it's designed - see `platform/app-onboarding`'s permission/paywall sequencing.
+5. **Empty, success, and progress states** - the easiest screens to skip, and the ones that most reveal whether an app was actually finished with care. Replace "no data yet" with a path forward; acknowledge completions; show progress. See `references/patterns.md` for the empty-state pattern.
+
+A full redesign still wins when it's in scope - it fixes the experience consistently across every screen and flow rather than in five high-leverage spots. But for a scoped engagement, this order is where the visible improvement per hour of work is highest.
 
 ### Pillar 1 - Craft (visual precision)
 

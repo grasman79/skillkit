@@ -152,6 +152,7 @@ Reusable across projects: `skills/`, `templates/`, `commands/`
 | Expo MCP, expo doctor, build log debugging, simulator control, Expo AI tooling, expo.dev/skills | `platform/expo` (ai-tooling.md) |
 | Animations, transitions, React Native Ease | `platform/react-native` |
 | Mobile app onboarding flow, questionnaire-style onboarding, subscription paywall onboarding | `platform/app-onboarding` |
+| App Store Connect assets, app icon, screenshots, app previews, product page header, search results creative, In-App Events, avoiding App Store asset rejection | `platform/app-store` |
 | Framework-specific patterns, SSR/RSC rendering modes | `framework/nextjs`, `framework/tanstack-start`, or `framework/astro` |
 | CMS, admin panel, content management, Payload collections, fields, hooks, access control, plugins | `cms/payload` |
 | Payload blocks field, flexible page layouts, block types, page builder, blockType, blockName, render blocks | `cms/payload-blocks` |
@@ -204,6 +205,17 @@ Reusable across projects: `skills/`, `templates/`, `commands/`
 | Empty states, search states, adaptive UI by user stage, input-method choice, post-purchase/order screens | `design/ui-ux` (patterns reference) |
 | Paywall, pricing screen, product page, booking, checkout conversion, "why isn't this converting" | `design/ui-ux` (conversion reference) |
 | Web app UI animation implementation, button press feedback, icon animations, loaders, skeleton screens, spring animations, number tickers, state transitions, micro-interactions | `ui/animation-patterns` |
+| Precise animation engineering judgment - easing curves, spring config, clip-path techniques, transform/opacity performance rules, component polish details (Emil Kowalski / Sonner author's philosophy) | `design/emil-kowalski/emil-design-eng` |
+| Building a specific web animation from scratch (choosing curve, duration, properties) | `design/emil-kowalski/animate` |
+| Building React Native/Expo animations - gestures, sheets, haptics, screen transitions, off-JS-thread motion | `design/emil-kowalski/animate-expo` |
+| Strict animation code review against a fixed rule set (before/after table format) | `design/emil-kowalski/review-animations` |
+| Auditing a whole codebase's animations, prioritized fix plan | `design/emil-kowalski/improve-animations` |
+| Finding UI spots that would benefit from animation - and what NOT to animate | `design/emil-kowalski/find-animation-opportunities` |
+| Precise animation vocabulary for prompting AI to get better motion results | `design/emil-kowalski/animation-vocabulary` |
+| Apple HIG / fluid motion design principles translated for web | `design/emil-kowalski/apple-design` |
+| Choosing a trusted UI library instead of hand-rolling a component | `design/emil-kowalski/pick-ui-library` |
+| Building multiple UI variations of one piece with a switcher to compare | `design/emil-kowalski/prototype` |
+| Sonner toast library setup, styling, recipes, common issues | `design/emil-kowalski/ask-sonner` |
 | Web design, UI polish, redesigns, visual style | `web-development/webdesign` |
 | Anti-AI-slop design system, greenfield page build, design audit/redesign, design extraction from URL/screenshot | `web-development/hallmark` |
 | 3D scroll cinematic site, scroll-scrubbed canvas hero (requires Higgsfield MCP) | `web-development/scroll-cinematic` |
