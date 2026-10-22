@@ -80,7 +80,7 @@ Continue with the appropriate questionnaire (web app or content website), but **
 **Questions that are always asked** (never pre-filled from external brief):
 - Package manager (SkillKit-specific)
 - Deployment platform(s) (SkillKit-specific)
-- Code review / Greptile (SkillKit-specific)
+- Code review - local reviewer or Greptile (SkillKit-specific)
 - Experience level (SkillKit-specific)
 
 **Questions that can be skipped** if covered by the brief:

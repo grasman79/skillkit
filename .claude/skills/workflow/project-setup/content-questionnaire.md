@@ -136,33 +136,42 @@ In 2-3 sentences, describe the website you're building.
 #### Question 5: Code Review (same as web app flow)
 
 ```
-Would you like a second AI to review your code before it goes live?
+How should your code be reviewed before it reaches your test site?
 
-A. Yes, set up Greptile (Recommended)
-B. No, skip code review
+A. Local reviewer (Recommended) - a fresh Claude agent reviews every change
+   on your machine. Free, no setup.
+B. Greptile - an external AI reviewer on GitHub (needs a Greptile account)
+C. No review
 
-Here's why I recommend it: I write your code, but I can make mistakes -
-wrong patterns, security issues, or bugs I don't catch. Greptile is a
-separate AI that reviews every pull request and gives it a confidence
-score from 1 to 5. If the score is high (4 or 5), your code merges
-automatically. If the score is low, I read Greptile's feedback, fix
-the issues, and resubmit - all without you needing to understand the code.
+Here's why I recommend A: I write your code, but I can make mistakes -
+wrong patterns, security issues, or bugs I don't catch. Before each change
+is merged, a separate reviewer that hasn't seen our conversation reads it
+with fresh eyes. I check what it finds, fix what's real, and only then merge
+to your test site - all without you needing to understand the code.
 
-It's like having a senior developer double-check everything before it ships.
-Used by teams at NVIDIA, Brex, and Coinbase.
-
-Free plan available at: https://greptile.com
+Greptile does the same job as a cloud service on GitHub
+(https://greptile.com). Choose it if you already use it.
 ```
 
-**If Greptile is selected:** Add a `## Code Review` section to `project/dev-context.md`:
+Add a `## Code Review` section to `project/dev-context.md` with the choice:
+
+```markdown
+## Code Review
+
+Provider: Local
+```
+
+For Greptile:
 
 ```markdown
 ## Code Review
 
 Provider: Greptile
-Auto-merge threshold: 4/5
+Merge threshold: 4/5
 Max fix cycles: 3
 ```
+
+For no review: `Provider: None`.
 
 ---
 
@@ -215,7 +224,7 @@ Does this look good?
 | Q2: Database | `## Tech Stack` -> Database |
 | Q3: Frontend deployment | `## Deployment` -> Frontend |
 | Q4: Project description | `## Project Overview` -> "What we're building" |
-| Q5: Code review | `## Code Review` in dev-context.md (if Greptile) |
+| Q5: Code review | `## Code Review` in dev-context.md (Provider: Local / Greptile / None) |
 
 ### Auto-Filled Sections
 

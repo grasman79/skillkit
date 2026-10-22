@@ -24,7 +24,7 @@ If the user pasted an external brief (see [brief-import.md](brief-import.md)), s
 **Questions that are always asked** (never pre-filled):
 - Q0b: Package manager (SkillKit-specific)
 - Q5: Experience level (SkillKit-specific)
-- Q8: Code review / Greptile (SkillKit-specific)
+- Q8: Code review - local reviewer or Greptile (SkillKit-specific)
 
 **Questions that can be skipped** if covered by the external brief:
 - Q0a: Project type (if determinable from brief)
@@ -230,37 +230,44 @@ Also reference [railway-webapp-deploy.md](railway-webapp-deploy.md) for setup st
 #### Question 8: Code Review
 
 ```
-Would you like a second AI to review your code before it goes live?
+How should your code be reviewed before it reaches your test site?
 
-A. Yes, set up Greptile (Recommended)
-B. No, skip code review
+A. Local reviewer (Recommended) - a fresh Claude agent reviews every change
+   on your machine. Free, no setup.
+B. Greptile - an external AI reviewer on GitHub (needs a Greptile account)
+C. No review
 
-Here's why I recommend it: I write your code, but I can make mistakes -
-wrong patterns, security issues, or bugs I don't catch. Greptile is a
-separate AI that reviews every pull request and gives it a confidence
-score from 1 to 5. If the score is high (4 or 5), your code merges
-automatically. If the score is low, I read Greptile's feedback, fix
-the issues, and resubmit - all without you needing to understand the code.
+Here's why I recommend A: I write your code, but I can make mistakes -
+wrong patterns, security issues, or bugs I don't catch. Before each change
+is merged, a separate reviewer that hasn't seen our conversation reads it
+with fresh eyes. I check what it finds, fix what's real, and only then merge
+to your test site - all without you needing to understand the code.
 
-It's like having a senior developer double-check everything before it ships.
-Used by teams at NVIDIA, Brex, and Coinbase.
-
-Free plan available at: https://greptile.com
+Greptile does the same job as a cloud service on GitHub
+(https://greptile.com). Choose it if you already use it.
 ```
 
-**If Greptile is selected:** Add a `## Code Review` section to `project/dev-context.md`:
+Add a `## Code Review` section to `project/dev-context.md` with the choice:
+
+```markdown
+## Code Review
+
+Provider: Local
+```
+
+For Greptile:
 
 ```markdown
 ## Code Review
 
 Provider: Greptile
-Auto-merge threshold: 4/5
+Merge threshold: 4/5
 Max fix cycles: 3
 ```
 
-Also recommend the user install Greptile on their GitHub repo if they haven't already.
+For no review: `Provider: None`.
 
-**If not selected:** Skip this section in dev-context.md. The wrap-up skill will use auto-merge instead (code still gets linted and built, just no external review).
+Also recommend the user install Greptile on their GitHub repo if they haven't already.
 
 **Why dev-context.md?** This is project-specific config that must survive SkillKit updates. CLAUDE.md gets overwritten on updates, but dev-context.md is protected.
 
@@ -389,7 +396,7 @@ When creating documentation files, map questionnaire answers to template section
 | Q5: Experience level | (internal - affects explanation depth, not stored) |
 | Q6: Tech preferences | `## Tech Stack` → All subsections |
 | Q7: Timeline | `## Project Overview` → "Target launch" |
-| Q8: Code review | `## Code Review` in dev-context.md (if Greptile) |
+| Q8: Code review | `## Code Review` in dev-context.md (Provider: Local / Greptile / None) |
 | Q9: Deployment | `## Deployment` in dev-context.md (if Railway, include branching strategy + PR target) |
 
 **Note:** If the user selects "Content website" in Q0a, the web app questions above are skipped entirely. See [content-questionnaire.md](content-questionnaire.md) for the content website field mapping.

@@ -1,17 +1,24 @@
 ---
 name: wrap-up
-description: Use this skill when ending a session to log progress, lint, commit, push, create a PR, and clean up branches. Activate when the user mentions /wrap-up, wrapping up, shipping work, ending the session, or pushing and merging completed work.
+description: Use this skill when ending a session or a lap to log progress, lint, test, commit, push, create a PR, have it reviewed, merge it into the test environment, and hand the user a "Try this" list. Also handles going live (/go-live). Activate when the user mentions /wrap-up, wrapping up, shipping work to staging, ending the session, pushing and merging completed work, /go-live, going live, releasing to production, or promoting staging to main.
 ---
 
 # Wrap Up
 
-Single command to close out a work session. Handles everything: logs progress, lints, commits, pushes, creates a PR with auto-merge, and cleans up your local branch. You walk away and it's done.
+Single command to close out a lap. Logs progress, lints, tests, commits, pushes, opens a PR, has a fresh reviewer check it, merges it into the **test environment**, and ends with a short "Try this" list so you can try the result yourself.
+
+`/wrap-up` never puts a change live. Going live is a separate step (`/go-live`, see the end of this skill), so several laps can collect on the test environment and you decide when they reach your users.
+
+```
+plan -> build -> Claude tries it -> /wrap-up (merge to test) -> you try it -> next lap ... -> /go-live
+```
 
 ## When to Use This Skill
 
-- User says "wrap up", "wrap-up", "done for today", or "ship it"
+- User says "wrap up", "wrap-up", "done for today", or "ship it to staging"
+- A lap from `workflow/feature-planner` is built and checked
 - Session is ending and user wants to save, commit, and push everything
-- User wants the full end-of-session ritual in one command
+- User says "/go-live", "go live", "release", or "push staging to production" (see Go Live)
 
 ## What This Does
 
@@ -19,12 +26,14 @@ Single command to close out a work session. Handles everything: logs progress, l
 2. Run linter and fix issues
 3. Run the test suite (blocking - a failing suite stops the wrap-up)
 4. Verify build passes
-5. Check branch name matches the work (warn if mismatch)
-6. Commit all changes
-7. Push to remote
-8. Create PR (feature branches)
-9. Wait for code review and auto-fix if needed (optional - Greptile)
-10. Merge and clean up
+5. Check the lap was tried in the running app (flag, not blocker)
+6. Check branch name matches the work (warn if mismatch)
+7. Commit all changes and push
+8. Create PR into the test branch
+9. Code review: a fresh local reviewer agent by default, or Greptile if configured
+10. Merge into the test branch
+11. Make sure a testable version exists (staging URL, or a mobile test build)
+12. Clean up and hand you a "Try this" list
 
 ## Workflow
 
@@ -64,7 +73,7 @@ Review the conversation and identify:
 - [What to work on next]
 ```
 
-**Update `.claude/project/tasks.md`** - Mark completed tasks as done, update in-progress items.
+**Update `.claude/project/tasks.md`** - Update in-progress items. A lap that is merged to the test environment stays In Progress with its "Try this" note until the user has tried it (see `workflow/task-tracker`, "After You Tried It").
 
 **Update dev-context.md** (if features are still in progress) - Capture state for next session.
 
@@ -116,12 +125,22 @@ If the project has a build command in package.json:
 
 If build fails, fix the errors before committing. Do not push broken code.
 
-### Step 7: Branch Relevance Check
+### Step 7: Check the Lap Was Tried in the Running App
+
+If this lap came from a plan with "Claude checks in the running app" items (`workflow/feature-planner` Step 8), confirm they were run and their results reported this session.
+
+If they were not run, run them now if the tools are available. If they cannot be run, do not block, but say so in the summary:
+
+```
+Note: Claude did not try this in the running app ([reason]). Check these yourself on staging: [list]
+```
+
+### Step 8: Branch Relevance Check
 
 **If on a feature branch**, before committing, verify the branch name relates to the work being committed:
 
 1. Get the current branch name: `git branch --show-current`
-2. Review the changes being committed (from Steps 4-6)
+2. Review the changes being committed
 3. Compare the branch name against the actual changes
 
 **If the branch name does NOT match the work being done** (e.g., branch is `feature/add-payments` but changes are about authentication), warn the user:
@@ -135,11 +154,11 @@ Options:
 3. Abort wrap-up
 ```
 
-**If option 1:** Stash changes, create new branch from main, pop stash, and continue the workflow on the new branch.
+**If option 1:** Stash changes, create a new branch from the test branch, pop stash, and continue the workflow on the new branch.
 
 **If on main/staging:** Skip this check.
 
-### Step 8: Stage and Commit
+### Step 9: Commit and Push
 
 ```bash
 git add .
@@ -162,14 +181,6 @@ EOF
 
 **Commit types:** Feature, Fix, Update, Refactor, Chore
 
-### Step 9: Push to Remote
-
-```bash
-git push origin [current-branch]
-```
-
-If the branch doesn't exist on remote yet:
-
 ```bash
 git push -u origin [current-branch]
 ```
@@ -191,6 +202,9 @@ gh pr create --base [pr-target] --title "[Type]: Brief description" --body "$(ca
 - Change 1
 - Change 2
 
+## Definition of Done
+[Results of the plan's checks, if this lap had a plan]
+
 Created with Claude Code
 EOF
 )"
@@ -198,42 +212,44 @@ EOF
 
 Note the PR number from the output.
 
-**If on main/staging:** Skip PR creation, just push directly. Skip to Step 12.
+**If on main/staging:** Skip PR creation, just push directly. Skip to Step 13.
 
-### Step 11: Code Review Cycle (optional - Greptile users only)
+### Step 11: Code Review
 
-**Check if Greptile is configured:** Look for a `## Code Review` section in `project/dev-context.md`. If it exists and specifies Greptile, run the review cycle. If not, skip to Step 11b.
+Check `project/dev-context.md` for a `## Code Review` section:
 
-#### Greptile File Limit Check
+| Setting | Review |
+|---------|--------|
+| No section, or `Provider: Local` | Step 11a - local reviewer agent |
+| `Provider: Greptile` | Step 11b - Greptile cycle only (no double review) |
+| `Provider: None` | Skip review, go to Step 12 |
 
-Before waiting for Greptile, check how many files are in the PR:
+#### Step 11a: Local Reviewer Agent (default)
+
+A reviewer in a fresh context catches what the builder no longer sees. It runs on your machine, costs nothing extra, and needs no setup.
+
+1. Spawn one reviewer subagent with the Agent tool. It does not inherit this conversation, so its prompt must include:
+   - The PR diff (`gh pr diff [pr_number]`)
+   - The plan's Intent and Definition of Done, if this lap had a plan
+   - The `## Must Keep Working` section from dev-context.md
+   - The checklist from `workflow/code-reviewer`
+   - The instruction: return concrete findings ranked Critical / Warning / Suggestion with `file:line`, no rewrites. "No material findings" is a valid answer.
+2. **Vet every finding yourself** against the code. Reviewers over-report. Reject findings that are by-design, point at the wrong line, or duplicate each other.
+3. Fix accepted Critical and Warning findings. Leave Suggestions for the summary.
+4. Re-run lint, tests, and build. Commit (`Fix: Address review findings`) and push.
+5. Maximum 2 review cycles. If Critical findings remain after that, stop and show them to the user instead of merging.
+
+#### Step 11b: Greptile Review Cycle (optional)
+
+**Greptile File Limit Check** - Greptile has a 100-file limit per review:
 
 ```bash
 gh pr diff {pr_number} --name-only | wc -l
 ```
 
-**If file count exceeds 100:**
+If the count exceeds 100, warn the user and offer: (1) use the local reviewer agent instead (Step 11a), or (2) cancel and split into smaller PRs.
 
-Greptile has a 100-file limit per review. Show a warning:
-
-```
-Warning: This PR changes [X] files, which exceeds Greptile's 100-file limit.
-Greptile will skip this review.
-
-Options:
-1. Merge without Greptile review (auto-merge)
-2. Cancel and split into smaller PRs
-```
-
-If user chooses option 1 (or no response), fall back to auto-merge (Step 11b). If option 2, stop and let the user reorganize.
-
-**If file count is 100 or fewer:** Proceed with Greptile review cycle below.
-
-#### Step 11a: Greptile Review Cycle
-
-**Poll for review:**
-
-Wait for Greptile to post its review. Check every 30 seconds, up to 10 minutes:
+**Poll for review** every 30 seconds, up to 10 minutes:
 
 ```bash
 gh api repos/{owner}/{repo}/pulls/{pr_number}/reviews
@@ -241,81 +257,52 @@ gh api repos/{owner}/{repo}/pulls/{pr_number}/reviews
 
 Look for a review from Greptile (check the `user.login` field for greptile or greptileai).
 
-**If no Greptile review appears after 10 minutes:**
-Fall back to auto-merge (Step 11b). Show message: "Greptile review not detected - enabling auto-merge."
+**If no Greptile review appears after 10 minutes:** fall back to the local reviewer agent (Step 11a). Show message: "Greptile review not detected - using the local reviewer instead."
 
-**If Greptile review appears:**
-
-Read the review body to find the confidence score (Greptile provides a score like 3/5, 4/5, or 5/5).
-
-Also read all review comments:
+**If Greptile review appears:** read the confidence score (e.g. 3/5, 4/5, 5/5) and all review comments:
 
 ```bash
 gh api repos/{owner}/{repo}/pulls/{pr_number}/comments
 ```
 
-**If confidence score >= threshold (default 4/5):**
+**If confidence score >= threshold (default 4/5):** go to Step 12.
 
-```
-Greptile review: [score]/5
-No issues to fix. Merging...
-```
+**If confidence score < threshold:**
 
-Merge the PR:
+1. Read each Greptile comment and understand the issue
+2. Fix the code based on the feedback
+3. Run linter, tests, and build again
+4. Commit (`Fix: Address code review feedback`) and push
+5. Go back to the top of Step 11b and poll for a new review
+
+**Maximum review cycles:** 3 attempts. If still below threshold after 3 fix cycles, stop and show the remaining comments to the user instead of merging.
+
+### Step 12: Merge Into the Test Branch
 
 ```bash
 gh pr merge [pr_number] --squash --delete-branch
 ```
 
-Proceed to Step 12.
+If the repo requires status checks before merging, use `--auto` instead so it merges once they pass.
 
-**If confidence score < threshold:**
+If the PR target is `main` and the project has no test branch (the user accepted this when warned), this merge goes live. Say so in the summary.
 
-```
-Greptile review: [score]/5
-[X] issues found. Fixing...
-```
+### Step 13: Make Sure a Testable Version Exists
 
-1. Read each Greptile comment and understand the issue
-2. Fix the code based on the feedback
-3. Run linter again: `[runner] ultracite fix`
-4. Verify build passes (if applicable)
-5. Commit the fixes:
-   ```bash
-   git add .
-   git commit -m "$(cat <<'EOF'
-   Fix: Address code review feedback
+The point of merging is that the user can try the change. Confirm there is something to try.
 
-   - [Fix 1]
-   - [Fix 2]
+**Web:** the test branch auto-deploys (Railway staging environment, Cloudflare Workers preview URL). Find the staging URL in dev-context.md `## Deployment`, wait for the deploy, and confirm the URL loads. If it does not load within a few minutes, say so and show where to look (the platform's deploy logs).
 
-   Co-Authored-By: Claude <noreply@anthropic.com>
-   EOF
-   )"
-   ```
-6. Push: `git push origin [branch]`
-7. Go back to the top of Step 11a and poll for a new review
+**Mobile:** test builds are opt-in, because they take time, use build quota, and need store credentials. Check dev-context.md `## Deployment` for a `Mobile test builds:` line:
 
-**Maximum review cycles:** 3 attempts. If still below threshold after 3 fix cycles, merge anyway and show a warning:
+- **Not set:** ask once: "Should `/wrap-up` make a test build for your phone after merging (TestFlight internal testing on iOS, internal testing track on Android)?" Record the answer as `Mobile test builds: TestFlight internal` or `Mobile test builds: off`.
+- **Set to TestFlight internal:** ask "Start a test build now?" before every build. If yes, follow `platform/expo` (EAS Build, then EAS Submit to TestFlight / internal track).
+- **On any failure** (missing credentials, failed build, failed submit): stop and report the error and where to fix it. Never retry automatically; each retry spends build quota.
+- **If the change is JavaScript-only** and the project uses EAS Update, an update to the internal channel is a faster alternative. Offer it; do not choose it silently.
 
-```
-Merged after 3 fix cycles. Greptile score: [score]/5
-Some review comments may need manual attention.
-```
-
-#### Step 11b: No Code Review (auto-merge)
-
-If no Greptile is configured, enable auto-merge:
-
-```bash
-gh pr merge --auto --squash --delete-branch
-```
-
-### Step 12: Clean Up Local Branch
+### Step 14: Clean Up Local Branch
 
 **If on a feature branch:**
-
-Switch back to the PR target branch and delete the local feature branch:
 
 ```bash
 git checkout [pr-target]
@@ -325,50 +312,71 @@ git branch -d [feature-branch-name]
 
 **If on main/staging:** Skip this step.
 
-### Step 13: Confirm Everything
+### Step 15: Hand Over
 
-**With Greptile review:**
+End with what was done and what the user should try. The "Try this" list comes from the task's "You check on your device" items.
 
 ```
-Session wrapped up!
-
-Logged:
-- Changelog updated (YYYY-MM-DD)
-- Tasks updated: X completed, Y in progress
+Lap wrapped up and on staging!
 
 Code:
 - Linter: passed
 - Tests: X passed, 0 failed (or "no test suite")
 - Build: passed (or N/A)
-- Committed: [commit message summary]
-- Pushed to: [branch-name]
-- PR: #XX (URL)
-- Greptile review: [score]/5 - merged
-- Local branch cleaned up, now on staging
+- Claude tried it: 4/4 checks passed (or what was not verified)
+- Review: local reviewer - 2 findings fixed, 1 suggestion noted
+- PR: #XX merged into staging
 
-Next session: [suggested next task from tasks.md]
+Try this:
+- Staging: https://staging.yourapp.com (or: TestFlight build 35)
+- [ ] [Device check 1]
+- [ ] [Device check 2]
+
+When you've tried it, tell me what you saw. Each issue becomes the next small lap.
+When staging is ready for your users: /go-live
 ```
 
-**Without Greptile (auto-merge):**
+## Go Live
+
+Triggered by `/go-live`, "go live", "release", or "push staging to production". Moves everything on the test branch to production.
+
+### Step 1: Show What Will Go Live
+
+```bash
+git fetch origin
+git log --oneline origin/main..origin/[test-branch]
+```
+
+Summarize the laps in plain language (use the changelog), and flag any lap whose task is still waiting for the user's device check:
 
 ```
-Session wrapped up!
+Going live will release these changes to your users:
+1. Widget redesign - all sizes (you tried it on 21/10)
+2. Search filters (not tried yet on staging)
 
-Logged:
-- Changelog updated (YYYY-MM-DD)
-- Tasks updated: X completed, Y in progress
-
-Code:
-- Linter: passed
-- Tests: X passed, 0 failed (or "no test suite")
-- Build: passed (or N/A)
-- Committed: [commit message summary]
-- Pushed to: [branch-name]
-- PR: #XX (URL) - auto-merge enabled
-- Local branch cleaned up, now on staging
-
-Next session: [suggested next task from tasks.md]
+Go live now?
 ```
+
+### Step 2: Get Explicit Confirmation
+
+Never go live without a clear yes in this conversation. If any lap was not tried yet, recommend trying it first.
+
+### Step 3: Release
+
+**Web:**
+
+```bash
+gh pr create --base main --head [test-branch] --title "Release: [summary]" --body "[list of laps]"
+gh pr merge [pr_number] --merge
+```
+
+Use a merge commit (not squash) so `main` and the test branch keep the same history. Then wait for the production deploy and confirm the production URL loads.
+
+**Mobile:** hand off to `platform/app-store` for store assets and review readiness, and to `platform/expo` for submitting the tested build for store review. Confirm with the user before submitting.
+
+### Step 4: Log It
+
+Add a changelog entry `## [YYYY-MM-DD] - Release: [summary]` and mark the released tasks done.
 
 ## Error Handling
 
@@ -398,121 +406,78 @@ Changelog and tasks have been updated.
 
 Skip the commit/push/PR steps.
 
-**Auto-merge not available on the repo:**
-If `gh pr merge --auto` fails (auto-merge not enabled in repo settings), show a message:
+**Merge blocked (branch protection or conflicts):**
+Show the reason and the PR URL. Do not force-merge.
 
-```
-Auto-merge is not enabled for this repository.
-
-To enable it: GitHub repo Settings > General > Allow auto-merge
-
-For now, merge manually from the PR page:
-[PR URL]
-```
+**Staging does not load after merge:**
+Report it with the deploy log location. The lap is merged but not ready to try; say so rather than handing over a broken "Try this" list.
 
 **gh CLI not available:**
 Push the branch and provide the manual PR creation URL instead.
 
 ## Examples
 
-**Wrap-up with Greptile review (score passes):**
+**Wrap-up after a planned lap (local reviewer):**
 
 ```
 User: "/wrap-up"
 
-Claude: "Wrapping up your session...
-
-Logged:
-- Changelog updated (2026-02-11)
-- Tasks: 'Add contact search' marked complete
+Claude: "Wrapping up...
 
 Code:
 - Linter: passed (2 auto-fixes applied)
+- Tests: 14 passed, 0 failed
 - Build: passed
-- Committed: Feature: Add contact search with filters
-- Pushed to: feature/contact-search
-- PR: #47 created
+- Claude tried it: 6/6 checks passed (screenshots above)
+- PR: #47 into staging
+- Review: local reviewer found a missing null check in the search handler - fixed
+- Merged into staging, local branch cleaned up
 
-Waiting for Greptile review...
-Greptile review: 5/5 - no issues found
-PR #47 merged and branches cleaned up
-Now on: staging
+Try this:
+- Staging: https://staging.yourapp.com/contacts
+- [ ] Search feels instant while typing
+- [ ] Filter labels read naturally in German
 
-Next session: Add bulk actions to contact list"
+When you've tried it, tell me what you saw."
 ```
 
 ---
 
-**Wrap-up with Greptile review (needs fixes):**
+**Wrap-up with Greptile configured:**
 
 ```
 User: "/wrap-up"
 
-Claude: "Wrapping up your session...
+Claude: "Wrapping up...
 
-[... log, lint, build, commit, push, PR created ...]
+[... lint, tests, build, commit, push, PR #48 into staging ...]
 
 Waiting for Greptile review...
-Greptile review: 2/5 - 3 issues found
-
-Fixing:
-1. Missing null check in search handler
-2. Unused import in results component
-3. SQL injection risk in filter query
-
-Fixes applied, re-pushing...
-Waiting for re-review...
+Greptile review: 2/5 - 3 issues found. Fixing...
 Greptile review: 5/5 - all issues resolved
 
-PR #47 merged and branches cleaned up
-Now on: staging
-
-Next session: Add bulk actions to contact list"
+Merged into staging. Try this:
+- Staging: https://staging.yourapp.com
+- [ ] ..."
 ```
 
 ---
 
-**Wrap-up without Greptile (auto-merge):**
+**Go live:**
 
 ```
-User: "/wrap-up"
+User: "/go-live"
 
-Claude: "Wrapping up your session...
+Claude: "Going live will release these changes to your users:
+1. Contact search with filters (you tried it on staging)
+2. Sidebar collapse fix (you tried it on staging)
 
-Logged:
-- Changelog updated (2026-02-11)
-- Tasks: 'Add contact search' marked complete
+Go live now?"
 
-Code:
-- Linter: passed
-- Build: passed
-- Committed: Feature: Add contact search with filters
-- Pushed to: feature/contact-search
-- PR: #47 - auto-merge enabled
-- Switched to staging, local branch deleted
+User: "Yes"
 
-Next session: Add bulk actions to contact list"
-```
-
----
-
-**Wrap-up from staging branch (no PR):**
-
-```
-User: "wrap up"
-
-Claude: "Wrapping up your session...
-
-Logged:
-- Changelog updated (2026-02-11)
-- Tasks: 'Fix sidebar collapse bug' marked complete
-
-Code:
-- Linter: passed
-- Committed: Fix: Sidebar collapse state persistence
-- Pushed to: staging
-
-Next session: Implement deal pipeline view"
+Claude: "Release PR #49 merged into main. Production deploy finished and
+https://yourapp.com loads. Changelog updated, both tasks marked done."
 ```
 
 ---
@@ -532,3 +497,10 @@ No code changes to commit.
 
 Next session: Start building the Products module"
 ```
+
+## How to Verify
+
+- The PR targets the test branch, never a branch that does not exist on the remote
+- The review step ran (local agent or Greptile) and its findings were vetted, not applied blindly
+- The summary ends with a "Try this" list and a working staging URL or build number
+- Nothing reached `main` without `/go-live` and an explicit yes (unless the project has no test branch and the user accepted that)

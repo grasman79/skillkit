@@ -88,10 +88,11 @@ Reusable across projects: `skills/`, `templates/`, `commands/`
 - Use plan mode for verification steps, not just building
 
 ### Verify Before Done
-- Never mark a task complete without proving it works
-- Run tests, check the dev server, review logs - demonstrate correctness
+- Every plan defines "done" up front in three columns: automated tests, Claude checks in the running app, and what the user checks on their device
+- Never mark a task complete without proving it works: tests green, then try the change in the running app (browser or simulator) and show screenshots
+- Never claim a check you could not run - say exactly what was not verified and why
+- Claude's checks do not replace the user's: a lap is only done after the user has tried it on staging or a test build
 - Ask yourself: "Would a senior developer approve this?"
-- Diff behavior between main and your changes when relevant
 
 ### Learn From Corrections
 - After ANY correction from the user, capture the lesson in auto-memory
@@ -104,25 +105,33 @@ Reusable across projects: `skills/`, `templates/`, `commands/`
 - Zero context switching required from the user
 - Go fix failing CI tests without being told how
 
-## Automated Git Workflow
+## The Build-Test-Try Loop
 
-**Use these skills to automate your feature branch workflow:**
+Work happens in small laps. The user stays above the loop - deciding what to improve, defining what "done" means, and trying the result. Claude does the work inside it, and checks its own work before handing it over.
 
-### The Complete Workflow
+### One Lap
 
-1. **`/branch`** - Auto-create feature branch from current task
-2. **[Work on code]** - Make your changes
-3. **`/wrap-up`** - Log, lint, commit, push, create PR, handle code review, merge, clean up. Done.
+1. **Plan** (`workflow/feature-planner`, say "plan ...") - One improvement. Intent, references (screenshots, examples, official docs), the few product questions that matter, a design spec, the Must Keep Working rules it touches, and a three-column Definition of Done. Run `workflow/plan-review`, then get approval.
+2. **Build** - Write failing tests first, then build until green.
+3. **Claude tries it** - Use the running app (browser or simulator), screenshot every "Claude checks" item, fix until they pass. Report anything that could not be checked.
+4. **`/wrap-up`** - Lint, test, build, PR into staging, fresh local reviewer agent, merge into staging, confirm the test version exists, hand over a "Try this" list.
+5. **The user tries it** on staging or a test build and says what they saw. Each finding becomes a small next-lap task (`workflow/task-tracker`, "After You Tried It").
+6. **`/go-live`** - When staging is ready for real users: list what will go live, get a yes, release to production.
 
-### When to Use Each Command
+### Commands
 
 | Command | When to use | What it does |
 |---------|-------------|--------------|
-| `/branch` | Starting a new task | Creates feature/task-name branch from tasks.md |
-| `/wrap-up` | Done working | Logs session, lints, builds, commits, pushes, creates PR, waits for Greptile review (if configured) and auto-fixes issues, merges, cleans up branch |
+| `/branch` | Starting a task from tasks.md | Creates a feature branch from the test branch (staging) |
+| `/wrap-up` | A lap is built and checked | Logs, lints, tests, builds, PR into staging, local review (or Greptile), merges into staging, hands over a "Try this" list |
+| `/go-live` | Staging is ready for users | Shows what will go live, asks, releases staging to production |
 | `/log` | Mid-session progress save | Updates changelog.md and tasks.md (no push) |
 
-**Important:** Never push directly to staging/main. Always use feature branches with PRs.
+### Branches
+
+`feature/*` -> `staging` (test environment) -> `main` (production). The test branch comes from `## Deployment` in `project/dev-context.md`; `workflow/create-branch` resolves it when missing.
+
+**Important:** Never push directly to staging/main. Always use feature branches with PRs. Nothing reaches `main` without `/go-live` and an explicit yes.
 
 ## Skills
 
@@ -131,9 +140,11 @@ Reusable across projects: `skills/`, `templates/`, `commands/`
 | When the task involves... | Use this skill |
 |---------------------------|----------------|
 | Creating a feature branch | `workflow/create-branch` |
-| End of session (log + commit + push + merge) | `workflow/wrap-up` |
+| End of a lap (log + test + PR + review + merge to staging + "Try this") | `workflow/wrap-up` |
+| Going live, release staging to production (`/go-live`) | `workflow/wrap-up` (Go Live) |
 | Saving session progress (no push) | `workflow/session-log` |
 | Task tracking, what's next | `workflow/task-tracker` |
+| User tried a change on staging / test build and reports what they saw | `workflow/task-tracker` (After You Tried It) |
 | Database, schema, migrations, queries | `database/prisma`, `database/drizzle`, or `database/supabase` |
 | PostgreSQL naming conventions, table/column names, schema standards | `database/postgres-naming` |
 | User login, signup, sessions, OAuth | `auth/better-auth` |
@@ -175,7 +186,7 @@ Reusable across projects: `skills/`, `templates/`, `commands/`
 | Cloudflare Dynamic Workers, spawn worker at runtime, user code execution, sandboxed worker, LOADER binding, env.LOADER, multi-tenant workers, per-tenant worker, AI code mode, dynamic code execution | `cloudflare/dynamic-workers` |
 | Cloudflare Flagship, feature flags, feature toggles, flag evaluation, gradual rollout, targeting rules, percentage rollout | `cloudflare/flagship` |
 | Project setup, new projects | `workflow/project-setup` |
-| Feature planning, "plan feature" | `workflow/feature-planner` |
+| Feature planning, "plan feature", "plan [change]", improving something, next lap | `workflow/feature-planner` |
 | Server issues, port conflicts | `workflow/dev-server` |
 | Creating new skills | `workflow/skill-creator` |
 | Code review, quality checks | `workflow/code-reviewer` |

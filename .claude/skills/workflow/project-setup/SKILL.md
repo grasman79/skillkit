@@ -143,7 +143,12 @@ Do NOT add:
 
 ## Code Review
 
-[Will be populated during setup if Greptile is selected - see questionnaire Q8]
+[Populated during setup - Provider: Local (default), Greptile, or None - see questionnaire Q8]
+
+## Must Keep Working
+
+[Standing rules every change must respect, e.g. translations, accessibility, dark mode.
+Filled in the first time workflow/feature-planner runs - see templates/dev-context-template.md]
 ```
 
 **Process:**

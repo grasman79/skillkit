@@ -4,6 +4,16 @@ This file captures context for features in progress, so the next session can pic
 
 ---
 
+## Must Keep Working
+
+Standing rules every change must respect. Each plan lists the ones it could affect, and Claude checks them in the running app before handing a lap over.
+
+- [Example: All user-facing text is translated into every supported language]
+- [Example: Every screen works with a screen reader and keyboard]
+- [Example: Every screen works in light and dark mode, at phone and desktop width]
+
+---
+
 ## [Feature Name] - Last updated: [Date]
 
 ### State

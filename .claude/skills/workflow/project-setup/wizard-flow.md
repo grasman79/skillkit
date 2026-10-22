@@ -259,7 +259,7 @@ Ask these questions one at a time:
 2. **Database** - What database for content? (PostgreSQL [recommended] / SQLite-D1 / MongoDB)
 3. **Frontend deployment** - Where to deploy the Astro website? (Cloudflare Workers [recommended] / Netlify / Vercel)
 4. **Project description** - What is this website about? (free text)
-5. **Code review** - Set up Greptile? (Yes / No)
+5. **Code review** - Local reviewer (recommended), Greptile, or none?
 
 ### Step 2: Present Summary
 
