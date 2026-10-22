@@ -2,10 +2,10 @@
 
 > A skills system for Claude Code that teaches it exactly how to build your app, so you never have to explain the same thing twice.
 
-**Version:** 1.8.0
+**Version:** 1.9.0
 **Author:** Manu
 **License:** MIT
-**Date:** 21/08/2026
+**Date:** 22/10/2026
 
 ---
 
@@ -74,9 +74,10 @@ Skills are knowledge files that Claude reads when relevant. You don't invoke the
 | "Create a database schema" | `prisma` or `drizzle` | Follows your ORM's patterns correctly |
 | "Add payment processing" | `stripe` | Implements checkout, webhooks, subscriptions |
 | "Add AI chat to my app" | `vercel-ai-sdk` | Sets up streaming, models, UI components |
-| "Plan feature: user settings" | `feature-planner` | Creates detailed plan with ASCII mockups |
+| "Plan: make the widget look good at every size" | `feature-planner` | Plans one improvement with a three-column Definition of Done, builds it, and tries it in the running app |
 | "Save my progress" | `session-log` | Updates changelog, tasks, dev context |
 | "What should I work on?" | `task-tracker` | Shows status, suggests next task |
+| "I tried it on my phone - the image looks off" | `task-tracker` | Turns what you saw into the next small lap |
 
 **How trigger words work:** Each skill has specific words or phrases that activate it. For example, the `stripe` skill triggers on words like "payment", "checkout", "subscription", "billing". The `debugger` skill triggers on "error", "bug", "not working", "broken". You don't need to memorize these - just describe what you want naturally.
 
@@ -145,23 +146,39 @@ Describe what you want in plain language:
 
 Claude uses the right skills automatically - Prisma patterns for database work, Shadcn patterns for UI, etc.
 
-### Planning Features
+### The Build-Test-Try Loop
 
-Say "plan feature: [name]" to get a comprehensive implementation plan:
+You build in small laps. You decide what to improve, define what "done" means, and try the result. Claude does the work in between and checks its own work before handing it to you.
 
 ```
-"Plan feature: user settings page"
+plan -> approve -> build -> Claude tries it -> /wrap-up -> you try it -> next lap ... -> /go-live
 ```
 
-Claude will:
-1. Create a git branch automatically
-2. Generate a detailed plan with ASCII UI mockups
-3. List all required components (asks before installing)
-4. Show database changes, API endpoints, and the acceptance checks in plain language
-5. Wait for your approval before implementing
-6. Write the checkable items as failing tests, then build until they pass
+**1. Plan one improvement.** Say "plan [what you want to improve]":
 
-Step 4 is where you catch a misunderstanding for free. The acceptance checks are written as sentences you can read without knowing code ("a logged-out visitor cannot see another user's data"), so if one of them is wrong, you say so before anything has been built on top of it.
+```
+"Plan: the home widget looks cropped and only supports two sizes. Make it look good at every size."
+```
+
+Claude asks what good looks like, asks for screenshots, examples you like, or official docs links when they would help, and asks the few product questions that change the outcome. The plan includes a **Definition of Done** in three columns:
+
+| Column | Who checks | Example |
+|--------|------------|---------|
+| Automated tests | The test suite, forever | "A logged-out visitor cannot see another user's data" |
+| Claude checks in the running app | Claude, with screenshots | "The widget renders at every size, in every language" |
+| You check on your device | You | "It feels right on my phone" |
+
+Reading the Definition of Done is where you catch a misunderstanding for free, before anything is built on top of it.
+
+**2. Claude builds and tries it.** Failing tests first, then code until they pass. Then Claude opens the real app (browser or simulator), screenshots every check, and fixes what is off. If it cannot check something, it tells you exactly what was not verified.
+
+**3. `/wrap-up`.** Lint, tests, build, a pull request into `staging`, a fresh reviewer agent checks the change, merge into staging. It ends with a short "Try this" list and your staging link (or test build number for mobile).
+
+**4. You try it.** On staging or your phone. Tell Claude what you saw in plain words. Each issue becomes the next small lap.
+
+**5. `/go-live`.** When staging is ready for your users, Claude shows what will go live, asks for a yes, and releases it to production.
+
+**Must Keep Working.** `dev-context.md` holds a short list of rules every change must respect (translations, accessibility, dark mode...). Every plan checks against it, so you don't have to repeat yourself.
 
 ### Ending Your Session
 
@@ -180,9 +197,9 @@ Next session, Claude picks up exactly where you left off.
 | Skill | What It Does |
 |-------|--------------|
 | `project-setup` | Initialize new projects with recommended stack (TanStack Start, Supabase, Drizzle) |
-| `feature-planner` | Create detailed implementation plans with ASCII mockups, agree the acceptance checks up front, then write them as failing tests before any implementation code |
+| `feature-planner` | Plan one improvement per lap (intent, references, design spec, Must Keep Working, three-column Definition of Done), write failing tests first, build until green, then try it in the running app with screenshots |
 | `session-log` | Save progress at session end |
-| `task-tracker` | Track tasks and progress |
+| `task-tracker` | Track tasks and progress; turns what you saw on a test build into next-lap tasks |
 | `dev-server` | Manage dev servers, kill ports |
 | `skill-creator` | Create new skills from successful patterns |
 | `code-reviewer` | Review code for quality, security, maintainability |
@@ -350,8 +367,9 @@ Most skills in SkillKit are original work. A few are third-party skills, include
 | `ui-ux` (web typography) | Butterick's Practical Typography | [practicaltypography.com](https://practicaltypography.com) | - |
 | `ui-ux` (web motion) | Supafast | [withsupafast.com](https://withsupafast.com) | - |
 | `design/emil-kowalski/*` | Emil Kowalski | [github.com/emilkowalski/skills](https://github.com/emilkowalski/skills) | MIT |
+| Build-test-try loop (`feature-planner`, `wrap-up`, `task-tracker`) | Beto Moedano (Code with Beto), adapting Anthropic's AI-native SDLC playbook for solo builders | [codewithbeto.dev](https://codewithbeto.dev) | - |
 
-The `ui-ux` sources are educational material (courses, talks, articles) whose rules and frameworks were adapted into skill form with attribution; they are not code libraries with a software license. If you are one of these creators and want the attribution changed or the content removed, open an issue.
+The `ui-ux` and build-test-try loop sources are educational material (courses, talks, articles) whose rules and frameworks were adapted into skill form with attribution; they are not code libraries with a software license. If you are one of these creators and want the attribution changed or the content removed, open an issue.
 
 ---
 
@@ -377,8 +395,8 @@ Claude packages the approach into a reusable skill. Next time you need the same 
    - "Add a dark mode toggle"
    - Not "Create a useState hook with..."
 
-2. **One feature per session works best**
-   - "Build the user profile page"
+2. **One improvement per lap works best**
+   - "Make the profile page load faster"
    - Not "Build the entire app"
 
 3. **Point out inconsistencies**
@@ -413,7 +431,7 @@ Say "create a skill from what we just did" after accomplishing something you wan
 Say "save my progress" at session end. Claude saves context to `dev-context.md` so you pick up exactly where you left off.
 
 **How does code review work?**
-The `code-reviewer` skill guides Claude to review code for quality, security, and maintainability.
+During `/wrap-up`, a fresh reviewer agent (one that hasn't seen your conversation) reviews every pull request on your machine, using the `code-reviewer` checklist. Claude checks its findings, fixes the real ones, and only then merges to staging. Greptile can be used instead if you prefer a cloud reviewer.
 
 **How do I share skills with other projects?**
 Copy `skills/`, `templates/`, and `commands/` folders. The `project/` folder stays unique to each codebase.
@@ -437,6 +455,16 @@ The `project-setup` skill automatically recommends this stack and detects your p
 ---
 
 ## Changelog
+
+### v1.9.0 (22/10/2026)
+- **The build-test-try loop** - SkillKit's workflow is now a small repeating loop for solo builders instead of a straight line that auto-merged on green tests: plan one improvement, Claude builds it and tries it in the running app, `/wrap-up` merges it into staging, you try it on a device, what you notice becomes the next lap, and `/go-live` releases staging to production. Adapted from Beto Moedano's solo-builder version of Anthropic's AI-native SDLC playbook, see [Credits](#credits).
+- **`feature-planner` reworked** - One improvement per lap. Starts from the intent, optional references (screenshots, examples, official docs), and the product questions that change the outcome. Leaner plan with a Design spec and a three-column Definition of Done: automated tests / Claude checks in the running app / you check on your device. New step: Claude tries the change in the running app (browser, Expo MCP simulator tools, or simulator screenshots), screenshots every check, retries up to 3 times, and never claims a check it could not run. Creates its own branch from the test branch instead of bouncing to `/branch`.
+- **`wrap-up` merges to staging, never to production** - Runs a fresh local reviewer agent on every PR by default (Greptile still supported, never both), merges into the test branch, confirms the staging URL loads (or offers an opt-in TestFlight / internal-track test build for mobile, asking before every build), and ends with a "Try this" list. A failing review now stops the merge instead of merging anyway after 3 cycles.
+- **New `/go-live` command** - Lists what is on staging and not yet live, flags anything you have not tried, asks for a yes, then releases staging to main (web) or hands off to app store submission (mobile).
+- **`task-tracker` "After You Tried It"** - Say what you saw on a test build in plain words; each finding becomes a small next-lap task linked to the tried one.
+- **Must Keep Working** - New `dev-context.md` section for standing rules every change must respect (translations, accessibility, dark mode). Every plan checks against it; `feature-planner` asks once to fill it in.
+- **Fix: no more hardcoded `dev` branch** - `wrap-up` and `create-branch` targeted a `dev` branch no setup creates. Both now resolve the test branch from `## Deployment` in dev-context, else `staging`, else ask if only `dev` exists, else `main` with a one-time warning.
+- **Behaviour changes when updating** - Projects without a `## Code Review` section now get the local reviewer instead of a plain auto-merge. Feature branches made from `dev` before this update: finish and merge them first, or retarget their PR to your test branch. Setup questionnaires now recommend the local reviewer; Greptile is an optional alternative.
 
 ### v1.8.0 (21/08/2026)
 - **New `design/emil-kowalski/*` skill family** - Eleven skills for animation and UI polish decisions, vendored unmodified from [Emil Kowalski's skills repo](https://github.com/emilkowalski/skills) (creator of Sonner/Vaul, design engineering background at Vercel and Linear): `emil-design-eng` (overall philosophy), `animate`/`animate-expo` (web/React Native animation implementation), `review-animations`/`improve-animations` (diff-level critique / codebase-wide audit), `find-animation-opportunities`, `animation-vocabulary`, `apple-design`, `ask-sonner`, plus manual-invoke-only `pick-ui-library` and `prototype`. **Third-party**, MIT licensed, see [Credits](#credits).

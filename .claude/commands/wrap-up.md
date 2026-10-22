@@ -1,8 +1,8 @@
 ---
-description: End-of-session - log, lint, commit, push, create PR, merge, clean up
+description: End a lap - log, lint, test, commit, push, PR, review, merge to staging, hand over a "Try this" list
 ---
 
-Follow the wrap-up workflow to close out your work session.
+Follow the wrap-up workflow to close out this lap.
 
 ## Instructions
 
@@ -10,12 +10,11 @@ Follow the wrap-up workflow to close out your work session.
 
 2. Steps performed:
    - Log session progress (changelog + tasks)
-   - Run linter and fix issues
-   - Verify build passes
-   - Commit all changes
-   - Push to remote
-   - Create PR (feature branches)
-   - Handle code review cycle (if Greptile configured)
-   - Merge and clean up branches
+   - Run linter, tests, and build
+   - Confirm the lap was tried in the running app
+   - Commit, push, and create a PR into the test branch (staging)
+   - Code review: local reviewer agent (or Greptile if configured)
+   - Merge into the test branch and confirm a testable version exists
+   - Clean up branches
 
-3. Report final status to user
+3. Hand the user a "Try this" list. Never go live from here - that is `/go-live`

@@ -13,6 +13,7 @@ Reviews code for quality, security, and maintainability issues.
 - Before making a commit
 - User asks to "review this code" or "check my code"
 - After completing a feature
+- As the checklist for the local reviewer agent in `workflow/wrap-up` (Step 11a). That reviewer also checks the diff against the plan's Definition of Done and the project's `## Must Keep Working` rules
 
 ## Instructions
 

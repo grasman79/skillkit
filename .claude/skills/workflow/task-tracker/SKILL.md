@@ -14,6 +14,7 @@ Keeps track of what you're building - what's done, what you're working on, what'
 - User says a task is done or finished
 - User asks about blocked tasks or dependencies
 - User wants to see their task list
+- User reports what they saw after trying a change on staging or a test build ("I tried it", "on my phone", "feedback on the last change")
 
 ## Instructions
 
@@ -95,6 +96,47 @@ Suggested next: Dashboard Layout
 
 Start working on Dashboard Layout?
 ```
+
+### After You Tried It
+
+**Triggers:** "I tried it", "tried it on my phone", "on staging", "here's what I saw", "feedback", or a screenshot from a test build
+
+This closes the loop: what the user notices on a real device becomes the next small lap. It does not write code. The next lap goes through `workflow/feature-planner`.
+
+1. Find the task with a "Try this" note that the user is talking about (the most recent one if unclear)
+2. Split what the user said into separate findings. Ask for a screenshot only if a finding cannot be understood without one
+3. For each finding, add a small task to `project/tasks.md`, linked back to the tried task:
+   ```markdown
+   ## Task N: [Short finding]
+   **Status:** pending
+   **Priority:** [High if it blocks going live, else Medium]
+   **Tags:** #lap [relevant tags]
+   **From:** Task M ([tried task name]), tried on [date]
+
+   ### What was seen
+   [The user's words]
+   ```
+4. Update the tried task:
+   - User is happy with it -> mark it complete
+   - Findings must be fixed before users see it -> keep it In Progress and note "blocks go-live"
+5. If a finding is really a standing rule ("translations are broken again"), offer to add it to `## Must Keep Working` in dev-context.md
+6. Recommend the next lap:
+
+```
+GOT IT
+
+Tried: Widget redesign
+- Works: sizes switch correctly, queue shows up
+- Found: image aspect ratio looks off for portrait articles
+
+Added:
+- Task 12: Fix portrait image aspect ratio in widget (High - blocks go-live)
+
+Widget redesign stays In Progress until that's fixed.
+Next lap: plan the aspect ratio fix?
+```
+
+If the user is happy with everything on staging, suggest `/go-live`.
 
 ### Show Blocked Tasks
 

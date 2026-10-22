@@ -11,7 +11,7 @@ Automatically creates a feature branch based on your current task in `tasks.md`.
 
 - User says "branch", "create branch", or "start task"
 - Beginning work on a new task
-- Need to switch from main/dev to a feature branch
+- Need to switch from main/staging to a feature branch
 
 ## Workflow
 
@@ -21,7 +21,7 @@ Automatically creates a feature branch based on your current task in `tasks.md`.
 git branch --show-current
 ```
 
-If already on a feature branch (not main/dev/master), ask if they want to:
+If already on a feature branch (not main/staging/master), ask if they want to:
 - Stay on current branch
 - Create a new branch anyway
 - Switch to a different existing branch
@@ -87,19 +87,38 @@ What would you like to do?
 3. Create branch anyway (changes come with you)
 ```
 
-### Step 6: Create and Switch to Branch
+### Step 6: Resolve the Base Branch
+
+Feature branches start from the **test branch** - the branch that deploys to the test environment. Resolve it in this order:
+
+1. `project/dev-context.md` has `## Deployment` with `PR target for feature branches: [branch]` -> use that branch
+2. Otherwise, `staging` exists on the remote (`git ls-remote --heads origin staging`) -> use `staging`
+3. Otherwise, `dev` exists on the remote -> ask: "Is `dev` your test branch, where changes go before they go live?" Record the answer as `PR target for feature branches: [branch]` under `## Deployment` in dev-context.md so it is never asked again
+4. Otherwise -> use `main`, and warn once:
+   ```
+   This project has no test branch, so merged changes go live directly.
+   I recommend a `staging` branch that deploys to a test URL, so you can try
+   changes before your users see them. Set it up now, or continue with main?
+   ```
+   Record the answer under `## Deployment` in dev-context.md.
+
+`/wrap-up` uses the same rule for the PR target, so a branch always merges back where it started.
+
+### Step 7: Create and Switch to Branch
 
 ```bash
+git checkout [base-branch]
+git pull origin [base-branch]
 git checkout -b feature/branch-name
 ```
 
-### Step 7: Confirm Creation
+### Step 8: Confirm Creation
 
 ```
 Branch created and checked out!
 
 Branch: feature/user-authentication
-Based on: dev (or main)
+Based on: staging
 Task: Add user authentication
 
 Ready to start working. When done, use /wrap-up to ship everything.
@@ -129,7 +148,7 @@ User: "Yes"
 Claude: "Branch created and checked out!
 
 Branch: feature/stripe-payment-integration
-Based on: dev
+Based on: staging
 Task: Add Stripe payment integration
 
 Ready to start working. When done, use /wrap-up to ship everything."
@@ -147,7 +166,7 @@ Claude: "You're currently on: feature/auth-system
 This is already a feature branch. Would you like to:
 1. Stay on this branch and continue working
 2. Create a new branch for a different task
-3. Switch to main/dev"
+3. Switch to staging"
 
 User: "Create new"
 
@@ -181,7 +200,7 @@ User: "user-settings"
 Claude: "Creating branch with your name...
 
 Branch: feature/user-settings
-Based on: dev
+Based on: staging
 
 Branch created!
 
@@ -200,7 +219,7 @@ Claude: "Creating branch: fix/hotfix-production-error
 Branch created and checked out!
 
 Branch: fix/hotfix-production-error
-Based on: dev
+Based on: staging
 
 Ready to work on the hotfix."
 ```
