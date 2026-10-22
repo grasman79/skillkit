@@ -12,7 +12,7 @@ Installs and wires up a test runner so acceptance checks have somewhere to live.
 - Project has no test runner and a feature needs acceptance checks
 - User says "set up tests", "add a test runner", "we have no tests"
 - User wants browser-level end-to-end tests
-- `feature-planner` reaches Step 3 and finds no place to put checks
+- `feature-planner` reaches Step 4 and finds no place to put checks
 
 ## Before Installing Anything
 

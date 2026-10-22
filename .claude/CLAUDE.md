@@ -122,7 +122,7 @@ Reusable across projects: `skills/`, `templates/`, `commands/`
 | `/wrap-up` | Done working | Logs session, lints, builds, commits, pushes, creates PR, waits for Greptile review (if configured) and auto-fixes issues, merges, cleans up branch |
 | `/log` | Mid-session progress save | Updates changelog.md and tasks.md (no push) |
 
-**Important:** Never push directly to dev/main. Always use feature branches with PRs.
+**Important:** Never push directly to staging/main. Always use feature branches with PRs.
 
 ## Skills
 

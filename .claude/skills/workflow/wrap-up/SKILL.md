@@ -137,7 +137,7 @@ Options:
 
 **If option 1:** Stash changes, create new branch from main, pop stash, and continue the workflow on the new branch.
 
-**If on main/dev:** Skip this check.
+**If on main/staging:** Skip this check.
 
 ### Step 8: Stage and Commit
 
@@ -176,12 +176,14 @@ git push -u origin [current-branch]
 
 ### Step 10: Create PR (feature branches only)
 
-**If on a feature branch** (not main/dev/master):
+**If on a feature branch** (not main/staging/master):
+
+Resolve the PR target with the same rule `workflow/create-branch` uses (Step 6): `## Deployment` -> `PR target for feature branches` in dev-context.md, else `staging` if it exists on the remote, else ask if only `dev` exists, else `main` with a one-time warning that merges go live directly. Never default to a branch that does not exist on the remote.
 
 Create the PR:
 
 ```bash
-gh pr create --base dev --title "[Type]: Brief description" --body "$(cat <<'EOF'
+gh pr create --base [pr-target] --title "[Type]: Brief description" --body "$(cat <<'EOF'
 ## Summary
 [What changed and why]
 
@@ -196,7 +198,7 @@ EOF
 
 Note the PR number from the output.
 
-**If on main/dev:** Skip PR creation, just push directly. Skip to Step 12.
+**If on main/staging:** Skip PR creation, just push directly. Skip to Step 12.
 
 ### Step 11: Code Review Cycle (optional - Greptile users only)
 
@@ -313,15 +315,15 @@ gh pr merge --auto --squash --delete-branch
 
 **If on a feature branch:**
 
-Switch back to dev and delete the local feature branch:
+Switch back to the PR target branch and delete the local feature branch:
 
 ```bash
-git checkout dev
-git pull origin dev
+git checkout [pr-target]
+git pull origin [pr-target]
 git branch -d [feature-branch-name]
 ```
 
-**If on main/dev:** Skip this step.
+**If on main/staging:** Skip this step.
 
 ### Step 13: Confirm Everything
 
@@ -342,7 +344,7 @@ Code:
 - Pushed to: [branch-name]
 - PR: #XX (URL)
 - Greptile review: [score]/5 - merged
-- Local branch cleaned up, now on dev
+- Local branch cleaned up, now on staging
 
 Next session: [suggested next task from tasks.md]
 ```
@@ -363,7 +365,7 @@ Code:
 - Committed: [commit message summary]
 - Pushed to: [branch-name]
 - PR: #XX (URL) - auto-merge enabled
-- Local branch cleaned up, now on dev
+- Local branch cleaned up, now on staging
 
 Next session: [suggested next task from tasks.md]
 ```
@@ -434,7 +436,7 @@ Code:
 Waiting for Greptile review...
 Greptile review: 5/5 - no issues found
 PR #47 merged and branches cleaned up
-Now on: dev
+Now on: staging
 
 Next session: Add bulk actions to contact list"
 ```
@@ -463,7 +465,7 @@ Waiting for re-review...
 Greptile review: 5/5 - all issues resolved
 
 PR #47 merged and branches cleaned up
-Now on: dev
+Now on: staging
 
 Next session: Add bulk actions to contact list"
 ```
@@ -487,14 +489,14 @@ Code:
 - Committed: Feature: Add contact search with filters
 - Pushed to: feature/contact-search
 - PR: #47 - auto-merge enabled
-- Switched to dev, local branch deleted
+- Switched to staging, local branch deleted
 
 Next session: Add bulk actions to contact list"
 ```
 
 ---
 
-**Wrap-up from dev branch (no PR):**
+**Wrap-up from staging branch (no PR):**
 
 ```
 User: "wrap up"
@@ -508,7 +510,7 @@ Logged:
 Code:
 - Linter: passed
 - Committed: Fix: Sidebar collapse state persistence
-- Pushed to: dev
+- Pushed to: staging
 
 Next session: Implement deal pipeline view"
 ```
